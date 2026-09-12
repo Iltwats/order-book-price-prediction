@@ -1,0 +1,13 @@
+{
+  "model": "../baseline/baseline.onnx",
+  "backend": "onnx",
+  "onnx_mode": "iobinding",
+  "strict_inputs": true,
+  "affinity": false,
+  "postprocess": {
+    "scales": [
+      0.5,
+      0.5
+    ]
+  }
+}

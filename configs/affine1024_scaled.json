@@ -1,0 +1,13 @@
+{
+  "model": "../artifacts/training_pilot1024/affine_p1e-2/model.onnx",
+  "backend": "onnx",
+  "onnx_mode": "iobinding",
+  "strict_inputs": true,
+  "affinity": false,
+  "postprocess": {
+    "scales": [
+      1.25,
+      1.25
+    ]
+  }
+}

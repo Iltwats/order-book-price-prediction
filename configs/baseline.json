@@ -1,0 +1,8 @@
+{
+  "model": "../baseline/baseline.onnx",
+  "backend": "onnx",
+  "onnx_mode": "run",
+  "strict_inputs": true,
+  "affinity": false,
+  "postprocess": {}
+}

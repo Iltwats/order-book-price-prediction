@@ -1,0 +1,8 @@
+# The inference image contains dependencies only. Code/data are mounted at run
+# time, so the 35+ GB dataset, virtual environments and artifacts never enter
+# the Docker build context.
+**
+!requirements.txt
+!scripts/
+!scripts/Dockerfile
+!.dockerignore

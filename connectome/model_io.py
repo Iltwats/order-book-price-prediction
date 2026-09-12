@@ -214,7 +214,7 @@ def simplify_model(source, destination):
         helper.make_node("MatMul", ["next_hidden_1", "head_w"], ["head_product"], name="readout_matmul"),
         helper.make_node("Add", ["head_product", "head_b"], ["prediction"], name="readout_add"),
     ]
-    graph = helper.make_graph(nodes, "connectome_fixed_step", 
+    graph = helper.make_graph(nodes, "connectome_fixed_step",
                               [helper.make_tensor_value_info(name, TensorProto.FLOAT, shape) for name, shape in INPUT_SHAPES.items()],
                               [helper.make_tensor_value_info(name, TensorProto.FLOAT, shape) for name, shape in OUTPUT_SHAPES.items()],
                               initializers)
