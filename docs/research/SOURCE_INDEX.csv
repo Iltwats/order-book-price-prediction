@@ -1,0 +1,110 @@
+url,source_labels,cited_in
+https://aclanthology.org/2023.findings-emnlp.936/,RWKV paper,07_streaming_architectures.md
+https://arxiv.org/abs/1503.02531,Original distillation paper,09_distillation_ensembles.md
+https://arxiv.org/abs/1506.02629,Dwork and colleagues,10_validation_red_team.md
+https://arxiv.org/abs/1712.00975,TABL,04_lob_architectures.md
+https://arxiv.org/abs/1803.05407,SWA paper,09_distillation_ensembles.md
+https://arxiv.org/abs/1808.03668,Paper,04_lob_architectures.md
+https://arxiv.org/abs/2003.00598,BiN | BiN paper,04_lob_architectures.md | 08_causal_features.md
+https://arxiv.org/abs/2106.14112,TS-TCC paper,08_causal_features.md
+https://arxiv.org/abs/2107.06995,low-rank TABL,04_lob_architectures.md
+https://arxiv.org/abs/2403.09267,LOBFrame paper,04_lob_architectures.md
+https://arxiv.org/html/2112.13213,cross-impact study,08_causal_features.md
+https://arxiv.org/html/2402.02592v1,original LOTSA paper,03_foundation_hf.md
+https://arxiv.org/html/2402.03885v3,paper,03_foundation_hf.md
+https://arxiv.org/html/2402.06104v6,paper derivation,05_metric_head.md
+https://arxiv.org/html/2403.07815v2,paper,03_foundation_hf.md
+https://arxiv.org/html/2405.18938,HLOB paper,04_lob_architectures.md
+https://arxiv.org/html/2410.01201v2,minRNN paper,07_streaming_architectures.md
+https://arxiv.org/html/2511.19272v1,Tiny-TSM paper,02_small_hf.md
+https://arxiv.org/html/2606.10798v2,CITRAS paper,02_small_hf.md
+https://docs.pytorch.org/docs/2.5/generated/torch.nn.GRU.html,PyTorch GRU,06_gru_finetuning.md
+https://docs.pytorch.org/docs/2.5/generated/torch.optim.AdamW.html,AdamW,06_gru_finetuning.md
+https://docs.pytorch.org/docs/2.5/notes/gradcheck.html,double-precision gradcheck,06_gru_finetuning.md
+https://docs.pytorch.org/docs/2.5/notes/numerical_accuracy.html,PyTorch's numerical-accuracy documentation,06_gru_finetuning.md
+https://doi.org/10.1214/ss/1063994977,Politis's review,10_validation_red_team.md
+https://github.com/BorealisAI/minRNNs/blob/main/LICENSE,Official license,07_streaming_architectures.md
+https://github.com/FinancialComputingUCL/LOBFrame,LOBFrame,04_lob_architectures.md
+https://github.com/LeonardoBerti00/TLOB,TLOB | TLOB author code,04_lob_architectures.md
+https://github.com/aicheye/wundernn,Author repository,01_rules_provenance.md
+https://github.com/egetaga/TimePFN,TimePFN,03_foundation_hf.md
+https://github.com/emadeldeen24/TS-TCC/blob/main/dataloader/augmentations.py,actual augmentation code,08_causal_features.md
+https://github.com/eulogik/NanoForecast/blob/main/deploy/paper.tex,NanoForecast paper,02_small_hf.md
+https://github.com/google-research/google-research/tree/master/tsmixer,TSMixer,02_small_hf.md
+https://github.com/google-research/timesfm,official repository,03_foundation_hf.md
+https://github.com/jwallbridge/translob,TransLOB author code,04_lob_architectures.md
+https://github.com/locuslab/TCN,Author TCN repository,07_streaming_architectures.md
+https://github.com/lorenzolucchese/deepOBs,deepOBs,04_lob_architectures.md
+https://github.com/msrishav-28/wunder-fund-LOB-fairy-predictorium,Publisher repository,01_rules_provenance.md
+https://github.com/state-spaces/mamba,Current Mamba repository,07_streaming_architectures.md
+https://github.com/state-spaces/s4,S4/S4D author repository,07_streaming_architectures.md
+https://github.com/ts-kim/RevIN,RevIN author implementation,08_causal_features.md
+https://github.com/viebboy/TABL,TABL,04_lob_architectures.md
+https://github.com/zcakhaa/DeepLOB-Deep-Convolutional-Neural-Networks-for-Limit-Order-Books,author code,04_lob_architectures.md
+https://github.com/zhihanyue/ts2vec,TS2Vec author code,08_causal_features.md
+https://github.com/zhouhaoyi/ETDataset,dataset origin,02_small_hf.md
+https://huggingface.co/AutoML-org/TempoPFN,AutoML-org/TempoPFN,03_foundation_hf.md
+https://huggingface.co/AutoML-org/TempoPFN/blob/main/models/checkpoint_38M.pth,499 MB `.pth`,03_foundation_hf.md
+https://huggingface.co/AutonLab/MOMENT-1-small,AutonLab/MOMENT-1-small,03_foundation_hf.md
+https://huggingface.co/AutonLab/MOMENT-1-small/blob/main/model.safetensors,152 MB,03_foundation_hf.md
+https://huggingface.co/Salesforce/moirai-1.1-R-small,Salesforce/moirai-1.1-R-small,03_foundation_hf.md
+https://huggingface.co/Salesforce/moirai-1.1-R-small/raw/main/README.md,CC-BY-NC-4.0,03_foundation_hf.md
+https://huggingface.co/Salesforce/moirai-1.1-R-small/tree/main,55.3 MB,03_foundation_hf.md
+https://huggingface.co/Salesforce/moirai-2.0-R-small,Salesforce/moirai-2.0-R-small,03_foundation_hf.md
+https://huggingface.co/Salesforce/moirai-2.0-R-small/raw/main/README.md,CC-BY-NC-4.0,03_foundation_hf.md
+https://huggingface.co/Salesforce/moirai-2.0-R-small/tree/main,45.6 MB,03_foundation_hf.md
+https://huggingface.co/TuKoResearch/NoConnectomeGPT100M,TuKoResearch model card,01_rules_provenance.md
+https://huggingface.co/amazon/chronos-2,Canonical interface | amazon/chronos-2,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-2/tree/main,478 MB,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-bolt-mini,amazon/chronos-bolt-mini,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-bolt-mini/blob/main/model.safetensors,85 MB,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-bolt-tiny,amazon/chronos-bolt-tiny,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-bolt-tiny/tree/main,34.6 MB,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-t5-mini,amazon/chronos-t5-mini,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-t5-mini/tree/main,81.8 MB,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-t5-tiny,amazon/chronos-t5-tiny,03_foundation_hf.md
+https://huggingface.co/amazon/chronos-t5-tiny/blob/main/model.safetensors,33.6 MB,03_foundation_hf.md
+https://huggingface.co/api/models/Maple728/TimeMoE-50M?blobs=true,TimeMoE,02_small_hf.md
+https://huggingface.co/api/models/eulogik/nanoforecast-200k?blobs=true,NanoForecast,02_small_hf.md
+https://huggingface.co/api/models/hitachi-nlp/citras-fm?blobs=true,CITRAS,02_small_hf.md
+https://huggingface.co/api/models/ibm-granite/granite-timeseries-patchtsmixer?blobs=true,PatchTSMixer,02_small_hf.md
+https://huggingface.co/api/models/ibm-granite/granite-timeseries-ttm-r1?blobs=true,r1,02_small_hf.md
+https://huggingface.co/api/models/ibm-granite/granite-timeseries-ttm-r2?blobs=true,r2,02_small_hf.md
+https://huggingface.co/api/models/ibm-granite/granite-timeseries-ttm-r3?blobs=true,r3,02_small_hf.md
+https://huggingface.co/autogluon/chronos-2-small,autogluon/chronos-2-small,03_foundation_hf.md
+https://huggingface.co/autogluon/chronos-2-small/tree/main,112 MB,03_foundation_hf.md
+https://huggingface.co/autogluon/chronos-2-synth,Synthetic card | autogluon/chronos-2-synth,03_foundation_hf.md | 09_distillation_ensembles.md
+https://huggingface.co/autogluon/chronos-2-synth/blob/main/model.safetensors,476 MB,03_foundation_hf.md
+https://huggingface.co/autogluon/chronos-2-synth/raw/main/README.md,Apache-2.0 | Chronos-2-Synth card,03_foundation_hf.md
+https://huggingface.co/datasets/Salesforce/GiftEvalPretrain/tree/main,bitcoin_with_missing,03_foundation_hf.md
+https://huggingface.co/google/timesfm-1.0-200m-pytorch,1.0-200M,03_foundation_hf.md
+https://huggingface.co/google/timesfm-2.0-500m-pytorch,2.0-500M,03_foundation_hf.md
+https://huggingface.co/google/timesfm-2.5-200m-pytorch,google/timesfm-2.5-200m-pytorch,03_foundation_hf.md
+https://huggingface.co/google/timesfm-2.5-200m-pytorch/tree/main,925 MB,03_foundation_hf.md
+https://huggingface.co/google/timesfm-3.0-pytorch,google/timesfm-3.0-pytorch,03_foundation_hf.md
+https://huggingface.co/google/timesfm-3.0-pytorch/blob/main/LICENSE,new license,03_foundation_hf.md
+https://huggingface.co/google/timesfm-3.0-pytorch/tree/main,1.32 GB,03_foundation_hf.md
+https://huggingface.co/hitachi-nlp/citras-fm,CITRAS card,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-patchtsmixer,official card,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-patchtsmixer/raw/main/config.json,config,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-ttm-r1,r1 card,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2,r2 card,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2/blob/52-16-ft-r2.1/model.safetensors,r2 52,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-ttm-r2/blob/90-30-ft-r2.1/model.safetensors,r2 90,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-ttm-r3,r3 card,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-ttm-r3/blob/52-16-dec-52-lite-r3/model.safetensors,r3 52-lite,02_small_hf.md
+https://huggingface.co/ibm-granite/granite-timeseries-ttm-r3/blob/90-30-dec-90-lite-r3/model.safetensors,r3 90-lite,02_small_hf.md
+https://huggingface.co/medarc/CortexMAE,MedARC model card,01_rules_provenance.md
+https://huggingface.co/msrishav/wunder-fund-lob-predictorium,Publisher model card,01_rules_provenance.md
+https://huggingface.co/onnx-community/granite-timeseries-patchtsmixer,community ONNX conversion,02_small_hf.md
+https://onlinelibrary.wiley.com/doi/10.1111/mafi.12413,Original study | Stationary-input study,04_lob_architectures.md | 08_causal_features.md
+https://onnx.ai/onnx/operators/onnx__GRU.html,ONNX `linear_before_reset=1`,06_gru_finetuning.md
+https://proceedings.mlr.press/v115/aicher20a.html,Adaptive TBPTT research,06_gru_finetuning.md
+https://proceedings.mlr.press/v202/orvieto23a.html,LRU paper,07_streaming_architectures.md
+https://proceedings.mlr.press/v267/zhu25x.html,"GAR, ICML 2025",05_metric_head.md
+https://proceedings.mlr.press/v80/furlanello18a.html,Born-Again Networks,09_distillation_ensembles.md
+https://proceedings.mlr.press/v80/li18a.html,L2-SP,06_gru_finetuning.md
+https://wundernn.io/connectome/docs/faq,Current FAQ,01_rules_provenance.md
+https://wundernn.io/connectome/docs/quick_start,Current quick start,01_rules_provenance.md
+https://wundernn.io/connectome/docs/rules,Current competition rules,01_rules_provenance.md
+https://www.jmlr.org/papers/v11/cawley10a.html,Cawley and Talbot,10_validation_red_team.md
