@@ -1,0 +1,7 @@
+{
+  "model": "simplified.onnx",
+  "backend": "onnx",
+  "onnx_mode": "iobinding",
+  "strict_inputs": true,
+  "affinity": false
+}

@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "mode": "run",
+  "groups": [
+    0
+  ],
+  "bitwise_equal": true,
+  "max_output_absolute_error": 0.0,
+  "max_hidden_absolute_error": 0.0,
+  "max_bulk_absolute_error": 0.0,
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "per_sequence": [
+    {
+      "row_group": 0,
+      "reference": 0.6958558615528136,
+      "candidate": 0.6958558615528136
+    }
+  ],
+  "environment": {
+    "python": "3.11.16",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "architecture": "arm64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 2376007680
+  },
+  "original_sha256": "ade3cb7006096171cf6613c8c5a9659890808f2413777cb82e0fa5b674243004",
+  "candidate_sha256": "ade3cb7006096171cf6613c8c5a9659890808f2413777cb82e0fa5b674243004",
+  "bulk_model_sha256": "56b079f24011e786d5c3bfe17d777b4d9467ad2c0dcdaeff42f08b779f2bd4c5"
+}

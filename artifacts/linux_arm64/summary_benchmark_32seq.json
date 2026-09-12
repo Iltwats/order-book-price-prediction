@@ -1,0 +1,326 @@
+{
+  "environment": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:02:58.581267+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "390e00e678429670b76d1dbfc1263e22e5853a03b97213d29d2cd0697792a071",
+      "connectome/evaluation.py": "68daec84cf3346eda91a3dd9ae5cf9d54c176d25c1a2c978e53f9c02e8c2bd98",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "22398db6c4ef2ed54aba37cc01380cccf8d77e0d941c43097460de2f1dcf6919"
+    }
+  },
+  "phase": "benchmark",
+  "checks": [],
+  "benchmark_reports": [
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_original_reference.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_original_run.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_original_iobinding.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_original_ortvaluevector.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_original_native_row.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_original_native_packed.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_simplified_reference.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_simplified_run.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_simplified_iobinding.json",
+    "/workspace/artifacts/linux_arm64/benchmark_32seq_simplified_ortvaluevector.json"
+  ],
+  "native_promoted": false,
+  "manifest_sha256": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+  "groups": [
+    1562,
+    595,
+    750,
+    1192,
+    561,
+    1128,
+    584,
+    658,
+    387,
+    1038,
+    1868,
+    1664,
+    405,
+    1781,
+    562,
+    1796,
+    72,
+    1005,
+    639,
+    1422,
+    1305,
+    941,
+    1439,
+    252,
+    1408,
+    742,
+    695,
+    1259,
+    571,
+    761,
+    1700,
+    409
+  ],
+  "repetitions": 3,
+  "seconds": 669.369019221,
+  "results": {
+    "original": [
+      {
+        "mode": "reference",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          18.44394571600003,
+          18.536224758999992,
+          18.48545650899996
+        ],
+        "median_seconds": 18.48545650899996,
+        "median_callbacks_per_second": 34621.812000607344,
+        "mean_microseconds_per_callback": 28.88834738749999,
+        "startup_seconds": [
+          0.002892625000015414,
+          0.0020244169999728,
+          0.002950917000021036
+        ],
+        "sequence_p50_seconds": 0.5656980624999903,
+        "sequence_p95_seconds": 0.6470686567500081
+      },
+      {
+        "mode": "run",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          18.170664717000022,
+          19.65822484199998,
+          18.450313800000004
+        ],
+        "median_seconds": 18.450313800000004,
+        "median_callbacks_per_second": 34687.75690958708,
+        "mean_microseconds_per_callback": 29.31208508281251,
+        "startup_seconds": [
+          0.00230470899998636,
+          0.002317124999990483,
+          0.0054310000000441505
+        ],
+        "sequence_p50_seconds": 0.5516338130000236,
+        "sequence_p95_seconds": 0.7461292397500046
+      },
+      {
+        "mode": "iobinding",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          15.268706424000015,
+          14.962511715000005,
+          15.367497257000025
+        ],
+        "median_seconds": 15.268706424000015,
+        "median_callbacks_per_second": 41915.79707066868,
+        "mean_microseconds_per_callback": 23.74933093541669,
+        "startup_seconds": [
+          0.003141542000037134,
+          0.0020126659999846197,
+          0.0018376659999717049
+        ],
+        "sequence_p50_seconds": 0.4680436879999945,
+        "sequence_p95_seconds": 0.5159621457500094
+      },
+      {
+        "mode": "ortvaluevector",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          16.27504800600002,
+          15.680672257999959,
+          15.569217798000011
+        ],
+        "median_seconds": 15.680672257999959,
+        "median_callbacks_per_second": 40814.57666290328,
+        "mean_microseconds_per_callback": 24.752571907291664,
+        "startup_seconds": [
+          0.002684584000007817,
+          0.003792374999989079,
+          0.002265916999988349
+        ],
+        "sequence_p50_seconds": 0.4867342710000173,
+        "sequence_p95_seconds": 0.5682670940000207
+      },
+      {
+        "mode": "native_row",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          57.845883652000055,
+          57.57983765100005,
+          57.49202256800004
+        ],
+        "median_seconds": 57.57983765100005,
+        "median_callbacks_per_second": 11115.00181503003,
+        "mean_microseconds_per_callback": 90.06132493281257,
+        "startup_seconds": [
+          0.004177416999993966,
+          0.0049103329999979906,
+          0.0021377920000986705
+        ],
+        "sequence_p50_seconds": 1.7739349380000249,
+        "sequence_p95_seconds": 1.9218926472500186
+      },
+      {
+        "mode": "native_packed",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          20.375956717999998,
+          20.17742380100003,
+          20.81709450900007
+        ],
+        "median_seconds": 20.375956717999998,
+        "median_callbacks_per_second": 31409.56809329242,
+        "mean_microseconds_per_callback": 31.963789077083387,
+        "startup_seconds": [
+          0.003196708000018589,
+          0.001874125000085769,
+          0.0019494169999916267
+        ],
+        "sequence_p50_seconds": 0.6294988335000085,
+        "sequence_p95_seconds": 0.7462656047500502
+      }
+    ],
+    "simplified": [
+      {
+        "mode": "reference",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          18.362445008999998,
+          19.25286000799997,
+          18.890289551000023
+        ],
+        "median_seconds": 18.890289551000023,
+        "median_callbacks_per_second": 33879.840659515954,
+        "mean_microseconds_per_callback": 29.429997170833328,
+        "startup_seconds": [
+          0.004040458999952534,
+          0.0024245419999715523,
+          0.006176125000024513
+        ],
+        "sequence_p50_seconds": 0.5704223755000157,
+        "sequence_p95_seconds": 0.7544463337500247
+      },
+      {
+        "mode": "run",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          18.24110142500001,
+          18.72349700799998,
+          18.568148965999967
+        ],
+        "median_seconds": 18.568148965999967,
+        "median_callbacks_per_second": 34467.62524212297,
+        "mean_microseconds_per_callback": 28.92330593697914,
+        "startup_seconds": [
+          0.002133541999910449,
+          0.00454170900002282,
+          0.005087500000058753
+        ],
+        "sequence_p50_seconds": 0.5583471874999759,
+        "sequence_p95_seconds": 0.7276201564999667
+      },
+      {
+        "mode": "iobinding",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          15.919994925000083,
+          17.00404813199998,
+          15.917054965000034
+        ],
+        "median_seconds": 15.919994925000083,
+        "median_callbacks_per_second": 40201.01784046245,
+        "mean_microseconds_per_callback": 25.438071886458385,
+        "startup_seconds": [
+          0.0038745000000517393,
+          0.002056999999922482,
+          0.0181878329999563
+        ],
+        "sequence_p50_seconds": 0.48554602100000466,
+        "sequence_p95_seconds": 0.6507273647500256
+      },
+      {
+        "mode": "ortvaluevector",
+        "repetitions": 3,
+        "rows_per_repetition": 640000,
+        "seconds": [
+          17.965442424999992,
+          20.99846963399989,
+          21.924531761000026
+        ],
+        "median_seconds": 20.99846963399989,
+        "median_callbacks_per_second": 30478.41157737216,
+        "mean_microseconds_per_callback": 31.71273115624995,
+        "startup_seconds": [
+          0.0016091249999590218,
+          0.005099083999994036,
+          0.005208250000009684
+        ],
+        "sequence_p50_seconds": 0.6353418334999787,
+        "sequence_p95_seconds": 0.8506966677499861
+      }
+    ]
+  },
+  "completed": true
+}

@@ -1,0 +1,85 @@
+{
+  "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/baseline/baseline.onnx",
+  "sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+  "size_bytes": 770975,
+  "ir_version": 8,
+  "producer_name": "pytorch",
+  "producer_version": "2.5.1",
+  "opsets": [
+    {
+      "domain": "",
+      "version": 17
+    }
+  ],
+  "inputs": [
+    {
+      "name": "features",
+      "shape": [
+        1,
+        1,
+        112
+      ],
+      "dtype": "FLOAT"
+    },
+    {
+      "name": "hidden_0",
+      "shape": [
+        1,
+        1,
+        128
+      ],
+      "dtype": "FLOAT"
+    },
+    {
+      "name": "hidden_1",
+      "shape": [
+        1,
+        1,
+        128
+      ],
+      "dtype": "FLOAT"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "prediction",
+      "shape": [
+        1,
+        1,
+        2
+      ],
+      "dtype": "FLOAT"
+    },
+    {
+      "name": "next_hidden_0",
+      "shape": [
+        1,
+        1,
+        128
+      ],
+      "dtype": "FLOAT"
+    },
+    {
+      "name": "next_hidden_1",
+      "shape": [
+        1,
+        1,
+        128
+      ],
+      "dtype": "FLOAT"
+    }
+  ],
+  "node_count": 10,
+  "operator_counts": {
+    "Transpose": 2,
+    "GRU": 2,
+    "Constant": 2,
+    "Squeeze": 2,
+    "MatMul": 1,
+    "Add": 1
+  },
+  "initializer_count": 8,
+  "initializer_scalars": 192258,
+  "native_supported": true,
+  "native_unsupported_reason": null
+}

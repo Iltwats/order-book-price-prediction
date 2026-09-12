@@ -1,0 +1,5 @@
+........................................................................ [ 94%]
+....                                                                     [100%]
+=========================== short test summary info ============================
+SKIPPED [1] ../Users/atulsharma/research/ml/wnn_connectome_starterpack/tests/test_training.py:7: optional offline training dependency
+76 passed, 1 skipped in 3.76s

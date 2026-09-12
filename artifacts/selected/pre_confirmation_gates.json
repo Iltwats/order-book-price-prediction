@@ -1,0 +1,14 @@
+{
+  "model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "config_sha256": "4f3c27303d5d35b5fdc4a32e0365d084731654e1e50511118d0481d8e29b3904",
+  "development_selection_sha256": "292a9dc38d6780f194ed54b61cf51be67af7388b118c71e78529cb34471f8403",
+  "parity_report_sha256": "517d719d7354718c34432eccdc54be48a37794e3b95001c0e0b8e1c816c1eba7",
+  "fold_parity_sha256": "0821a3b41e068e8c3829257037a24ae61a56ab5ac57de7b487280c61bd6c3552",
+  "performance_report_sha256": "c8ac6df1b67daf52d5b4cce3702d63da0a0a6849c1bc439788fc6eccd5bafeab",
+  "candidate_zip_sha256": "9d8862659bbe823532879708fa2765ac023d2cae8984501919e1293a022c8de4",
+  "native_promoted": false,
+  "affinity_enabled": false,
+  "strict_causality_and_ownership_tests_passed": true,
+  "host_pytest": "89 passed",
+  "judge_runtime_verified": false
+}

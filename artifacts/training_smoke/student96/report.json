@@ -1,0 +1,64 @@
+{
+  "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student96/checkpoint.pt",
+  "complete": true,
+  "cursor": {
+    "epoch": 1,
+    "position": 0,
+    "sequences_seen": 1,
+    "updates": 1
+  },
+  "history": [
+    {
+      "distillation_loss": 11.499942976981401,
+      "epoch": 0,
+      "gradient_norm": 15.932855606079102,
+      "sequence_ids": [
+        43601
+      ],
+      "supervised_loss": 1.159473261097446,
+      "update": 1
+    }
+  ],
+  "method": "student",
+  "model_config": {
+    "head_state": "last",
+    "hidden_size": 96
+  },
+  "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student96/model.onnx",
+  "parameter_count": 116546,
+  "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student96/report.json",
+  "requested_epochs": 1,
+  "seconds": 4.241254708031192,
+  "seed": 20260912,
+  "specification": {
+    "batch_size": 1,
+    "chunk_size": 512,
+    "data": {
+      "mtime_ns": 1577826000000000000,
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/train.parquet",
+      "size": 29240219011
+    },
+    "distill_weight": 1.0,
+    "gradient_clip": 1.0,
+    "groups": [
+      0
+    ],
+    "head_only": false,
+    "learning_rate": 0.001,
+    "method": "student",
+    "model_config": {
+      "head_state": "last",
+      "hidden_size": 96
+    },
+    "seed": 20260912,
+    "source": {
+      "mtime_ns": 1577826000000000000,
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/baseline/baseline.onnx",
+      "sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+      "size": 770975
+    },
+    "teacher": null,
+    "weight_decay": 0.0001
+  },
+  "training_metric": "sequence-normalized clipped-target weighted MSE surrogate; not validation WP"
+}

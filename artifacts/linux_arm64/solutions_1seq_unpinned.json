@@ -1,0 +1,160 @@
+{
+  "reference": "actual baseline/solution.py PredictionModel.predict",
+  "baseline_solution_sha256": "d0ef0732fd98cc0a74dc298f5667385c690aab17d73742e6f75f474e808fef2e",
+  "baseline_model_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+  "candidate_config": {
+    "model": "simplified.onnx",
+    "backend": "onnx",
+    "onnx_mode": "iobinding",
+    "strict_inputs": true,
+    "affinity": false
+  },
+  "candidate_config_sha256": "83c72d82d7d7f54fd2353c8ef4396daceb30923ef94c8be883997edc1e93b674",
+  "candidate_model_sha256": "daef2091434c3145a2b238d20ab21027ab5ab0543dcc60861814fb1b649d3e63",
+  "strict_inputs": true,
+  "groups": [
+    1562
+  ],
+  "repetitions": 1,
+  "rows_per_repetition": 20000,
+  "ordered_runs": [
+    {
+      "name": "published_baseline",
+      "repetition": 1,
+      "seconds": 0.5729218339999989,
+      "callbacks_per_second": 34908.77605478035,
+      "startup_seconds": 0.004518416000109937,
+      "sequence_seconds": [
+        0.5729195839999193
+      ]
+    },
+    {
+      "name": "selected_candidate_strict",
+      "repetition": 1,
+      "seconds": 0.5262394169999425,
+      "callbacks_per_second": 38005.51489285757,
+      "startup_seconds": 0.0022582080000574933,
+      "sequence_seconds": [
+        0.5262372920001326
+      ]
+    }
+  ],
+  "summaries": {
+    "published_baseline": {
+      "seconds": [
+        0.5729218339999989
+      ],
+      "median_seconds": 0.5729218339999989,
+      "median_callbacks_per_second": 34908.77605478035,
+      "mean_microseconds_per_callback": 28.646091699999943,
+      "startup_seconds": [
+        0.004518416000109937
+      ],
+      "sequence_p50_seconds": 0.5729195839999193,
+      "sequence_p95_seconds": 0.5729195839999193
+    },
+    "selected_candidate_strict": {
+      "seconds": [
+        0.5262394169999425
+      ],
+      "median_seconds": 0.5262394169999425,
+      "median_callbacks_per_second": 38005.51489285757,
+      "mean_microseconds_per_callback": 26.311970849997124,
+      "startup_seconds": [
+        0.0022582080000574933
+      ],
+      "sequence_p50_seconds": 0.5262372920001326,
+      "sequence_p95_seconds": 0.5262372920001326
+    }
+  },
+  "candidate_throughput_ratio_vs_published": 1.0887094647265114,
+  "load_seconds_excluded": 0.028806583000005048,
+  "seconds": 1.1357610840000234,
+  "affinity": {
+    "requested": false,
+    "applied": false
+  },
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 341323776
+  },
+  "timed_domain": "actual complete Python DataPoint callback; data preloaded; startup and warm-up separate",
+  "hardware_counters": {
+    "collected": false,
+    "perf_available": false,
+    "reason": "No hardware cache/performance counters were collected; the inference image does not install perf"
+  },
+  "host_exclusive": false,
+  "judge_runtime_verified": false,
+  "hidden_test_rows": null,
+  "linux_constraints": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:16:24.805202+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+      "connectome/evaluation.py": "4d3c5452d3be4e9ee0affe75f63dffb703ad1e7a2b3689ff8c1fcc2ea8e8f74b",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "144329101e9843b15e0cd24c2d846ff549b5bb58aa53fcf27536cabc11799be8"
+    }
+  },
+  "native_promoted": false
+}

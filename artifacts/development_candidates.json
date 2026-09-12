@@ -1,0 +1,52 @@
+[
+  {
+    "name": "original_baseline",
+    "config_path": "configs/baseline.json",
+    "dev_report_path": "artifacts/baseline_dev_tracked.json",
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown."
+  },
+  {
+    "name": "baseline_half",
+    "config_path": "configs/baseline_half.json",
+    "dev_report_path": "artifacts/calibration_dev.json",
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+    "report_key": "best"
+  },
+  {
+    "name": "baseline_quarter",
+    "config_path": "configs/baseline_quarter.json",
+    "dev_report_path": "artifacts/baseline_scale_refinement_dev.json",
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown."
+  },
+  {
+    "name": "affine256_raw",
+    "config_path": "configs/affine256_raw.json",
+    "dev_report_path": "artifacts/training_pilot256/affine_p1e-2/dev_raw_tracked.json",
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown."
+  },
+  {
+    "name": "affine256_scaled",
+    "config_path": "configs/affine256_scaled.json",
+    "dev_report_path": "artifacts/training_pilot256/affine_p1e-2/dev_calibrated.json",
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown."
+  },
+  {
+    "name": "affine1024_raw",
+    "config_path": "configs/affine1024_raw.json",
+    "dev_report_path": "artifacts/training_pilot1024/affine_p1e-2/dev_raw.json",
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown."
+  },
+  {
+    "name": "affine1024_scaled",
+    "config_path": "configs/affine1024_scaled.json",
+    "dev_report_path": "artifacts/training_pilot1024/affine_p1e-2/dev_calibrated.json",
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown."
+  }
+]

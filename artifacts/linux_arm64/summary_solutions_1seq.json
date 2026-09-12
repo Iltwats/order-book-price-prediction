@@ -1,0 +1,80 @@
+{
+  "environment": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:16:24.805202+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+      "connectome/evaluation.py": "4d3c5452d3be4e9ee0affe75f63dffb703ad1e7a2b3689ff8c1fcc2ea8e8f74b",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "144329101e9843b15e0cd24c2d846ff549b5bb58aa53fcf27536cabc11799be8"
+    }
+  },
+  "phase": "solutions",
+  "checks": [],
+  "benchmark_reports": [
+    "/workspace/artifacts/linux_arm64/solutions_1seq_unpinned.json"
+  ],
+  "native_promoted": false,
+  "manifest_sha256": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+  "groups": [
+    1562
+  ],
+  "repetitions": 1,
+  "seconds": 1.3192996259999745,
+  "completed": true
+}

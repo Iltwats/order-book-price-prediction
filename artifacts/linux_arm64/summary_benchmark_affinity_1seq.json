@@ -1,0 +1,169 @@
+{
+  "environment": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:15:00.056992+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+      "connectome/evaluation.py": "4d3c5452d3be4e9ee0affe75f63dffb703ad1e7a2b3689ff8c1fcc2ea8e8f74b",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "144329101e9843b15e0cd24c2d846ff549b5bb58aa53fcf27536cabc11799be8"
+    }
+  },
+  "phase": "benchmark",
+  "checks": [],
+  "benchmark_reports": [
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_iobinding_affinity.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_ortvaluevector_affinity.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_simplified_iobinding_affinity.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_simplified_ortvaluevector_affinity.json"
+  ],
+  "native_promoted": false,
+  "manifest_sha256": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+  "groups": [
+    1562
+  ],
+  "repetitions": 3,
+  "seconds": 7.176438128999962,
+  "results": {
+    "original": [
+      {
+        "mode": "iobinding",
+        "repetitions": 3,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.6113606669999854,
+          0.5665052079999668,
+          0.6364507920000051
+        ],
+        "median_seconds": 0.6113606669999854,
+        "median_callbacks_per_second": 32713.91353673801,
+        "mean_microseconds_per_callback": 30.23861111666595,
+        "startup_seconds": [
+          0.005707583000003069,
+          0.0027387079999243724,
+          0.002508708999926057
+        ],
+        "sequence_p50_seconds": 0.6113584170000195,
+        "sequence_p95_seconds": 0.6339399047999563
+      },
+      {
+        "mode": "ortvaluevector",
+        "repetitions": 3,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.6256714999999531,
+          0.7229253330000347,
+          0.509296790999997
+        ],
+        "median_seconds": 0.6256714999999531,
+        "median_callbacks_per_second": 31965.656099089538,
+        "mean_microseconds_per_callback": 30.96489373333308,
+        "startup_seconds": [
+          0.0019403329999931884,
+          0.0023712920000207305,
+          0.008675874999994448
+        ],
+        "sequence_p50_seconds": 0.6256695420000824,
+        "sequence_p95_seconds": 0.7131980295000631
+      }
+    ],
+    "simplified": [
+      {
+        "mode": "iobinding",
+        "repetitions": 3,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.5174944589999768,
+          0.47350312499997926,
+          0.4727708340000163
+        ],
+        "median_seconds": 0.47350312499997926,
+        "median_callbacks_per_second": 42238.36959893533,
+        "mean_microseconds_per_callback": 24.39614029999954,
+        "startup_seconds": [
+          0.0013030840000283206,
+          0.001815374999978303,
+          0.0019075420000262966
+        ],
+        "sequence_p50_seconds": 0.47350120799990236,
+        "sequence_p95_seconds": 0.513093370799993
+      },
+      {
+        "mode": "ortvaluevector",
+        "repetitions": 3,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.4600961250000637,
+          0.4621062090000123,
+          0.4621142089999921
+        ],
+        "median_seconds": 0.4621062090000123,
+        "median_callbacks_per_second": 43280.09364617619,
+        "mean_microseconds_per_callback": 23.07194238333447,
+        "startup_seconds": [
+          0.001388875000088774,
+          0.001961959000027491,
+          0.0019250000000283762
+        ],
+        "sequence_p50_seconds": 0.4621042500000385,
+        "sequence_p95_seconds": 0.46211163809997513
+      }
+    ]
+  },
+  "completed": true
+}

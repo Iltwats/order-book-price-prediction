@@ -1,0 +1,144 @@
+{
+  "parity": {
+    "sequence_id": 256678,
+    "rows": 20000,
+    "prediction_max_abs_error": 1.1920928955078125e-05,
+    "state_max_abs_errors": [
+      7.12275505065918e-06,
+      2.5928020477294922e-05
+    ],
+    "original_wp": [
+      0.6099307711795063,
+      0.6795125447628395
+    ],
+    "torch_wp": [
+      0.609930603323401,
+      0.6795125356863941
+    ],
+    "max_wp_difference": 1.6785610534864048e-07
+  },
+  "runs": {
+    "head_last": {
+      "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_last/model.onnx",
+      "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_last/checkpoint.pt",
+      "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_last/report.json",
+      "complete": true,
+      "seconds": 2.3062643751036376,
+      "model_config": {
+        "hidden_size": 128,
+        "head_state": "last"
+      },
+      "parameter_count": 192258
+    },
+    "head_both": {
+      "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_both/model.onnx",
+      "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_both/checkpoint.pt",
+      "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_both/report.json",
+      "complete": true,
+      "seconds": 1.3120792910922319,
+      "model_config": {
+        "hidden_size": 128,
+        "head_state": "both"
+      },
+      "parameter_count": 192514
+    },
+    "affine": {
+      "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/affine/model.onnx",
+      "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/affine/checkpoint.pt",
+      "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/affine/report.json",
+      "complete": true,
+      "seconds": 1.1636786670424044,
+      "model_config": {
+        "hidden_size": 128,
+        "head_state": "last"
+      },
+      "parameter_count": 192258
+    },
+    "fine_tune": {
+      "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/fine_tune/model.onnx",
+      "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/fine_tune/checkpoint.pt",
+      "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/fine_tune/report.json",
+      "complete": true,
+      "seconds": 4.5371284999419,
+      "model_config": {
+        "hidden_size": 128,
+        "head_state": "last"
+      },
+      "parameter_count": 192258
+    },
+    "student96": {
+      "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student96/model.onnx",
+      "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student96/checkpoint.pt",
+      "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student96/report.json",
+      "complete": true,
+      "seconds": 4.241254708031192,
+      "model_config": {
+        "hidden_size": 96,
+        "head_state": "last"
+      },
+      "parameter_count": 116546
+    },
+    "student64": {
+      "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student64/model.onnx",
+      "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student64/checkpoint.pt",
+      "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/student64/report.json",
+      "complete": true,
+      "seconds": 3.4976289588958025,
+      "model_config": {
+        "hidden_size": 64,
+        "head_state": "last"
+      },
+      "parameter_count": 59266
+    }
+  },
+  "validation_smoke": {
+    "head_last": {
+      "weighted_pearson": 0.6487381138062274,
+      "t0": 0.6144743134302797,
+      "t1": 0.6830019141821752,
+      "rows_seen": 20000,
+      "seconds": 0.6632095829118043,
+      "interpretation": "one-sequence smoke only; not evidence to promote"
+    },
+    "head_both": {
+      "weighted_pearson": 0.6520455082645034,
+      "t0": 0.618608509818562,
+      "t1": 0.6854825067104448,
+      "rows_seen": 20000,
+      "seconds": 0.6506192919332534,
+      "interpretation": "one-sequence smoke only; not evidence to promote"
+    },
+    "affine": {
+      "weighted_pearson": 0.7097580573420355,
+      "t0": 0.7008050886654515,
+      "t1": 0.7187110260186194,
+      "rows_seen": 20000,
+      "seconds": 0.6234210000839084,
+      "interpretation": "one-sequence smoke only; not evidence to promote"
+    },
+    "fine_tune": {
+      "weighted_pearson": 0.6451611698091898,
+      "t0": 0.6106044894330026,
+      "t1": 0.679717850185377,
+      "rows_seen": 20000,
+      "seconds": 0.7945121668744832,
+      "interpretation": "one-sequence smoke only; not evidence to promote"
+    },
+    "student96": {
+      "weighted_pearson": -0.12571915142223894,
+      "t0": -0.03912216672897644,
+      "t1": -0.21231613611550146,
+      "rows_seen": 20000,
+      "seconds": 0.5986703750677407,
+      "interpretation": "one-sequence smoke only; not evidence to promote"
+    },
+    "student64": {
+      "weighted_pearson": 0.01274490118407941,
+      "t0": 0.025322635141865814,
+      "t1": 0.00016716722629300356,
+      "rows_seen": 20000,
+      "seconds": 0.4495889579411596,
+      "interpretation": "one-sequence smoke only; not evidence to promote"
+    }
+  }
+}

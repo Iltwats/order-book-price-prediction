@@ -1,0 +1,54 @@
+{
+  "t0": 0.618608509818562,
+  "t1": 0.6854825067104448,
+  "weighted_pearson": 0.6520455082645034,
+  "blocks": 1,
+  "eligible_blocks": 1,
+  "excluded_blocks": 0,
+  "selected_rows": 2599,
+  "effective_scored_rows": 2599,
+  "metric_clip": [
+    -2.0,
+    2.0
+  ],
+  "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson",
+  "provenance": {
+    "model_sha256": "3fc2cd840044b6c15ce212296a877aacf40a58ea6ba1fba5b05f3d6e4a4611d6",
+    "mode": "run",
+    "dataset_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/valid.parquet",
+    "dataset_size": 5615509128,
+    "environment": {
+      "python": "3.11.16",
+      "platform": "macOS-26.5.2-arm64-arm-64bit",
+      "architecture": "arm64",
+      "numpy": "2.2.6",
+      "onnxruntime": "1.23.2",
+      "peak_rss_bytes": 294879232
+    },
+    "raw_unclipped": true
+  },
+  "rows_seen": 20000,
+  "seconds": 0.6506192919332534,
+  "rows_per_second": 30739.943078804044,
+  "startup_seconds": 0.0022428331431001425,
+  "per_sequence": [
+    {
+      "row_group": 0,
+      "seq_ix": 256678,
+      "eligible": true,
+      "t0": 0.618608509818562,
+      "t1": 0.6854825067104448,
+      "weighted_pearson": 0.6520455082645034
+    }
+  ],
+  "environment": {
+    "python": "3.11.16",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "architecture": "arm64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 306266112
+  },
+  "execution": "row_callback",
+  "judge_runtime_verified": false
+}

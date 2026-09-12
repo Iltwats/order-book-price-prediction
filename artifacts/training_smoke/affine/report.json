@@ -1,0 +1,41 @@
+{
+  "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/affine/checkpoint.pt",
+  "complete": true,
+  "completed_sequences": 1,
+  "method": "affine",
+  "model_config": {
+    "head_state": "last",
+    "hidden_size": 128
+  },
+  "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/affine/model.onnx",
+  "parameter_count": 192258,
+  "planned_sequences": 1,
+  "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/affine/report.json",
+  "ridge": 0.001,
+  "sampled_rows": 2048,
+  "seconds": 1.1636786670424044,
+  "seed": 20260912,
+  "specification": {
+    "chunk_size": 512,
+    "data": {
+      "mtime_ns": 1577826000000000000,
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/train.parquet",
+      "size": 29240219011
+    },
+    "groups": [
+      0
+    ],
+    "head_state": "last",
+    "method": "affine",
+    "ridge": 0.001,
+    "rows_per_sequence": 2048,
+    "seed": 20260912,
+    "source": {
+      "mtime_ns": 1577826000000000000,
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/baseline/baseline.onnx",
+      "sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+      "size": 770975
+    }
+  },
+  "training_metric": "sequence-normalized clipped-target weighted MSE surrogate; not validation WP"
+}

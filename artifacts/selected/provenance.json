@@ -1,0 +1,26 @@
+{
+  "original_model_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+  "selected_model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "training_report_sha256": "cdabf73233820f036955d4ca2783c377f076c47f6a0da7a7b1fedca776458570",
+  "training_sequences": 1024,
+  "training_rows_per_sequence": 20000,
+  "training_supervised_rows_per_sequence": 19901,
+  "train_only_affine_degrees_of_freedom": 6,
+  "original_recurrent_parameters_unchanged": 192000,
+  "total_parameters": 192258,
+  "unchanged_recurrent_tensors": [
+    "w0",
+    "r0",
+    "b0",
+    "w1",
+    "r1",
+    "b1"
+  ],
+  "head_scale": [
+    1.25,
+    1.25
+  ],
+  "source_data": "supplied competition training data only",
+  "architecture": "112 -> GRU128 -> GRU128 -> linear2",
+  "no_extra_inference_operations": true
+}

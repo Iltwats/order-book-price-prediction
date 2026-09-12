@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "phase": "final_confirmation_decision",
+  "freeze_sha256": "0a5c32e3ec89b0a1b0310ccf1d3eb17ca4c062e1917f76179fd42f52a1b3f0a5",
+  "selected": "candidate",
+  "policy": "positive mean paired confirmation delta selects candidate; zero/negative retains original baseline",
+  "bootstrap": {
+    "delta": 0.04132811914950105,
+    "ci_low": 0.03746015111161875,
+    "ci_high": 0.04537319186193393,
+    "confidence": 0.95,
+    "candidate_wp": 0.6409979952634937,
+    "baseline_wp": 0.5996698761139927,
+    "sequences": 473,
+    "win_fraction": 0.7928118393234672,
+    "n_resamples": 10000,
+    "seed": 20260912,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "positive_ci_evidence": true,
+  "candidate_report": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/confirmation_report.json",
+  "candidate_report_sha256": "ebeedb06204bcce68312538148d392fd1bce7d3459cf23e571744a0c012802dd",
+  "baseline_report": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/baseline_confirmation.json",
+  "baseline_report_sha256": "794716d8503cedf9c54df2c4e3d386aeb08ee21acb1a677fbdfd522bbf8a6844",
+  "no_further_confirmation_tuning": true
+}

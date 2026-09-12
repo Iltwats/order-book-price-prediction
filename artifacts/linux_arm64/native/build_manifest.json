@@ -1,0 +1,39 @@
+{
+  "library_path": "/workspace/artifacts/linux_arm64/native/libconnectome_native.so",
+  "os": "Linux",
+  "architecture": "aarch64",
+  "compiler": "c++ (Debian 12.2.0-14+deb12u1) 12.2.0\nCopyright (C) 2022 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  "command": [
+    "c++",
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-O3",
+    "-DNDEBUG",
+    "-fvisibility=hidden",
+    "-shared",
+    "-fPIC",
+    "/workspace/native/connectome_native.cpp",
+    "-o",
+    "/workspace/artifacts/linux_arm64/native/libconnectome_native.so"
+  ],
+  "fast_math": false,
+  "native_isa_flags": false,
+  "library_sha256": "d170a7ca03c939dd3573c683f690f0b5856401bc31edcc29b5b153584c7faf40",
+  "source_sha256": "c0f7999f0505d721516545b431f23b1be6f849385e9f7c1778b9faddd0c83826",
+  "abi_version": 1,
+  "weight_count": 192258,
+  "checks": {
+    "reference": {
+      "passed": true,
+      "output": "native reference/layout/reset/buffer checks passed; max_abs_error=1.66091e-07"
+    },
+    "sanitized": {
+      "passed": true,
+      "output": "native reference/layout/reset/buffer checks passed; max_abs_error=1.66091e-07"
+    }
+  }
+}

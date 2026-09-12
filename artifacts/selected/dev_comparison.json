@@ -1,0 +1,45 @@
+{
+  "vs_original": {
+    "delta": 0.04306749085763798,
+    "ci_low": 0.04073649358112153,
+    "ci_high": 0.04545394602192753,
+    "confidence": 0.95,
+    "candidate_wp": 0.6292555347902447,
+    "baseline_wp": 0.5861880439326067,
+    "sequences": 1399,
+    "win_fraction": 0.8227305218012866,
+    "n_resamples": 10000,
+    "seed": 20260912,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "vs_quarter_baseline": {
+    "delta": 0.0006931461950064933,
+    "ci_low": 0.00046939896223517933,
+    "ci_high": 0.0009466720222946935,
+    "confidence": 0.95,
+    "candidate_wp": 0.6292555347902447,
+    "baseline_wp": 0.6285623885952382,
+    "sequences": 1399,
+    "win_fraction": 0.5689778413152251,
+    "n_resamples": 10000,
+    "seed": 20260912,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "vs_affine256": {
+    "delta": 1.8139811666659353e-05,
+    "ci_low": -0.00012424303675008177,
+    "ci_high": 0.00015698447244402594,
+    "confidence": 0.95,
+    "candidate_wp": 0.6292555347902447,
+    "baseline_wp": 0.629237394978578,
+    "sequences": 1399,
+    "win_fraction": 0.47962830593280914,
+    "n_resamples": 10000,
+    "seed": 20260912,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "folding_score_delta": 8.789213801208007e-11
+}

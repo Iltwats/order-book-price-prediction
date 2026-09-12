@@ -1,0 +1,23 @@
+{
+  "artifacts": {
+    "baseline/README.md": {
+      "size_bytes": 643,
+      "sha256": "354714ae694fc59eabb7907ad4ac41ebae5f72ee267b9068409a565e1ec66e14"
+    },
+    "baseline/baseline.onnx": {
+      "size_bytes": 770975,
+      "sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd"
+    },
+    "baseline/baseline_submission.zip": {
+      "size_bytes": 716978,
+      "sha256": "53f7faff8bd9ff7b13a9c38410bba5752050b1bc4879b1e913b61cbd1cf2b950"
+    },
+    "baseline/solution.py": {
+      "size_bytes": 2987,
+      "sha256": "d0ef0732fd98cc0a74dc298f5667385c690aab17d73742e6f75f474e808fef2e"
+    }
+  },
+  "scoring_reference_sha256": "408af0fe32620480ac0c85fa56d6beb92f583118fd206de1c890a55cda140935",
+  "metric_document_sha256": "96e3695c2056ffd55f181a74312fb4051096d24b3f95607f1a3e2a159fa03d70",
+  "data_fingerprints": "manifest.json; dataset fingerprints are sampled, not full-content SHA256"
+}

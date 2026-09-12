@@ -1,0 +1,141 @@
+{
+  "model_sha256": "daef2091434c3145a2b238d20ab21027ab5ab0543dcc60861814fb1b649d3e63",
+  "groups": [
+    1562,
+    595,
+    750,
+    1192,
+    561,
+    1128,
+    584,
+    658,
+    387,
+    1038,
+    1868,
+    1664,
+    405,
+    1781,
+    562,
+    1796,
+    72,
+    1005,
+    639,
+    1422,
+    1305,
+    941,
+    1439,
+    252,
+    1408,
+    742,
+    695,
+    1259,
+    571,
+    761,
+    1700,
+    409
+  ],
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 648634368
+  },
+  "affinity": {
+    "requested": false,
+    "applied": false
+  },
+  "runs": [
+    {
+      "mode": "run",
+      "repetitions": 3,
+      "rows_per_repetition": 640000,
+      "seconds": [
+        18.24110142500001,
+        18.72349700799998,
+        18.568148965999967
+      ],
+      "median_seconds": 18.568148965999967,
+      "median_callbacks_per_second": 34467.62524212297,
+      "mean_microseconds_per_callback": 28.92330593697914,
+      "startup_seconds": [
+        0.002133541999910449,
+        0.00454170900002282,
+        0.005087500000058753
+      ],
+      "sequence_p50_seconds": 0.5583471874999759,
+      "sequence_p95_seconds": 0.7276201564999667
+    }
+  ],
+  "timed_domain": "complete Python callback; sequences preloaded; startup separate",
+  "judge_runtime_verified": false,
+  "hidden_test_rows": null,
+  "linux_constraints": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:02:58.581267+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "390e00e678429670b76d1dbfc1263e22e5853a03b97213d29d2cd0697792a071",
+      "connectome/evaluation.py": "68daec84cf3346eda91a3dd9ae5cf9d54c176d25c1a2c978e53f9c02e8c2bd98",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "22398db6c4ef2ed54aba37cc01380cccf8d77e0d941c43097460de2f1dcf6919"
+    }
+  },
+  "native_promoted": false,
+  "comparison_caveat": "Linux ARM64 on a shared M2 host; quota-limited, not an exclusive or known judge CPU"
+}

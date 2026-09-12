@@ -1,0 +1,255 @@
+{
+  "environment": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:02:12.747758+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "390e00e678429670b76d1dbfc1263e22e5853a03b97213d29d2cd0697792a071",
+      "connectome/evaluation.py": "68daec84cf3346eda91a3dd9ae5cf9d54c176d25c1a2c978e53f9c02e8c2bd98",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "22398db6c4ef2ed54aba37cc01380cccf8d77e0d941c43097460de2f1dcf6919"
+    }
+  },
+  "phase": "benchmark",
+  "checks": [],
+  "benchmark_reports": [
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_reference.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_run.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_iobinding.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_ortvaluevector.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_native_row.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_original_native_packed.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_simplified_reference.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_simplified_run.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_simplified_iobinding.json",
+    "/workspace/artifacts/linux_arm64/benchmark_1seq_simplified_ortvaluevector.json"
+  ],
+  "native_promoted": false,
+  "manifest_sha256": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+  "groups": [
+    1562
+  ],
+  "repetitions": 1,
+  "seconds": 7.411026502999988,
+  "results": {
+    "original": [
+      {
+        "mode": "reference",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.5692232499999932
+        ],
+        "median_seconds": 0.5692232499999932,
+        "median_callbacks_per_second": 35135.59925740953,
+        "mean_microseconds_per_callback": 28.461162499999656,
+        "startup_seconds": [
+          0.0029867089999982
+        ],
+        "sequence_p50_seconds": 0.5692218760000003,
+        "sequence_p95_seconds": 0.5692218760000003
+      },
+      {
+        "mode": "run",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.5607647919999863
+        ],
+        "median_seconds": 0.5607647919999863,
+        "median_callbacks_per_second": 35665.57723545613,
+        "mean_microseconds_per_callback": 28.038239599999315,
+        "startup_seconds": [
+          0.0018328749999909633
+        ],
+        "sequence_p50_seconds": 0.5607640830000094,
+        "sequence_p95_seconds": 0.5607640830000094
+      },
+      {
+        "mode": "iobinding",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.48271029199997884
+        ],
+        "median_seconds": 0.48271029199997884,
+        "median_callbacks_per_second": 41432.719234419965,
+        "mean_microseconds_per_callback": 24.13551459999894,
+        "startup_seconds": [
+          0.0017673750000142263
+        ],
+        "sequence_p50_seconds": 0.4827084169999978,
+        "sequence_p95_seconds": 0.4827084169999978
+      },
+      {
+        "mode": "ortvaluevector",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.48179279199999314
+        ],
+        "median_seconds": 0.48179279199999314,
+        "median_callbacks_per_second": 41511.62145240289,
+        "mean_microseconds_per_callback": 24.089639599999657,
+        "startup_seconds": [
+          0.0017982500000073287
+        ],
+        "sequence_p50_seconds": 0.48179070800000545,
+        "sequence_p95_seconds": 0.48179070800000545
+      },
+      {
+        "mode": "native_row",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          1.7076066260000005
+        ],
+        "median_seconds": 1.7076066260000005,
+        "median_callbacks_per_second": 11712.299364197943,
+        "mean_microseconds_per_callback": 85.38033130000002,
+        "startup_seconds": [
+          0.002538250000014841
+        ],
+        "sequence_p50_seconds": 1.707603750000004,
+        "sequence_p95_seconds": 1.707603750000004
+      },
+      {
+        "mode": "native_packed",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.6786190420000082
+        ],
+        "median_seconds": 0.6786190420000082,
+        "median_callbacks_per_second": 29471.61627097366,
+        "mean_microseconds_per_callback": 33.93095210000041,
+        "startup_seconds": [
+          0.0017749170000058712
+        ],
+        "sequence_p50_seconds": 0.6786179170000253,
+        "sequence_p95_seconds": 0.6786179170000253
+      }
+    ],
+    "simplified": [
+      {
+        "mode": "reference",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.5323528339999939
+        ],
+        "median_seconds": 0.5323528339999939,
+        "median_callbacks_per_second": 37569.068337110104,
+        "mean_microseconds_per_callback": 26.617641699999695,
+        "startup_seconds": [
+          0.0014748329999747511
+        ],
+        "sequence_p50_seconds": 0.5323515830000076,
+        "sequence_p95_seconds": 0.5323515830000076
+      },
+      {
+        "mode": "run",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.5353993329999867
+        ],
+        "median_seconds": 0.5353993329999867,
+        "median_callbacks_per_second": 37355.29494953722,
+        "mean_microseconds_per_callback": 26.76996664999933,
+        "startup_seconds": [
+          0.0014448329999936504
+        ],
+        "sequence_p50_seconds": 0.535397875000001,
+        "sequence_p95_seconds": 0.535397875000001
+      },
+      {
+        "mode": "iobinding",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.45829295800001546
+        ],
+        "median_seconds": 0.45829295800001546,
+        "median_callbacks_per_second": 43640.20797369382,
+        "mean_microseconds_per_callback": 22.914647900000773,
+        "startup_seconds": [
+          0.0018405829999892376
+        ],
+        "sequence_p50_seconds": 0.4582909589999815,
+        "sequence_p95_seconds": 0.4582909589999815
+      },
+      {
+        "mode": "ortvaluevector",
+        "repetitions": 1,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.4511862920000169
+        ],
+        "median_seconds": 0.4511862920000169,
+        "median_callbacks_per_second": 44327.58786031391,
+        "mean_microseconds_per_callback": 22.559314600000846,
+        "startup_seconds": [
+          0.00168279199999688
+        ],
+        "sequence_p50_seconds": 0.4511842500000114,
+        "sequence_p95_seconds": 0.4511842500000114
+      }
+    ]
+  },
+  "completed": true
+}

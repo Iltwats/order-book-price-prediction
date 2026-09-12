@@ -1,0 +1,24 @@
+{
+  "archive": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/dist/candidate.zip",
+  "size_bytes": 722475,
+  "sha256": "9d8862659bbe823532879708fa2765ac023d2cae8984501919e1293a022c8de4",
+  "files": {
+    "MODEL.md": "ba1db52438cef3eb90a7b6aad09d0b27738d60af4e83a9656c9568c03feaa3bf",
+    "connectome/__init__.py": "ea78d2847e3336ad17c2441e5f8282b444a44655e5e107f9f46cfb1ec8c7dd48",
+    "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+    "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+    "model.onnx": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "solution.py": "a9a88b3aa5dd27ec84a052be0847987ed77ff57d19e684823bff12028d0b184b",
+    "submission_config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac"
+  },
+  "verified": true,
+  "judge_runtime_verified": false,
+  "verification": {
+    "passed": true,
+    "rows": 768,
+    "resets": 2,
+    "independent_output_ownership": true,
+    "network_disabled": true,
+    "python": "3.11.16"
+  }
+}

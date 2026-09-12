@@ -1,0 +1,56 @@
+{
+  "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_last/checkpoint.pt",
+  "complete": true,
+  "cursor": {
+    "epoch": 1,
+    "position": 0,
+    "sequences_seen": 1,
+    "updates": 1
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "gradient_norm": 24.027620315551758,
+      "sampled_rows": 19901,
+      "sequence_id": 43601,
+      "supervised_loss": 9.842043280601501
+    }
+  ],
+  "method": "head_adamw",
+  "model_config": {
+    "head_state": "last",
+    "hidden_size": 128
+  },
+  "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_last/model.onnx",
+  "optimizer": "AdamW",
+  "parameter_count": 192258,
+  "report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/head_last/report.json",
+  "requested_epochs": 1,
+  "seconds": 2.3062643751036376,
+  "seed": 20260912,
+  "specification": {
+    "chunk_size": 512,
+    "data": {
+      "mtime_ns": 1577826000000000000,
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/train.parquet",
+      "size": 29240219011
+    },
+    "groups": [
+      0
+    ],
+    "head_state": "last",
+    "learning_rate": 0.001,
+    "method": "head_adamw",
+    "minibatch_size": 4096,
+    "penalty": 0.001,
+    "rows_per_sequence": null,
+    "seed": 20260912,
+    "source": {
+      "mtime_ns": 1577826000000000000,
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/baseline/baseline.onnx",
+      "sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+      "size": 770975
+    }
+  },
+  "training_metric": "sequence-normalized clipped-target weighted MSE surrogate; not validation WP"
+}

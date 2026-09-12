@@ -1,0 +1,128 @@
+{
+  "t0": 0.7323126701142644,
+  "t1": 0.7756012607641453,
+  "weighted_pearson": 0.7539569654392049,
+  "blocks": 1,
+  "eligible_blocks": 1,
+  "excluded_blocks": 0,
+  "selected_rows": 686,
+  "effective_scored_rows": 686,
+  "metric_clip": [
+    -2.0,
+    2.0
+  ],
+  "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson",
+  "candidate_config": {
+    "model": "simplified.onnx",
+    "backend": "onnx",
+    "onnx_mode": "iobinding",
+    "strict_inputs": true,
+    "affinity": false
+  },
+  "candidate_config_sha256": "83c72d82d7d7f54fd2353c8ef4396daceb30923ef94c8be883997edc1e93b674",
+  "candidate_model_sha256": "daef2091434c3145a2b238d20ab21027ab5ab0543dcc60861814fb1b649d3e63",
+  "strict_inputs": true,
+  "capture_raw": false,
+  "prediction_cache": false,
+  "execution": "production_row_callback_streaming",
+  "groups": [
+    1562
+  ],
+  "rows_seen": 20000,
+  "seconds": 0.6543646669999816,
+  "rows_per_second": 30563.99742928137,
+  "startup_seconds": 0.00270949999980985,
+  "per_sequence": [
+    {
+      "row_group": 1562,
+      "seq_ix": 1788254407,
+      "seconds": 0.5664577919999374,
+      "eligible": true,
+      "t0": 0.7323126701142644,
+      "t1": 0.7756012607641453,
+      "weighted_pearson": 0.7539569654392049
+    }
+  ],
+  "affinity": {
+    "requested": false,
+    "applied": false
+  },
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 341106688
+  },
+  "timed_domain": "end-to-end: startup, one sequence Parquet read at a time, strict configured callback, validation and official scoring; no prediction cache",
+  "peak_rss_caveat": "process lifetime high-water mark; includes Python/runtime/dataset/scorer overhead",
+  "host_exclusive": false,
+  "judge_runtime_verified": false,
+  "hidden_test_rows": null,
+  "linux_constraints": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:16:40.831758+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+      "connectome/evaluation.py": "34d0e92cf7bca49c15b22a9840f61b04e36a32030641bd5dc232f4d004d3068b",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "144329101e9843b15e0cd24c2d846ff549b5bb58aa53fcf27536cabc11799be8"
+    }
+  }
+}

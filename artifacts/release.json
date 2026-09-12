@@ -1,0 +1,53 @@
+{
+  "model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "config_sha256": "4f3c27303d5d35b5fdc4a32e0365d084731654e1e50511118d0481d8e29b3904",
+  "freeze_sha256": "0a5c32e3ec89b0a1b0310ccf1d3eb17ca4c062e1917f76179fd42f52a1b3f0a5",
+  "archive": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/dist/submission.zip",
+  "archive_sha256": "9d8862659bbe823532879708fa2765ac023d2cae8984501919e1293a022c8de4",
+  "archive_bytes": 722475,
+  "backend": "onnx",
+  "onnx_mode": "iobinding",
+  "affinity": false,
+  "native_promoted": false,
+  "original_recurrent_parameters_unchanged": 192000,
+  "development_wp": 0.6292555347902444,
+  "confirmation_wp": 0.6409979952634934,
+  "confirmation_comparison": {
+    "delta": 0.04132811914950105,
+    "ci_low": 0.03746015111161875,
+    "ci_high": 0.04537319186193393,
+    "confidence": 0.95,
+    "candidate_wp": 0.6409979952634937,
+    "baseline_wp": 0.5996698761139927,
+    "sequences": 473,
+    "win_fraction": 0.7928118393234672,
+    "n_resamples": 10000,
+    "seed": 20260912,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "combined_validation_wp": 0.6322225133179407,
+  "callback_throughput_ratio": 1.0952112516006982,
+  "stream_rows_per_second": 36248.6884753436,
+  "stream_peak_rss_bytes": 370044928,
+  "linux_archive_verified": true,
+  "host_archive_verified": true,
+  "linux_limits": {
+    "cpu_quota": 1,
+    "ram_bytes": 16000000000,
+    "network": "none"
+  },
+  "tests": {
+    "host_passed": 89,
+    "linux_inference_passed": 79,
+    "linux_skipped_training_module": 1,
+    "native_asan_ubsan": "passed"
+  },
+  "judge_runtime_verified": false,
+  "remaining_platform_information": [
+    "hidden test row count",
+    "judge CPU architecture and speed"
+  ],
+  "recurrent_finetune_promoted": false,
+  "recurrent_finetune_limitation": "reconstructed Torch GRU fails initial long-sequence FP32 parity gate"
+}

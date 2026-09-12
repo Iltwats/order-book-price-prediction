@@ -1,0 +1,154 @@
+{
+  "sequence_id": 256678,
+  "rows": 20000,
+  "atol": 1e-06,
+  "rtol": 1e-05,
+  "torch_full_sequence": {
+    "prediction": {
+      "values": 40000,
+      "violations": 1159,
+      "max_absolute_error": 1.1920928955078125e-05,
+      "max_tolerance_ratio": 6.519373731574348,
+      "worst_index": [
+        12201,
+        0
+      ],
+      "worst_actual": 0.009719491004943848,
+      "worst_reference": 0.0097123384475708,
+      "worst_allowed_error": 1.097123384475708e-06,
+      "passed": false
+    },
+    "h0": {
+      "values": 2560000,
+      "violations": 62089,
+      "max_absolute_error": 1.2040138244628906e-05,
+      "max_tolerance_ratio": 3.8740689492884677,
+      "worst_index": [
+        11296,
+        48
+      ],
+      "worst_actual": -0.09501928091049194,
+      "worst_reference": -0.09501172602176666,
+      "worst_allowed_error": 1.950117260217667e-06,
+      "passed": false
+    },
+    "h1": {
+      "values": 2560000,
+      "violations": 140141,
+      "max_absolute_error": 2.765655517578125e-05,
+      "max_tolerance_ratio": 14.609728923322848,
+      "worst_index": [
+        17680,
+        26
+      ],
+      "worst_actual": 0.015530457720160484,
+      "worst_reference": 0.015547338873147964,
+      "worst_allowed_error": 1.1554733887314797e-06,
+      "passed": false
+    }
+  },
+  "torch_chunks512": {
+    "prediction": {
+      "values": 40000,
+      "violations": 1159,
+      "max_absolute_error": 1.1920928955078125e-05,
+      "max_tolerance_ratio": 6.519373731574348,
+      "worst_index": [
+        12201,
+        0
+      ],
+      "worst_actual": 0.009719491004943848,
+      "worst_reference": 0.0097123384475708,
+      "worst_allowed_error": 1.097123384475708e-06,
+      "passed": false
+    },
+    "h0": {
+      "values": 2560000,
+      "violations": 62089,
+      "max_absolute_error": 1.2040138244628906e-05,
+      "max_tolerance_ratio": 3.8740689492884677,
+      "worst_index": [
+        11296,
+        48
+      ],
+      "worst_actual": -0.09501928091049194,
+      "worst_reference": -0.09501172602176666,
+      "worst_allowed_error": 1.950117260217667e-06,
+      "passed": false
+    },
+    "h1": {
+      "values": 2560000,
+      "violations": 140141,
+      "max_absolute_error": 2.765655517578125e-05,
+      "max_tolerance_ratio": 14.609728923322848,
+      "worst_index": [
+        17680,
+        26
+      ],
+      "worst_actual": 0.015530457720160484,
+      "worst_reference": 0.015547338873147964,
+      "worst_allowed_error": 1.1554733887314797e-06,
+      "passed": false
+    }
+  },
+  "torch_one_step_with_original_ort_prior_states": {
+    "prediction": {
+      "values": 40000,
+      "violations": 1,
+      "max_absolute_error": 3.337860107421875e-06,
+      "max_tolerance_ratio": 1.1046787155330793,
+      "worst_index": [
+        12575,
+        1
+      ],
+      "worst_actual": -0.002518564462661743,
+      "worst_reference": -0.0025174319744110107,
+      "worst_allowed_error": 1.02517431974411e-06,
+      "passed": false
+    },
+    "h0": {
+      "values": 2560000,
+      "violations": 27,
+      "max_absolute_error": 2.4959444999694824e-06,
+      "max_tolerance_ratio": 1.6511983194063828,
+      "worst_index": [
+        15284,
+        58
+      ],
+      "worst_actual": 0.0021049082279205322,
+      "worst_reference": 0.0021032223012298346,
+      "worst_allowed_error": 1.0210322230122982e-06,
+      "passed": false
+    },
+    "h1": {
+      "values": 2560000,
+      "violations": 34,
+      "max_absolute_error": 2.644956111907959e-06,
+      "max_tolerance_ratio": 1.7044058285724557,
+      "worst_index": [
+        14254,
+        117
+      ],
+      "worst_actual": -0.05518611520528793,
+      "worst_reference": -0.055183470249176025,
+      "worst_allowed_error": 1.5518347024917602e-06,
+      "passed": false
+    },
+    "head_only": {
+      "values": 40000,
+      "violations": 0,
+      "max_absolute_error": 3.337860107421875e-06,
+      "max_tolerance_ratio": 0.535595508349483,
+      "worst_index": [
+        4192,
+        1
+      ],
+      "worst_actual": 0.005721777677536011,
+      "worst_reference": 0.005722343921661377,
+      "worst_allowed_error": 1.0572234392166137e-06,
+      "passed": true
+    }
+  },
+  "torch_build": "PyTorch built with:\n  - GCC 4.2\n  - C++ Version: 201703\n  - clang 14.0.3\n  - OpenMP 201811\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: NO AVX\n  - Build settings: BLAS_INFO=accelerate, BUILD_TYPE=Release, CXX_COMPILER=/Applications/Xcode_14.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++, CXX_FLAGS= -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOCUPTI -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_PYTORCH_QNNPACK -DAT_BUILD_ARM_VEC256_WITH_SLEEF -DUSE_XNNPACK -DUSE_PYTORCH_METAL_EXPORT -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DUSE_COREML_DELEGATE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=braced-scalar-init -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wvla-extension -Wsuggest-override -Wnewline-eof -Winconsistent-missing-override -Winconsistent-missing-destructor-override -Wno-pass-failed -Wno-error=old-style-cast -Wconstant-conversion -Wno-missing-braces -Qunused-arguments -fcolor-diagnostics -faligned-new -Wno-unused-but-set-variable -fno-math-errno -fno-trapping-math -Werror=format -DUSE_MPS -Wno-unused-private-field -Wno-missing-braces, LAPACK_INFO=accelerate, TORCH_VERSION=2.5.1, USE_CUDA=OFF, USE_CUDNN=OFF, USE_CUSPARSELT=OFF, USE_EIGEN_FOR_BLAS=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=OFF, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, \n",
+  "conclusion": "Weight roundtrip is exact, but strict numerical parity must be assessed separately from WP closeness. Frozen fitting defaults to the independently bitwise-verified original ONNX encoder."
+}

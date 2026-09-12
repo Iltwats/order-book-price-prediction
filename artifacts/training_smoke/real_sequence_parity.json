@@ -1,0 +1,20 @@
+{
+  "sequence_id": 256678,
+  "rows": 20000,
+  "prediction_max_abs_error": 1.1920928955078125e-05,
+  "state_max_abs_errors": [
+    7.12275505065918e-06,
+    2.5928020477294922e-05
+  ],
+  "original_wp": [
+    0.6099307711795063,
+    0.6795125447628395
+  ],
+  "torch_wp": [
+    0.609930603323401,
+    0.6795125356863941
+  ],
+  "max_wp_difference": 1.6785610534864048e-07,
+  "scope": "Numerical closeness and WP check only; the original strict tolerance gate is audited separately.",
+  "strict_audit_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/torch_strict_parity_audit.json"
+}

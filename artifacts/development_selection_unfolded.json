@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "phase": "development_selection",
+  "selected": {
+    "name": "affine1024_scaled",
+    "weighted_pearson": 0.6292555347023527,
+    "feasible": true,
+    "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+    "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/affine1024_scaled.json",
+    "config_sha256": "5cde0506a2a696a0b953c5daff6b06590d797fc486eb88763cdac10de5088038",
+    "model_sha256": "001870d654996e85a6e4106e91cb4f3879beacac1868611698fd84d1db1a38ae",
+    "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_pilot1024/affine_p1e-2/dev_calibrated.json",
+    "dev_report_sha256": "f843b67d1e8e2e631828c981420d32fbb589111a52997e56be202175b61e451b"
+  },
+  "ranking": [
+    {
+      "name": "affine1024_scaled",
+      "weighted_pearson": 0.6292555347023527,
+      "feasible": true,
+      "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+      "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/affine1024_scaled.json",
+      "config_sha256": "5cde0506a2a696a0b953c5daff6b06590d797fc486eb88763cdac10de5088038",
+      "model_sha256": "001870d654996e85a6e4106e91cb4f3879beacac1868611698fd84d1db1a38ae",
+      "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_pilot1024/affine_p1e-2/dev_calibrated.json",
+      "dev_report_sha256": "f843b67d1e8e2e631828c981420d32fbb589111a52997e56be202175b61e451b"
+    },
+    {
+      "name": "affine256_scaled",
+      "weighted_pearson": 0.629237394978578,
+      "feasible": true,
+      "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+      "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/affine256_scaled.json",
+      "config_sha256": "1a34c31ed59b40a0777f63c996b6612fee5f7ac419724b7fdd9dd57e48d0b322",
+      "model_sha256": "8c2da3ee84bf620eac7b6539b28ee402d936f09108f33f744a494e6fe4f42b76",
+      "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_pilot256/affine_p1e-2/dev_calibrated.json",
+      "dev_report_sha256": "e6b206914a5f4524c7c3d2041cde0463f2f4d4bbc1cb5cacfc178e63a679542b"
+    },
+    {
+      "name": "affine1024_raw",
+      "weighted_pearson": 0.6291033714727852,
+      "feasible": true,
+      "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+      "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/affine1024_raw.json",
+      "config_sha256": "82d50eb1d519e24a87c1881d0e7bf3c4f0decb035c1c7f6bff7bb382dc329eac",
+      "model_sha256": "001870d654996e85a6e4106e91cb4f3879beacac1868611698fd84d1db1a38ae",
+      "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_pilot1024/affine_p1e-2/dev_raw.json",
+      "dev_report_sha256": "e19426f86cecbc3823102e53bda5c193a209d05dda1aa3f59f0379e58ace315a"
+    },
+    {
+      "name": "affine256_raw",
+      "weighted_pearson": 0.6291001962297605,
+      "feasible": true,
+      "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+      "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/affine256_raw.json",
+      "config_sha256": "73f7d065f780c33c9752d5a974da30e2cc20c2c0fb8b212ad50a9d82d047d3c6",
+      "model_sha256": "8c2da3ee84bf620eac7b6539b28ee402d936f09108f33f744a494e6fe4f42b76",
+      "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_pilot256/affine_p1e-2/dev_raw_tracked.json",
+      "dev_report_sha256": "50925ba8fb8c73cc66a44d179b9ae375921c904cf07e44c3f25e08b088442b74"
+    },
+    {
+      "name": "baseline_quarter",
+      "weighted_pearson": 0.6285623885952383,
+      "feasible": true,
+      "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+      "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/baseline_quarter.json",
+      "config_sha256": "89fd7a97d235853f790b6f54df90f5958d2ea1c0b4e33d127353037e66c76ada",
+      "model_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+      "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/baseline_scale_refinement_dev.json",
+      "dev_report_sha256": "c2591aa3eb55bec05ee5e61b415987424d3166e6e4692c3c28f2b8552eb4047d"
+    },
+    {
+      "name": "baseline_half",
+      "weighted_pearson": 0.6203684013977173,
+      "feasible": true,
+      "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+      "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/baseline_half.json",
+      "config_sha256": "8ac82c19631a19bca97e4990ad061afe3eeddc366f091852098a9e29e4ee4d0d",
+      "model_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+      "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/calibration_dev.json",
+      "dev_report_sha256": "d4fe02c83a7b0c3eaa64bc70bbb4a0f21106e6d9dd68a9194e94f25350edda6f"
+    },
+    {
+      "name": "original_baseline",
+      "weighted_pearson": 0.5861880439326067,
+      "feasible": true,
+      "feasibility_reason": "Original GRU128 architecture; single-thread ONNX; experimental comparison only. Final deployment feasibility requires actual strict-callback Linux benchmark; hidden judge runtime is unknown.",
+      "config_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/configs/baseline.json",
+      "config_sha256": "a0269d7eb052f44cce205995ae0e3bb1dcc4a0c9ba03d590c4c9368490ed2d09",
+      "model_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+      "dev_report_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/baseline_dev_tracked.json",
+      "dev_report_sha256": "e0829e007d7920cf9c8b466ec03cd81b42791a9ecb27d614f9ea4b152ebc96c6"
+    }
+  ],
+  "manifest_sha256": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+  "confirmation_used": false,
+  "policy": "highest development WP among documented feasible candidates; no confirmation tuning"
+}

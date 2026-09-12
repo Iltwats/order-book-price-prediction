@@ -1,0 +1,39 @@
+{
+  "library_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/native/libconnectome_native.dylib",
+  "os": "Darwin",
+  "architecture": "arm64",
+  "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)\nTarget: arm64-apple-darwin25.5.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "command": [
+    "c++",
+    "-std=c++17",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-fno-fast-math",
+    "-ffp-contract=off",
+    "-O3",
+    "-DNDEBUG",
+    "-fvisibility=hidden",
+    "-dynamiclib",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/native/connectome_native.cpp",
+    "-o",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/native/libconnectome_native.dylib"
+  ],
+  "fast_math": false,
+  "native_isa_flags": false,
+  "library_sha256": "dbf30b062ec5e2fbac61bbe60d83af6831c88dde679c7dfc5b84f4febaf6fac8",
+  "source_sha256": "64189d6bc6ce95a96368a089de86ec25c0655c7f7f386d3a2d208fcba8e20bf4",
+  "abi_version": 1,
+  "weight_count": 192258,
+  "checks": {
+    "reference": {
+      "passed": true,
+      "output": "native reference/layout/reset/buffer checks passed; max_abs_error=1.66091e-07"
+    },
+    "sanitized": {
+      "passed": true,
+      "output": "native reference/layout/reset/buffer checks passed; max_abs_error=1.66091e-07"
+    }
+  },
+  "context_buffer_alignment_bytes": 64
+}

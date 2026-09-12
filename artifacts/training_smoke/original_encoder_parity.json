@@ -1,0 +1,30 @@
+{
+  "sequence_id": 256678,
+  "rows": 20000,
+  "atol": 1e-06,
+  "rtol": 1e-05,
+  "encoder": {
+    "kind": "original_onnx_bulk",
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/original_encoder.onnx",
+    "sha256": "948ec9aad0cf1ddb97f76a1a2f995ee176af5d0ccfd30ac4675288accb183186",
+    "source_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+    "onnxruntime": "1.23.2",
+    "compute_threads": 1
+  },
+  "prediction": {
+    "max_abs_error": 0.0,
+    "violations": 0,
+    "values": 40000
+  },
+  "h0": {
+    "max_abs_error": 0.0,
+    "violations": 0,
+    "values": 2560000
+  },
+  "h1": {
+    "max_abs_error": 0.0,
+    "violations": 0,
+    "values": 2560000
+  },
+  "strict_passed": true
+}

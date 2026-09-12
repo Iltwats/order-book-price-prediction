@@ -1,0 +1,191 @@
+{
+  "reference": {
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/baseline/baseline.onnx",
+    "sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+    "size_bytes": 770975,
+    "ir_version": 8,
+    "producer_name": "pytorch",
+    "producer_version": "2.5.1",
+    "opsets": [
+      {
+        "domain": "",
+        "version": 17
+      }
+    ],
+    "inputs": [
+      {
+        "name": "features",
+        "shape": [
+          1,
+          1,
+          112
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "hidden_0",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "hidden_1",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "prediction",
+        "shape": [
+          1,
+          1,
+          2
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "next_hidden_0",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "next_hidden_1",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      }
+    ],
+    "node_count": 10,
+    "operator_counts": {
+      "Transpose": 2,
+      "GRU": 2,
+      "Constant": 2,
+      "Squeeze": 2,
+      "MatMul": 1,
+      "Add": 1
+    },
+    "initializer_count": 8,
+    "initializer_scalars": 192258,
+    "native_supported": true,
+    "native_unsupported_reason": null
+  },
+  "simplified": {
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/native/simplified.onnx",
+    "sha256": "daef2091434c3145a2b238d20ab21027ab5ab0543dcc60861814fb1b649d3e63",
+    "size_bytes": 769892,
+    "ir_version": 8,
+    "producer_name": "connectome.fixed_step",
+    "producer_version": "",
+    "opsets": [
+      {
+        "domain": "",
+        "version": 17
+      }
+    ],
+    "inputs": [
+      {
+        "name": "features",
+        "shape": [
+          1,
+          1,
+          112
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "hidden_0",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "hidden_1",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "prediction",
+        "shape": [
+          1,
+          1,
+          2
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "next_hidden_0",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      },
+      {
+        "name": "next_hidden_1",
+        "shape": [
+          1,
+          1,
+          128
+        ],
+        "dtype": "FLOAT"
+      }
+    ],
+    "node_count": 4,
+    "operator_counts": {
+      "GRU": 2,
+      "MatMul": 1,
+      "Add": 1
+    },
+    "initializer_count": 8,
+    "initializer_scalars": 192258,
+    "native_supported": true,
+    "native_unsupported_reason": null
+  },
+  "library": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/native/libconnectome_native.dylib",
+  "ort_version": "1.23.2",
+  "groups": [
+    {
+      "group": 0,
+      "seq_ix": 256678,
+      "rows": 20000,
+      "native_prediction_max_abs": 1.3113021850585938e-05,
+      "native_hidden_max_abs": 1.0970979928970337e-05,
+      "native_prediction_tolerance_failures": 1061,
+      "native_hidden_tolerance_failures": 36824,
+      "simplified_prediction_max_abs": 0.0,
+      "simplified_hidden_max_abs": 0.0,
+      "simplified_bitwise_equal": true,
+      "native_layout_bitwise_equal": true,
+      "verification_seconds": 4.1477569590788335
+    }
+  ],
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "promoted": false,
+  "timings_are_deployment_benchmarks": false
+}

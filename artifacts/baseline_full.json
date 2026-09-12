@@ -1,0 +1,13 @@
+{
+  "t0": 0.5714917100207911,
+  "t1": 0.6076973122694176,
+  "weighted_pearson": 0.5895945111451044,
+  "eligible_blocks": 1872,
+  "blocks": 1873,
+  "rows_seen": 37460000,
+  "seconds": 379.8297631260939,
+  "published_wp": 0.589595,
+  "execution": "offline_sequence_parity_checked",
+  "judge_runtime_verified": false,
+  "published_delta": -4.888548955639394e-07
+}

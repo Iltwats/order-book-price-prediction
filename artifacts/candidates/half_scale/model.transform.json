@@ -1,0 +1,16 @@
+{
+  "source_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+  "model_sha256": "ca81a8e4ce8ac9145fbc9f7238bd0c0f7046fba894b4e1f302b601a91d9bb3fc",
+  "scales": [
+    0.5,
+    0.5
+  ],
+  "affine": {},
+  "changed_initializers": [
+    "onnx::MatMul_186",
+    "reg_head.bias"
+  ],
+  "recurrent_weights_unchanged": true,
+  "additional_operations": 0,
+  "parity_required": true
+}

@@ -1,0 +1,130 @@
+{
+  "environment": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "hardware_counters": {
+      "collected": false,
+      "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+    },
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:20:09.719502+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+      "connectome/evaluation.py": "c204289fddf8fe92b3f649a7d890eb863cea0ad682b9464e0c719540da290018",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "bcdcbf28047e705b6118bb12035ad97163f602d45c3658fc8ede775b1d196d21"
+    }
+  },
+  "phase": "benchmark",
+  "checks": [],
+  "benchmark_reports": [
+    "/workspace/artifacts/linux_arm64/align64/benchmark_1seq_original_native_row.json",
+    "/workspace/artifacts/linux_arm64/align64/benchmark_1seq_original_native_packed.json"
+  ],
+  "native_promoted": false,
+  "manifest_sha256": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+  "groups": [
+    1562
+  ],
+  "repetitions": 3,
+  "seconds": 7.57952166899986,
+  "results": {
+    "original": [
+      {
+        "mode": "native_row",
+        "repetitions": 3,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          1.8186307510000006,
+          1.7775918339998498,
+          1.7516879590000372
+        ],
+        "median_seconds": 1.7775918339998498,
+        "median_callbacks_per_second": 11251.176798555034,
+        "mean_microseconds_per_callback": 89.13184239999812,
+        "startup_seconds": [
+          0.002310125000121843,
+          0.0024073750000752625,
+          0.0019170000000485743
+        ],
+        "sequence_p50_seconds": 1.7775894169999447,
+        "sequence_p95_seconds": 1.8145226045000755
+      },
+      {
+        "mode": "native_packed",
+        "repetitions": 3,
+        "rows_per_repetition": 20000,
+        "seconds": [
+          0.6351122080000096,
+          0.6150810419999289,
+          0.6201074589998825
+        ],
+        "median_seconds": 0.6201074589998825,
+        "median_callbacks_per_second": 32252.47448604515,
+        "mean_microseconds_per_callback": 31.171678483330346,
+        "startup_seconds": [
+          0.0017173749999983556,
+          0.002001457999995182,
+          0.002067875000193453
+        ],
+        "sequence_p50_seconds": 0.6201047500001096,
+        "sequence_p95_seconds": 0.6336098125000718
+      }
+    ],
+    "simplified": []
+  },
+  "completed": true
+}

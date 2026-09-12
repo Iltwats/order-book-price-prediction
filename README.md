@@ -1,5 +1,8 @@
 # Sequence Prediction Challenge
 
+The implemented pretrained-model workflow, CPU experiments, training tools and
+release commands are documented in [IMPLEMENTATION.md](IMPLEMENTATION.md).
+
 Predict `t0` and `t1`, two indicators of future price movements of instrument
 `i0`, from the L11 book-feature representation, trade and additional features.
 
@@ -74,7 +77,7 @@ Package the solution and its required model files in one ZIP, with
 - **Time:** 60 minutes for the entire test set.
 - **Submission size:** at most 20 MB for the uploaded ZIP.
 
-The environment is Linux with Python 3.10, local SSD storage and no internet
+This implementation targets Linux with Python 3.11, local SSD storage and no internet
 access.
 
 ## Website pages

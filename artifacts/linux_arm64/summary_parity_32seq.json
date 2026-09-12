@@ -1,0 +1,93 @@
+{
+  "environment": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "cpu.max": "100000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-12T15:01:51.902512+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "390e00e678429670b76d1dbfc1263e22e5853a03b97213d29d2cd0697792a071",
+      "connectome/evaluation.py": "68daec84cf3346eda91a3dd9ae5cf9d54c176d25c1a2c978e53f9c02e8c2bd98",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "22398db6c4ef2ed54aba37cc01380cccf8d77e0d941c43097460de2f1dcf6919"
+    }
+  },
+  "phase": "parity",
+  "checks": [
+    {
+      "command": [
+        "/usr/local/bin/python",
+        "native/verify_backend.py",
+        "--library",
+        "/workspace/artifacts/linux_arm64/native/libconnectome_native.so",
+        "--dataset",
+        "/workspace/datasets/valid.parquet",
+        "--groups",
+        "0",
+        "--output",
+        "/workspace/artifacts/linux_arm64/verification/parity_group0.json"
+      ],
+      "returncode": 0,
+      "seconds": 4.673748211000003,
+      "log": "/workspace/artifacts/linux_arm64/parity_group0.log"
+    }
+  ],
+  "benchmark_reports": [],
+  "native_promoted": false,
+  "native_accuracy_gate_passed": false,
+  "simplified_bitwise_equal": true,
+  "seconds": 4.693403043999979,
+  "completed": true
+}
