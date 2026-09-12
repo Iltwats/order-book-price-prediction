@@ -1,0 +1,14 @@
+.bootstrap/
+.python/
+.venv/
+.cache/
+.DS_Store
+__pycache__/
+.pytest_cache/
+*.pyc
+.coverage
+htmlcov/
+datasets/
+artifacts/
+dist/
+build/
