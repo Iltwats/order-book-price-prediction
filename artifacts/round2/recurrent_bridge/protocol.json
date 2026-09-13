@@ -1,0 +1,82 @@
+{
+  "budget": {
+    "version": "approximate_training_bridge.v1",
+    "strict": {
+      "atol": 1e-06,
+      "rtol": 1e-05
+    },
+    "common_state": {
+      "normalized_max": 1.52587890625e-05,
+      "normalized_rms": 9.5367431640625e-07
+    },
+    "carried_state": {
+      "normalized_max": 6.103515625e-05,
+      "normalized_rms": 3.814697265625e-06
+    },
+    "wp": {
+      "max_sequence_target_drift": 2e-05,
+      "max_mean_target_drift": 2e-06
+    },
+    "fp64_equation": {
+      "atol": 1e-12,
+      "rtol": 1e-10
+    },
+    "normalization": "per coordinate max(1, reference RMS); RMS bound applies to every coordinate",
+    "rationale": "Prospective engineering limits informed by the existing roughly 1e-5 FP32 discrepancy; not formal roundoff bounds or a claim that strict parity passes. Common-state limits are tighter because recurrence cannot accumulate error. State scale stays one for bounded GRU states; the RMS floor prevents unstable relative errors near zero. WP limits constrain task-level drift, per sequence as well as per-target means to prevent cancellation. These diagnostics use training data only and do not establish generalization or release fitness."
+  },
+  "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/model.onnx",
+  "train_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/train.parquet",
+  "train_fingerprint": {
+    "size_bytes": 29240219011,
+    "mtime_ns": 1577826000000000000,
+    "sample_sha256": "3cf39b8571e6cef4dc69ab6450589d2757872436a7a8eb8038376a6263ead9b8",
+    "sample_bytes_per_edge": 65536,
+    "method": "size+mtime_ns+sha256(first_and_last_bytes); not a full-file hash"
+  },
+  "groups": [
+    2309,
+    9078,
+    4507,
+    3165,
+    3508,
+    2523,
+    1866,
+    5932
+  ],
+  "stages": [
+    2,
+    8
+  ],
+  "common_state_batch_size": 256,
+  "mode": "initial_source",
+  "initial_bridge_report": null,
+  "expected_sequence_ids": {
+    "1866": 390992812,
+    "2309": 480770951,
+    "2523": 523915547,
+    "3165": 652237022,
+    "3508": 717052999,
+    "4507": 919552685,
+    "5932": 1222968840,
+    "9078": 1855651319
+  },
+  "artifacts": {
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/numerical_bridge.py": "86b753dcfb51f45bb29e38064551e4dac1ead9e1cdea695ab4ae461579e43366",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/training.py": "9797400313fe68a49d65e0588398a9293bf17b936f072cb2ddd4763082e6b07e",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/model_io.py": "2986889375178834d73d0928308c0aa977f97c9603d7c5543228c09d13045cc6",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/data.py": "2df8e76f5c445b8509fb1486a309c3008f3e725f44b8d5f6bff06d3b2ad766d7",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/conversion_audit.py": "4a998c452426cf4ec40babe34fe14680738844d5c06de8eabf7b94d49accaa7d",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/evaluation.py": "c204289fddf8fe92b3f649a7d890eb863cea0ad682b9464e0c719540da290018",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/utils.py": "408af0fe32620480ac0c85fa56d6beb92f583118fd206de1c890a55cda140935",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/model.onnx": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/manifest.json": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_pilot1024/affine_p1e-2/report.json": "cdabf73233820f036955d4ca2783c377f076c47f6a0da7a7b1fedca776458570",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/conversion/selected/report.json": "ceef78318aca3d48034e9a6988f3d2d5d54c701b9c986d8c3d224d447aa71fbb",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/conversion/fp64_gradients.json": "cdaf2c4e323c4d32ae102e1433e637421807594208f93549a8c5ecf7aa3d51cb",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/torch_strict_parity_audit.json": "050691eab8e71944f0c4f098da2c2219799d67733cb7a56d3a71a622c9a9c1da"
+  },
+  "scope": "TRAIN-only numerical diagnostics; no optimizer or validation/confirmation data reads",
+  "strict_status": "historical failed strict FP32 gate is unchanged and remains separate",
+  "fp64_spotcheck": "64 evenly spaced rows per sequence; actual GRU128 weights, common ORT states",
+  "completion": "8 sequences required; stop on first failure; strict parity remains separate"
+}

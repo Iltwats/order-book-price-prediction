@@ -1,0 +1,454 @@
+{
+  "protocol_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/recurrent_bridge/protocol.json",
+  "protocol_sha256": "4f89027ce6834a87af9e48705d92a51075546d830b9003f677d26a7a7ae5cab2",
+  "budget": {
+    "version": "approximate_training_bridge.v1",
+    "strict": {
+      "atol": 1e-06,
+      "rtol": 1e-05
+    },
+    "common_state": {
+      "normalized_max": 1.52587890625e-05,
+      "normalized_rms": 9.5367431640625e-07
+    },
+    "carried_state": {
+      "normalized_max": 6.103515625e-05,
+      "normalized_rms": 3.814697265625e-06
+    },
+    "wp": {
+      "max_sequence_target_drift": 2e-05,
+      "max_mean_target_drift": 2e-06
+    },
+    "fp64_equation": {
+      "atol": 1e-12,
+      "rtol": 1e-10
+    },
+    "normalization": "per coordinate max(1, reference RMS); RMS bound applies to every coordinate",
+    "rationale": "Prospective engineering limits informed by the existing roughly 1e-5 FP32 discrepancy; not formal roundoff bounds or a claim that strict parity passes. Common-state limits are tighter because recurrence cannot accumulate error. State scale stays one for bounded GRU states; the RMS floor prevents unstable relative errors near zero. WP limits constrain task-level drift, per sequence as well as per-target means to prevent cancellation. These diagnostics use training data only and do not establish generalization or release fitness."
+  },
+  "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "zero_update_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "encoder": {
+    "kind": "original_onnx_bulk",
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/recurrent_bridge/encoder.onnx",
+    "sha256": "72042347f13af6b3f6c30ef052e4c2509e9557628044a4383f6188a2701032df",
+    "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "onnxruntime": "1.23.2",
+    "compute_threads": 1
+  },
+  "torch": "2.5.1",
+  "threads": 1,
+  "sequences": [
+    {
+      "row_group": 2309,
+      "seq_ix": 480770951,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 7.494005416219807e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.942890293094024e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "ort_teacher_domain": {
+        "domain": "all TRAIN post-warmup rows; not comparable to masked development scores",
+        "weighting": "both WP variants clip targets and weight by absolute clipped target; only prediction clipping differs",
+        "rows": 19901,
+        "eligible": true,
+        "targets": {
+          "t0": {
+            "target_clip_fraction": 0.006532335058539772,
+            "prediction_clip_fraction": 0.0002512436560976835,
+            "target_rms": 0.9777331407098387,
+            "clipped_target_rms": 0.9679849122726238,
+            "prediction_rms": 1.0099530825325937,
+            "clipped_prediction_rms": 1.0099210739100077,
+            "raw_prediction_wp": 0.22497250338119243,
+            "clipped_prediction_wp": 0.22500934520076712
+          },
+          "t1": {
+            "target_clip_fraction": 0.027184563589769357,
+            "prediction_clip_fraction": 0.0006532335058539772,
+            "target_rms": 0.9673893044990758,
+            "clipped_target_rms": 0.9256937404579896,
+            "prediction_rms": 0.9409199327580022,
+            "clipped_prediction_rms": 0.9408425281820438,
+            "raw_prediction_wp": 0.3363460391118931,
+            "clipped_prediction_wp": 0.3365896674081932
+          }
+        }
+      },
+      "branches": {
+        "full_torch": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 3.82494181394577e-05,
+              "rms_error": 3.8454909721215235e-06,
+              "normalized_max": 3.82494181394577e-05,
+              "normalized_rms": 2.9001334898766493e-05,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 251823,
+              "strict_max_tolerance_ratio": 35.29599008084974,
+              "strict_passed": false,
+              "approximate_passed": false
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 7.030367851257324e-05,
+              "rms_error": 4.646280251551815e-06,
+              "normalized_max": 7.030367851257324e-05,
+              "normalized_rms": 4.138630442348927e-05,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 422080,
+              "strict_max_tolerance_ratio": 35.78202883010592,
+              "strict_passed": false,
+              "approximate_passed": false
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 7.271766662597656e-06,
+              "rms_error": 2.0204381377518945e-06,
+              "normalized_max": 7.20711059021418e-06,
+              "normalized_rms": 2.0276926143627454e-06,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0089711503069296,
+              "strict_violations": 1132,
+              "strict_max_tolerance_ratio": 5.226123930212432,
+              "strict_passed": false,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.22500931483383566,
+              "t1": 0.3365894028727478,
+              "weighted_pearson": 0.2807993588532917,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.22500934520076712,
+              "t1": 0.3365896674081932,
+              "weighted_pearson": 0.28079950630448014,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -3.03669314694055e-08,
+              -2.645354453822968e-07
+            ],
+            "passed": true
+          }
+        },
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.259148120880127e-06,
+              "rms_error": 6.585826818356498e-08,
+              "normalized_max": 1.259148120880127e-06,
+              "normalized_rms": 1.7768418939496851e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.851201313217241,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 2.9578804969787598e-06,
+              "rms_error": 9.103254182656497e-08,
+              "normalized_max": 2.9578804969787598e-06,
+              "normalized_rms": 2.859466366712439e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 19,
+              "strict_max_tolerance_ratio": 2.0433782510665877,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 5.960464477539062e-07,
+              "rms_error": 1.1756931194027252e-07,
+              "normalized_max": 5.960464477539062e-07,
+              "normalized_rms": 1.171242644713399e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0089711503069296,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.3504076058073286,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.2250093441087789,
+              "t1": 0.33658965679998465,
+              "weighted_pearson": 0.2807995004543818,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.22500934520076712,
+              "t1": 0.3365896674081932,
+              "weighted_pearson": 0.28079950630448014,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -1.0919882220683519e-09,
+              -1.0608208533824381e-08
+            ],
+            "passed": true
+          }
+        },
+        "upper_on_ort_lower": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 7.089972496032715e-05,
+              "rms_error": 4.230939728326037e-06,
+              "normalized_max": 7.089972496032715e-05,
+              "normalized_rms": 4.1605219755859674e-05,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 262776,
+              "strict_max_tolerance_ratio": 26.478866089226567,
+              "strict_passed": false,
+              "approximate_passed": false
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 6.67572021484375e-06,
+              "rms_error": 2.149264897522108e-06,
+              "normalized_max": 6.67572021484375e-06,
+              "normalized_rms": 2.400274910001435e-06,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0089711503069296,
+              "strict_violations": 1804,
+              "strict_max_tolerance_ratio": 5.168055886543405,
+              "strict_passed": false,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.22500937708240185,
+              "t1": 0.3365895757280054,
+              "weighted_pearson": 0.28079947640520364,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.22500934520076712,
+              "t1": 0.3365896674081932,
+              "weighted_pearson": 0.28079950630448014,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              3.188163472112038e-08,
+              -9.168018777483411e-08
+            ],
+            "passed": true
+          }
+        }
+      }
+    }
+  ],
+  "strict_historical_status": "historical failed strict FP32 gate is unchanged and remains separate",
+  "stages": [],
+  "mode": "initial_source",
+  "approximate_candidate_export_accepted": false,
+  "summary": {
+    "branches": {
+      "full_torch": {
+        "eligible_sequences": 1,
+        "mean_target_wp_drift": [
+          -3.03669314694055e-08,
+          -2.645354453822968e-07
+        ],
+        "strict_passed": false,
+        "approximate_passed": false
+      },
+      "common_state": {
+        "eligible_sequences": 1,
+        "mean_target_wp_drift": [
+          -1.0919882220683519e-09,
+          -1.0608208533824381e-08
+        ],
+        "strict_passed": false,
+        "approximate_passed": true
+      },
+      "upper_on_ort_lower": {
+        "eligible_sequences": 1,
+        "mean_target_wp_drift": [
+          3.188163472112038e-08,
+          -9.168018777483411e-08
+        ],
+        "strict_passed": false,
+        "approximate_passed": false
+      }
+    },
+    "approximate_passed": false,
+    "strict_passed": false
+  },
+  "seconds": 1.4453122920822352,
+  "completed_sequences": 1,
+  "approximate_training_accepted": false,
+  "stop_reason": "prospective numerical/equation budget failed; investigate, do not relax"
+}
