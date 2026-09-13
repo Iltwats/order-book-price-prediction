@@ -1,0 +1,35 @@
+{
+  "candidate": "correlation_gru1024_seed20260912",
+  "model_sha256": "15c3dad6c0f9964df7489c5dc8c3b5d5774907d6dc33ac80d8fe5533a61f6cde",
+  "performance_passed": true,
+  "dev_approved": true,
+  "selection": "Both expansion screens complete; highest screen WP above incumbent and interim256; all three complete-callback repetitions no slower than original baseline",
+  "per_repetition_throughput_ratios": [
+    1.0968890509947569,
+    1.150325363526085,
+    1.1547750922972209
+  ],
+  "median_throughput_ratio": 1.1340066177800774,
+  "stream_rows_per_second": 36495.057097392,
+  "stream_seconds": 140.292971356,
+  "stream_peak_rss_bytes": 370384896,
+  "linux_host_screen_wp_delta": 8.216622826573428e-09,
+  "consumed_before_dev": {
+    "screen": 12,
+    "dev": 3
+  },
+  "final_dev_for_one_candidate_only": true,
+  "judge_runtime_verified": false,
+  "confirmation_reused": false,
+  "evidence": {
+    "artifacts/round2/correlation_expansion_selection.json": "b722ab99afa5319787d95c68af413b9be8b28d4c4cc2da1bcbc6e53fa0e59609",
+    "artifacts/round2/correlation1024_linux/solutions_32seq_unpinned.json": "420a06be4700de55d7f85a48e1a8ad520ecc75d6c4490177c7a03330bf98a1c0",
+    "artifacts/round2/correlation1024_linux/stream_256seq.json": "279028c5e918cf6bc0ebb6bd174b4cb473633275e307ad49ed8e9504bf5cbd18",
+    "artifacts/round2/correlation_gru1024_seed20260912/screen_report.json": "f5f2775c7e60c411e2f4ced44b5c22df6729b5f136dad851b6b6de1df413f586",
+    "artifacts/round2/correlation_gru1024_seed20260912/screen_comparison.json": "b8af25b361bba72b3f19ae46680c05597c6772cb70f5ff07a2933c83128a1fd9",
+    "artifacts/round2/correlation_gru1024_seed20260912/parity.json": "7823654bac1da6d396212f668b5e723cf6d9d8c3e1df3f989709f38452bf14fe",
+    "artifacts/round2/correlation_gru1024_seed20260912/bridge/report.json": "bba8a1567b1ab6b3a18970e037a0a902ad823203b4e0d7ea1bdf6194f9fed53e",
+    "artifacts/round2/registry_before_correlation1024_dev.json": "666ff1747b0eed48b0face367c14bfc52e45316fb177f340da3a762b09df5809",
+    "artifacts/round2/correlation1024_screen_vs256.json": "512dad26ec37592de6d12e6497cde7671ae0db0b96738549d37fce85c2c0f6cb"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "correlation_gru1024_seed20260912": {
+    "delta": 0.00045424279822499515,
+    "ci_low": 0.00027550330493465887,
+    "ci_high": 0.000641676488426564,
+    "confidence": 0.95,
+    "candidate_wp": 0.639553702471183,
+    "baseline_wp": 0.6390994596729581,
+    "sequences": 256,
+    "win_fraction": 0.703125,
+    "n_resamples": 10000,
+    "seed": 20260913,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "correlation_gru1024_seed20260913": {
+    "delta": 0.00044723978961486415,
+    "ci_low": 0.0002460339950579576,
+    "ci_high": 0.0006531387603634801,
+    "confidence": 0.95,
+    "candidate_wp": 0.639546699462573,
+    "baseline_wp": 0.6390994596729581,
+    "sequences": 256,
+    "win_fraction": 0.68359375,
+    "n_resamples": 10000,
+    "seed": 20260913,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  }
+}
