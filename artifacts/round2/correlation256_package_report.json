@@ -1,0 +1,43 @@
+{
+  "archive": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/dist/submission_correlation256.zip",
+  "size_bytes": 722519,
+  "sha256": "da54694005d2e96b65c3a8f8de83b6793144aa47c4a59a4752afea25908104a2",
+  "files": {
+    "MODEL.md": "d32cb512c3ae7f39d0586c2be50cd027b50aef71a6d5c28a80ceaf8e7ee7a5d8",
+    "connectome/__init__.py": "ea78d2847e3336ad17c2441e5f8282b444a44655e5e107f9f46cfb1ec8c7dd48",
+    "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+    "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+    "model.onnx": "d9ca8757d6930694e6102bafcb8c62a0e5aac85e6bf402357e11690c9454abff",
+    "solution.py": "a9a88b3aa5dd27ec84a052be0847987ed77ff57d19e684823bff12028d0b184b",
+    "submission_config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac"
+  },
+  "verified": true,
+  "judge_runtime_verified": false,
+  "verification": {
+    "passed": true,
+    "rows": 768,
+    "resets": 2,
+    "independent_output_ownership": true,
+    "network_disabled": true,
+    "python": "3.11.16"
+  },
+  "candidate": "correlation_gru_lr3e-5",
+  "status": "experimental; positive screen, full development pending",
+  "screen_comparison": {
+    "delta": 0.00018337436782425595,
+    "ci_low": 0.00011964324866110381,
+    "ci_high": 0.00024904386487390877,
+    "confidence": 0.95,
+    "candidate_wp": 0.6390994596729581,
+    "baseline_wp": 0.6389160853051339,
+    "sequences": 256,
+    "win_fraction": 0.69140625,
+    "n_resamples": 10000,
+    "seed": 20260913,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "model_sha256": "d9ca8757d6930694e6102bafcb8c62a0e5aac85e6bf402357e11690c9454abff",
+  "confirmation_reused": false,
+  "live_target_achieved": false
+}

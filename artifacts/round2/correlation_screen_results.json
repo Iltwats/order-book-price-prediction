@@ -1,0 +1,88 @@
+{
+  "kind": "completed_direct_correlation_screens",
+  "candidates": [
+    {
+      "candidate": "correlation_gru_lr1e-5",
+      "learning_rate": 1e-05,
+      "t0": 0.6385088103253657,
+      "t1": 0.6394518587334103,
+      "wp": 0.638980334529388,
+      "comparison": {
+        "delta": 6.424922425395877e-05,
+        "ci_low": 4.216700344308378e-05,
+        "ci_high": 8.693908683856495e-05,
+        "confidence": 0.95,
+        "candidate_wp": 0.6389803345293879,
+        "baseline_wp": 0.6389160853051339,
+        "sequences": 256,
+        "win_fraction": 0.69140625,
+        "n_resamples": 10000,
+        "seed": 20260913,
+        "method": "paired sequence percentile bootstrap",
+        "assumption": "sequences are sufficiently independent; search bias is not corrected"
+      },
+      "training_seconds": 192.80325450003147,
+      "training_groups": 256,
+      "lower_unchanged": true,
+      "evidence": {
+        "artifacts/round2/correlation_gru_lr1e-5/model.onnx": "321bdad0b1f6e74904bfc3cf8a223ac06a36122fdd3b0d69e6fbb7d769c83de3",
+        "artifacts/round2/correlation_gru_lr1e-5/config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac",
+        "artifacts/round2/correlation_gru_lr1e-5/report.json": "69c58cd32e4e00e9386680d4a3ee5b78b5004c294525c8277393df59d0660b29",
+        "artifacts/round2/correlation_gru_lr1e-5/screen_report.json": "bf8ccc9935f636e3197a315d9d1099279fa12a67d7b61f7114ad4019984bb913",
+        "artifacts/round2/correlation_gru_lr1e-5/screen_comparison.json": "b93eb34c89e3a3a5713c53ddbcfb35c55ddcb7bf029be8c4b1df9ec1ad9eaeba",
+        "artifacts/round2/correlation_gru_lr1e-5/parity.json": "436608f9f2b5c5e9d5d0f9ca3c9deae67b497f9d9c71b6434e464cd880ed2ef7",
+        "artifacts/round2/correlation_gru_lr1e-5/bridge/protocol.json": "61c8f211ea7be18c0198870c488b7952b74e30167ab22fc7d769a88a126f6d1d",
+        "artifacts/round2/correlation_gru_lr1e-5/bridge/report.json": "eb01c259a6d88838d9069488ec1134e2ce0dcd6d545feb4ccd7b5e7a7ab0d3a3"
+      }
+    },
+    {
+      "candidate": "correlation_gru_lr3e-5",
+      "learning_rate": 3e-05,
+      "t0": 0.6386013649973937,
+      "t1": 0.6395975543485226,
+      "wp": 0.6390994596729582,
+      "comparison": {
+        "delta": 0.00018337436782425595,
+        "ci_low": 0.00011964324866110381,
+        "ci_high": 0.00024904386487390877,
+        "confidence": 0.95,
+        "candidate_wp": 0.6390994596729581,
+        "baseline_wp": 0.6389160853051339,
+        "sequences": 256,
+        "win_fraction": 0.69140625,
+        "n_resamples": 10000,
+        "seed": 20260913,
+        "method": "paired sequence percentile bootstrap",
+        "assumption": "sequences are sufficiently independent; search bias is not corrected"
+      },
+      "training_seconds": 193.3735946251545,
+      "training_groups": 256,
+      "lower_unchanged": true,
+      "evidence": {
+        "artifacts/round2/correlation_gru_lr3e-5/model.onnx": "d9ca8757d6930694e6102bafcb8c62a0e5aac85e6bf402357e11690c9454abff",
+        "artifacts/round2/correlation_gru_lr3e-5/config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac",
+        "artifacts/round2/correlation_gru_lr3e-5/report.json": "32b0c743e722ce0fa977a2198e0e5933651927d9767cf12429a9ca63aadd03d2",
+        "artifacts/round2/correlation_gru_lr3e-5/screen_report.json": "5de61b0807f401bba7d4ce5f188b4c0e92f57692b917f0df009520877b38cf98",
+        "artifacts/round2/correlation_gru_lr3e-5/screen_comparison.json": "6742d743c680051d2c071d7e9de8d1cbb4715ef07e45aca28d5ef6ba1661bb41",
+        "artifacts/round2/correlation_gru_lr3e-5/parity.json": "74adc52e0c73d36bd4ade5fbe18290f8e525ec388fcc5e81a9e2a50c32f6d84a",
+        "artifacts/round2/correlation_gru_lr3e-5/bridge/protocol.json": "4c8bec931f21a070d252ed68d531a76f8c1065ced16bf5a38dd789a5fb118288",
+        "artifacts/round2/correlation_gru_lr3e-5/bridge/report.json": "0e060d35dd057afc727523a70257dfe44bda55124551fbd65c41b94bea302c39"
+      }
+    }
+  ],
+  "selected_by_screen": "correlation_gru_lr3e-5",
+  "selected_learning_rate": 3e-05,
+  "decision": "Both paired screen intervals are positive. Validate the stronger candidate on full development after its speed gate; prospectively test first1024 training groups with two seeds.",
+  "caps": {
+    "screen": 12,
+    "dev": 4
+  },
+  "consumed": {
+    "screen": 10,
+    "dev": 2
+  },
+  "registry_snapshot": "artifacts/round2/registry_after_correlation_screen.json",
+  "registry_sha256": "83a0abdb6ec1bd5adedebbdbf2c0983def7a8f1eef09f67f82d430502582dd82",
+  "confirmation_reused": false,
+  "live_target_achieved": false
+}

@@ -1,0 +1,262 @@
+{
+  "reference": "actual baseline/solution.py PredictionModel.predict",
+  "baseline_solution_sha256": "d0ef0732fd98cc0a74dc298f5667385c690aab17d73742e6f75f474e808fef2e",
+  "baseline_model_sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+  "candidate_config": {
+    "model": "model.onnx",
+    "backend": "onnx",
+    "onnx_mode": "iobinding",
+    "strict_inputs": true,
+    "affinity": false,
+    "postprocess": {}
+  },
+  "candidate_config_sha256": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac",
+  "candidate_model_sha256": "d9ca8757d6930694e6102bafcb8c62a0e5aac85e6bf402357e11690c9454abff",
+  "strict_inputs": true,
+  "groups": [
+    1562,
+    595,
+    750,
+    1192,
+    561,
+    1128,
+    584,
+    658
+  ],
+  "repetitions": 3,
+  "rows_per_repetition": 160000,
+  "ordered_runs": [
+    {
+      "name": "published_baseline",
+      "repetition": 1,
+      "seconds": 5.319776128000001,
+      "callbacks_per_second": 30076.453623275473,
+      "startup_seconds": 0.03310395799999988,
+      "sequence_seconds": [
+        0.7623784589999998,
+        0.7058563749999998,
+        0.5880902080000001,
+        0.5405211259999998,
+        0.5924308329999999,
+        0.7256568339999996,
+        0.7590320840000002,
+        0.6458006670000005
+      ]
+    },
+    {
+      "name": "selected_candidate_strict",
+      "repetition": 1,
+      "seconds": 4.783288960999999,
+      "callbacks_per_second": 33449.787647064964,
+      "startup_seconds": 0.0035692500000008565,
+      "sequence_seconds": [
+        0.49498616699999953,
+        0.5770423329999996,
+        0.6330095,
+        0.5008734170000011,
+        0.4960563760000003,
+        0.5639189170000005,
+        0.5594590010000005,
+        0.9579303340000003
+      ]
+    },
+    {
+      "name": "selected_candidate_strict",
+      "repetition": 2,
+      "seconds": 4.045660835,
+      "callbacks_per_second": 39548.54510190299,
+      "startup_seconds": 0.002627249999999748,
+      "sequence_seconds": [
+        0.5202511669999996,
+        0.5121244580000006,
+        0.49374362600000055,
+        0.5093387919999994,
+        0.508409541999999,
+        0.4962870420000005,
+        0.5063555839999996,
+        0.49913620899999955
+      ]
+    },
+    {
+      "name": "published_baseline",
+      "repetition": 2,
+      "seconds": 4.492655293000002,
+      "callbacks_per_second": 35613.68268099618,
+      "startup_seconds": 0.001852500000001811,
+      "sequence_seconds": [
+        0.5530787920000009,
+        0.5371093330000001,
+        0.5427039170000008,
+        0.551385125000003,
+        0.6053814590000002,
+        0.5856172080000022,
+        0.560312917000001,
+        0.5570579590000015
+      ]
+    },
+    {
+      "name": "published_baseline",
+      "repetition": 3,
+      "seconds": 5.049269627000001,
+      "callbacks_per_second": 31687.75126296102,
+      "startup_seconds": 0.002419209000002809,
+      "sequence_seconds": [
+        0.9157417079999988,
+        0.5969307510000021,
+        0.6616565419999993,
+        0.5674980420000004,
+        0.5500767919999987,
+        0.5580842510000004,
+        0.6168020009999999,
+        0.5824695409999983
+      ]
+    },
+    {
+      "name": "selected_candidate_strict",
+      "repetition": 3,
+      "seconds": 4.083446043999999,
+      "callbacks_per_second": 39182.59192749604,
+      "startup_seconds": 0.0025975830000000144,
+      "sequence_seconds": [
+        0.5001868340000009,
+        0.49311220799999944,
+        0.5112875420000016,
+        0.5086787919999978,
+        0.5019686669999999,
+        0.4929517919999995,
+        0.5422350830000013,
+        0.5330138749999982
+      ]
+    }
+  ],
+  "summaries": {
+    "published_baseline": {
+      "seconds": [
+        5.319776128000001,
+        4.492655293000002,
+        5.049269627000001
+      ],
+      "median_seconds": 5.049269627000001,
+      "median_callbacks_per_second": 31687.75126296102,
+      "mean_microseconds_per_callback": 30.961877183333343,
+      "startup_seconds": [
+        0.03310395799999988,
+        0.001852500000001811,
+        0.002419209000002809
+      ],
+      "sequence_p50_seconds": 0.5868537080000011,
+      "sequence_p95_seconds": 0.7618765027499999
+    },
+    "selected_candidate_strict": {
+      "seconds": [
+        4.783288960999999,
+        4.045660835,
+        4.083446043999999
+      ],
+      "median_seconds": 4.083446043999999,
+      "median_callbacks_per_second": 39182.59192749604,
+      "mean_microseconds_per_callback": 26.900824666666665,
+      "startup_seconds": [
+        0.0035692500000008565,
+        0.002627249999999748,
+        0.0025975830000000144
+      ],
+      "sequence_p50_seconds": 0.5085441669999984,
+      "sequence_p95_seconds": 0.6246144249499999
+    }
+  },
+  "candidate_throughput_ratio_vs_published": 1.2365216957915075,
+  "load_seconds_excluded": 0.2692516669999998,
+  "seconds": 27.915126847,
+  "affinity": {
+    "requested": false,
+    "applied": false
+  },
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 419491840
+  },
+  "timed_domain": "actual complete Python DataPoint callback; data preloaded; startup and warm-up separate",
+  "hardware_counters": {
+    "collected": false,
+    "perf_available": false,
+    "reason": "No hardware cache/performance counters were collected; the inference image does not install perf"
+  },
+  "host_exclusive": false,
+  "judge_runtime_verified": false,
+  "hidden_test_rows": null,
+  "linux_constraints": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "hardware_counters": {
+      "collected": false,
+      "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+    },
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-13T07:57:23.629118+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+      "connectome/evaluation.py": "c204289fddf8fe92b3f649a7d890eb863cea0ad682b9464e0c719540da290018",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "bcdcbf28047e705b6118bb12035ad97163f602d45c3658fc8ede775b1d196d21"
+    }
+  },
+  "native_promoted": false
+}

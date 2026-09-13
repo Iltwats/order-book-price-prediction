@@ -1,0 +1,120 @@
+{
+  "procedure": {
+    "version": "correlation_ort_forward_gradient.v1",
+    "objective": {
+      "version": "full_sequence_clipped_correlation.v1",
+      "label_clip": [
+        -2.0,
+        2.0
+      ],
+      "prediction_clip": [
+        -2.0,
+        2.0
+      ],
+      "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+      "rho_bound": [
+        -1.0,
+        1.0
+      ],
+      "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+      "weight": "absolute clipped target; normalized separately per complete sequence and target",
+      "weight_sum_floor": 1e-08,
+      "std_floor": 1e-08,
+      "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+      "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+      "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+      "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+      "teacher_denominator_floor": 1e-12,
+      "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+      "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+      "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+      "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+      "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+    },
+    "gradient": {
+      "atol": 1e-06,
+      "rtol": 0.0001
+    },
+    "gradient_chunk_starts": [
+      0,
+      19744
+    ],
+    "teacher_weight": 0.1,
+    "chunk_size": 256,
+    "forward": "current-student ORT full trajectory; Torch chunk-local gradient and exact ORT forward proxies",
+    "new_evidence": "correlation-specific full-sequence coefficients and FP32/FP64 gradients; MSE gradient evidence is not relabeled",
+    "scope": "TRAIN-only approximation check; not masked WP or a model improvement score"
+  },
+  "budget": {
+    "version": "approximate_training_bridge.v1",
+    "strict": {
+      "atol": 1e-06,
+      "rtol": 1e-05
+    },
+    "common_state": {
+      "normalized_max": 1.52587890625e-05,
+      "normalized_rms": 9.5367431640625e-07
+    },
+    "carried_state": {
+      "normalized_max": 6.103515625e-05,
+      "normalized_rms": 3.814697265625e-06
+    },
+    "wp": {
+      "max_sequence_target_drift": 2e-05,
+      "max_mean_target_drift": 2e-06
+    },
+    "fp64_equation": {
+      "atol": 1e-12,
+      "rtol": 1e-10
+    },
+    "normalization": "per coordinate max(1, reference RMS); RMS bound applies to every coordinate",
+    "rationale": "Prospective engineering limits informed by the existing roughly 1e-5 FP32 discrepancy; not formal roundoff bounds or a claim that strict parity passes. Common-state limits are tighter because recurrence cannot accumulate error. State scale stays one for bounded GRU states; the RMS floor prevents unstable relative errors near zero. WP limits constrain task-level drift, per sequence as well as per-target means to prevent cancellation. These diagnostics use training data only and do not establish generalization or release fitness."
+  },
+  "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/correlation_gru_lr1e-5/model.onnx",
+  "teacher_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/model.onnx",
+  "train_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/train.parquet",
+  "train_fingerprint": {
+    "size_bytes": 29240219011,
+    "mtime_ns": 1577826000000000000,
+    "sample_sha256": "3cf39b8571e6cef4dc69ab6450589d2757872436a7a8eb8038376a6263ead9b8",
+    "sample_bytes_per_edge": 65536,
+    "method": "size+mtime_ns+sha256(first_and_last_bytes); not a full-file hash"
+  },
+  "groups": [
+    2309,
+    9078
+  ],
+  "stages": [
+    2
+  ],
+  "mode": "candidate_export",
+  "expected_sequence_ids": {
+    "2309": 480770951,
+    "9078": 1855651319
+  },
+  "artifacts": {
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/correlation_training_bridge.py": "c40d56cd879f29789dc22721d0540d1cc4f8a8f436527fc3b08c27025ee46fff",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/recurrent_objectives.py": "69d6e1160f7e1411fb1433b53fbb4c6ebd04d6bcf2d3f1924e149b0738f2bf3c",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/ort_training_bridge.py": "3806362d9f9ec750780a440b83b783ae3ca94574dc29009de7cea7d130d8c482",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/numerical_bridge.py": "86b753dcfb51f45bb29e38064551e4dac1ead9e1cdea695ab4ae461579e43366",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/correlation_gru.py": "c04fd797181de6230db3cb2e9d615d8f98bac4c4623163f3ca0236231a0aff63",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/partial_gru.py": "a0a45a9dd647c02ab23826056e7492d80cae758565c4da543f0981f10fb15ae6",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/training.py": "9797400313fe68a49d65e0588398a9293bf17b936f072cb2ddd4763082e6b07e",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/conversion_audit.py": "4a998c452426cf4ec40babe34fe14680738844d5c06de8eabf7b94d49accaa7d",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/model_io.py": "2986889375178834d73d0928308c0aa977f97c9603d7c5543228c09d13045cc6",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/data.py": "2df8e76f5c445b8509fb1486a309c3008f3e725f44b8d5f6bff06d3b2ad766d7",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/evaluation.py": "c204289fddf8fe92b3f649a7d890eb863cea0ad682b9464e0c719540da290018",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/utils.py": "408af0fe32620480ac0c85fa56d6beb92f583118fd206de1c890a55cda140935",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/correlation_gru_lr1e-5/model.onnx": "321bdad0b1f6e74904bfc3cf8a223ac06a36122fdd3b0d69e6fbb7d769c83de3",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/model.onnx": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/manifest.json": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_pilot1024/affine_p1e-2/report.json": "cdabf73233820f036955d4ca2783c377f076c47f6a0da7a7b1fedca776458570",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/ort_training_bridge/report.json": "06b2954fdf8f810e9644bab2eb54ed052a34e995af4937b89f65323e062836ff",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/ort_training_bridge/protocol.json": "c4b550f16a97f8acd0f4f63df22a87f244e5e68718fa647ea36f125cc9346177",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/correlation_training_bridge/report.json": "705b08ffac94efbeb49c4d73bbeece2e3f54ba1a96d221ac130ab7df97030aeb",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/correlation_training_bridge/protocol.json": "72635b5006e7b2cb95f7c1807967f5dc4b9791e50de16915e87ab1532f681969"
+  },
+  "forward_bridge_report": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/ort_training_bridge/report.json",
+  "strict_status": "Historical strict and conventional carried-state failures remain unchanged",
+  "completion": "2 complete fixed TRAIN sequences; stop on first local/equation/gradient failure"
+}
