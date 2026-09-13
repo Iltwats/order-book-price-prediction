@@ -1,0 +1,8 @@
+{
+  "measured_sequences": 16,
+  "measured_seconds": 13.158303540898487,
+  "projected_seconds_per_256_sequence_configuration": 210.5328566543758,
+  "projected_seconds_two_configurations": 421.0657133087516,
+  "method": "linear planning estimate only; not a measured larger training run or inference timing",
+  "peak_rss_bytes": 2170109952
+}

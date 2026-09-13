@@ -1,0 +1,418 @@
+{
+  "method": "partial_gru",
+  "complete": true,
+  "specification": {
+    "method": "partial_gru",
+    "groups": [
+      2309,
+      9078,
+      4507,
+      3165,
+      3508,
+      2523,
+      1866,
+      5932,
+      3789,
+      5946,
+      2791,
+      4958,
+      10064,
+      6363,
+      2174,
+      5564
+    ],
+    "seed": 20260912,
+    "epochs": 1,
+    "parameters": {
+      "batch_size": 8,
+      "chunk_size": 256,
+      "learning_rate": 1e-05,
+      "teacher_weight": 0.1,
+      "anchor_weight": 0.001,
+      "weight_decay": 0.0001,
+      "gradient_clip": 1.0,
+      "threads": 1,
+      "dtype": "float32",
+      "device": "cpu",
+      "scope": "upper_gru_and_head",
+      "forward": "current_student_original_onnx_full_sequence_snapshot_per_batch",
+      "gradient": "torch_chunk_local_jacobian_with_ort_hidden_and_prediction_forward_corrections",
+      "chunk_initial_state": "detached_current_student_ort_upper_at_start_minus_one_or_zero",
+      "local_diagnostics": "uncorrected_torch_upper_and_prediction_per_sequence_coordinate_rms_before_update",
+      "local_diagnostic_limits": {
+        "normalized_max": 6.103515625e-05,
+        "normalized_rms": 3.814697265625e-06
+      },
+      "teacher": "unchanged_source_original_onnx_raw_predictions",
+      "teacher_normalization": "same_clipped_label_absolute_weights_and_full_sequence_target_denominators_as_supervision",
+      "anchor_normalization": "joint_squared_distance_over_selected_upper_and_head_squared_norm_once_per_batch",
+      "warmup_rows": 99,
+      "training_mask": "all_post_warmup_rows_no_sign_eligibility_filter"
+    },
+    "source": {
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/model.onnx",
+      "sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45"
+    },
+    "data": {
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/train.parquet",
+      "size_bytes": 29240219011,
+      "mtime_ns": 1577826000000000000,
+      "sample_sha256": "3cf39b8571e6cef4dc69ab6450589d2757872436a7a8eb8038376a6263ead9b8",
+      "sample_bytes_per_edge": 65536,
+      "method": "size+mtime_ns+sha256(first_and_last_bytes); not a full-file hash"
+    },
+    "implementation": {
+      "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/partial_gru.py": "a0a45a9dd647c02ab23826056e7492d80cae758565c4da543f0981f10fb15ae6",
+      "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/training.py": "9797400313fe68a49d65e0588398a9293bf17b936f072cb2ddd4763082e6b07e",
+      "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/conversion_audit.py": "4a998c452426cf4ec40babe34fe14680738844d5c06de8eabf7b94d49accaa7d",
+      "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/model_io.py": "2986889375178834d73d0928308c0aa977f97c9603d7c5543228c09d13045cc6",
+      "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/data.py": "2df8e76f5c445b8509fb1486a309c3008f3e725f44b8d5f6bff06d3b2ad766d7",
+      "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/evaluation.py": "c204289fddf8fe92b3f649a7d890eb863cea0ad682b9464e0c719540da290018",
+      "/Users/atulsharma/research/ml/wnn_connectome_starterpack/utils.py": "408af0fe32620480ac0c85fa56d6beb92f583118fd206de1c890a55cda140935"
+    }
+  },
+  "model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/partial_gru_pilot16/model.onnx",
+  "model_sha256": "d64574f90704d8bcd849a0781d3ff2f4750d25a229acb1a28ec12b017d18a477",
+  "sequence_model_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/partial_gru_pilot16/sequence.onnx",
+  "sequence_model_sha256": "bff790f4675afd4f81c7230f3f5faff7fd7f590f63ce9ec932820fd37cbce27f",
+  "checkpoint_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/partial_gru_pilot16/checkpoint.pt",
+  "checkpoint_sha256": "499fcb903da84925f3e48e58af4b1dc9ebf9a367cabc824689df4ac177d7b2e4",
+  "cursor": {
+    "epoch": 1,
+    "position": 0,
+    "updates": 2,
+    "sequences_seen": 16
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "update": 1,
+      "groups": [
+        2309,
+        3508,
+        5564,
+        2174,
+        1866,
+        2523,
+        3789,
+        3165
+      ],
+      "sequence_ids": [
+        480770951,
+        717052999,
+        1144599551,
+        455787963,
+        390992812,
+        523915547,
+        774200196,
+        652237022
+      ],
+      "supervised_loss": 1.3581600370816886,
+      "teacher_loss": 0.0,
+      "relative_anchor": 0.0,
+      "gradient_norm": 1.0891233682632446,
+      "student_model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+      "student_encoder": {
+        "kind": "original_onnx_bulk",
+        "sha256": "72042347f13af6b3f6c30ef052e4c2509e9557628044a4383f6188a2701032df",
+        "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+        "onnxruntime": "1.23.2",
+        "compute_threads": 1
+      },
+      "teacher_model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+      "local_diagnostics": [
+        {
+          "sequence_id": 480770951,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 9.499490261077881e-06,
+            "normalized_rms": 1.2839081693354352e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.430511474609375e-06,
+            "normalized_rms": 2.3352492054609884e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 717052999,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 4.9173831939697266e-06,
+            "normalized_rms": 7.176483198400049e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.6689300537109375e-06,
+            "normalized_rms": 2.79370346409079e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1144599551,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 8.124858140945435e-06,
+            "normalized_rms": 1.203300495539477e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.4901161193847656e-06,
+            "normalized_rms": 2.436716684165375e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 455787963,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 9.603798389434814e-06,
+            "normalized_rms": 1.0675817617663168e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.3113021850585938e-06,
+            "normalized_rms": 2.1679771063963064e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 390992812,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 9.533017873764038e-06,
+            "normalized_rms": 1.0210134621525874e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.5497207641601562e-06,
+            "normalized_rms": 2.440240654384541e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 523915547,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 5.245208740234375e-06,
+            "normalized_rms": 9.264499687046294e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.6689300537109375e-06,
+            "normalized_rms": 3.016373420714398e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 774200196,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 8.369795978069305e-06,
+            "normalized_rms": 1.7703874265292018e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.2516975402832031e-06,
+            "normalized_rms": 2.3319969730712566e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 652237022,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 4.231929779052734e-06,
+            "normalized_rms": 9.444548774815615e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.3709068298339844e-06,
+            "normalized_rms": 2.514309450080239e-07,
+            "passed": true
+          }
+        }
+      ]
+    },
+    {
+      "epoch": 0,
+      "update": 2,
+      "groups": [
+        4507,
+        5946,
+        10064,
+        2791,
+        6363,
+        5932,
+        9078,
+        4958
+      ],
+      "sequence_ids": [
+        919552685,
+        1225539062,
+        2045308822,
+        572855275,
+        1306892334,
+        1222968840,
+        1855651319,
+        1018185575
+      ],
+      "supervised_loss": 1.3913402478210628,
+      "teacher_loss": 3.4383134611681854e-07,
+      "relative_anchor": 4.9625019649113256e-09,
+      "gradient_norm": 0.8442074060440063,
+      "student_model_sha256": "ca1acdf88932d650fb88ef61bdd9f360f8e3ef2f54d46adcd3af6bbe71ce8630",
+      "student_encoder": {
+        "kind": "original_onnx_bulk",
+        "sha256": "ec71d1115a843123e41442f5f0c78ebc14cf944ea85b8dc355f609510b7174b9",
+        "source_sha256": "ca1acdf88932d650fb88ef61bdd9f360f8e3ef2f54d46adcd3af6bbe71ce8630",
+        "onnxruntime": "1.23.2",
+        "compute_threads": 1
+      },
+      "teacher_model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+      "local_diagnostics": [
+        {
+          "sequence_id": 919552685,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 3.874301910400391e-06,
+            "normalized_rms": 7.117389370810161e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.430511474609375e-06,
+            "normalized_rms": 2.3650166168679533e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1225539062,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 9.119510650634766e-06,
+            "normalized_rms": 8.952136377593956e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 2.1457672119140625e-06,
+            "normalized_rms": 2.735325597761564e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 2045308822,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 7.927417755126953e-06,
+            "normalized_rms": 1.1751089263770893e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.9073486328125e-06,
+            "normalized_rms": 2.8164810873512423e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 572855275,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 7.631257176399231e-06,
+            "normalized_rms": 9.364607455901932e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.3113021850585938e-06,
+            "normalized_rms": 2.2183700541544623e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1306892334,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 6.318092346191406e-06,
+            "normalized_rms": 8.750079918186881e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.3113021850585938e-06,
+            "normalized_rms": 2.2039497468487804e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1222968840,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 5.245208740234375e-06,
+            "normalized_rms": 1.0254836944211432e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.430511474609375e-06,
+            "normalized_rms": 2.3314722710912153e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1855651319,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 9.894371032714844e-06,
+            "normalized_rms": 1.1273143056073454e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.6689300537109375e-06,
+            "normalized_rms": 2.9116724078834037e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1018185575,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 6.079673767089844e-06,
+            "normalized_rms": 8.272233381076767e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 9.5367431640625e-07,
+            "normalized_rms": 1.7647794418826317e-07,
+            "passed": true
+          }
+        }
+      ]
+    }
+  ],
+  "encoder": {
+    "kind": "original_onnx_bulk",
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/partial_gru_pilot16/source_encoder.onnx",
+    "sha256": "72042347f13af6b3f6c30ef052e4c2509e9557628044a4383f6188a2701032df",
+    "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "onnxruntime": "1.23.2",
+    "compute_threads": 1
+  },
+  "lower_recurrence_bitwise_equal": true,
+  "teacher_model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "forward_method": "current_student_original_onnx_full_sequence_snapshot_per_batch",
+  "gradient_method": "torch_chunk_local_jacobian_with_ort_hidden_and_prediction_forward_corrections",
+  "local_diagnostic_limits": {
+    "normalized_max": 6.103515625e-05,
+    "normalized_rms": 3.814697265625e-06
+  },
+  "training_metric": "sequence-target mean weighted label MSE + weighted raw selected-teacher MSE + relative parameter anchor",
+  "deployment_gate": "separately accepted ORT-forward/local-gradient bridge, candidate original-graph checks and clipped development WP still required; prior carried-Torch bridge remains failed",
+  "seconds": 13.158303540898487,
+  "environment": {
+    "python": "3.11.16",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "torch": "2.5.1",
+    "numpy": "2.2.6",
+    "pyarrow": "19.0.1",
+    "torch_cpu_threads": 1,
+    "deterministic_algorithms": true
+  }
+}
