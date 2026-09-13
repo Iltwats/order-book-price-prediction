@@ -1,0 +1,94 @@
+{
+  "environment": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "hardware_counters": {
+      "collected": false,
+      "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+    },
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-13T07:29:42.438835+00:00",
+    "onnx": "1.17.0",
+    "onnxruntime": "1.23.2",
+    "torch_installed": false,
+    "source_sha256": {
+      "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+      "connectome/evaluation.py": "c204289fddf8fe92b3f649a7d890eb863cea0ad682b9464e0c719540da290018",
+      "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+      "scripts/run_linux_checks.py": "bcdcbf28047e705b6118bb12035ad97163f602d45c3658fc8ede775b1d196d21"
+    }
+  },
+  "phase": "tests",
+  "checks": [
+    {
+      "command": [
+        "/usr/local/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "-p",
+        "no:cacheprovider",
+        "tests",
+        "native/test_model_io.py"
+      ],
+      "returncode": 0,
+      "seconds": 4.305226461000018,
+      "log": "/workspace/artifacts/round2/recurrent_linux_tests/pytest.log"
+    }
+  ],
+  "benchmark_reports": [],
+  "native_promoted": false,
+  "seconds": 4.326993543000015,
+  "completed": true
+}

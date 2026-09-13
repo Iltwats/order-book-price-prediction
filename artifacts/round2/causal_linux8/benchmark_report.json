@@ -1,0 +1,1649 @@
+{
+  "completed": true,
+  "specification_sha256": "99153ed9f8b38210fec8161c16bff541257648c39bb690a0d6d6769fe016ccf4",
+  "zero_parity": {
+    "passed": true,
+    "bitwise_equal": true,
+    "rows": 160000,
+    "groups": [
+      1562,
+      595,
+      750,
+      1192,
+      561,
+      1128,
+      584,
+      658
+    ],
+    "all_row_hidden_states_checked": true,
+    "output_ownership_checked": true,
+    "raw_prediction_sha256": "0807d6387fab36168b995f8bfe01ebe89270efef09c30e18cb2b0832700bc374",
+    "selected_model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "zero_model_sha256": "a34a14ea56d8077e2abde4c4bd3953de72176be76e7b226a17af6f0c3282c844",
+    "load_seconds_excluded": 0.35543195900000013,
+    "rss_before_load": {
+      "current_bytes": 76734464,
+      "process_peak_bytes": 89591808
+    },
+    "rss_after_load": {
+      "current_bytes": 399581184,
+      "process_peak_bytes": 399581184
+    },
+    "environment": {
+      "python": "3.11.16",
+      "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+      "architecture": "aarch64",
+      "numpy": "2.2.6",
+      "onnxruntime": "1.23.2",
+      "peak_rss_bytes": 406589440
+    },
+    "constraints": {
+      "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+      "architecture": "aarch64",
+      "python": "3.11.16",
+      "judge_runtime_verified": false,
+      "host_exclusive": false,
+      "native_promoted": false,
+      "hardware_counters": {
+        "collected": false,
+        "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+      },
+      "cpu.max": "100000 100000",
+      "memory.max": "16000000000",
+      "memory.swap.max": "0",
+      "cpuset.cpus.effective": "0-3",
+      "network_interfaces": {
+        "lo": {
+          "flags": 9,
+          "up": true
+        },
+        "tunl0": {
+          "flags": 128,
+          "up": false
+        },
+        "gre0": {
+          "flags": 128,
+          "up": false
+        },
+        "gretap0": {
+          "flags": 4098,
+          "up": false
+        },
+        "erspan0": {
+          "flags": 4098,
+          "up": false
+        },
+        "ip_vti0": {
+          "flags": 128,
+          "up": false
+        },
+        "ip6_vti0": {
+          "flags": 128,
+          "up": false
+        },
+        "sit0": {
+          "flags": 128,
+          "up": false
+        },
+        "ip6tnl0": {
+          "flags": 128,
+          "up": false
+        },
+        "ip6gre0": {
+          "flags": 128,
+          "up": false
+        }
+      },
+      "active_non_loopback_interfaces": [],
+      "utc": "2026-09-13T07:23:53.661503+00:00"
+    },
+    "scoring_performed": false,
+    "judge_runtime_verified": false
+  },
+  "groups": [
+    1562,
+    595,
+    750,
+    1192,
+    561,
+    1128,
+    584,
+    658
+  ],
+  "repetitions": 3,
+  "rows_per_repetition": 160000,
+  "run_orders": [
+    [
+      "published_baseline",
+      "selected_incumbent",
+      "zero_dynamics",
+      "nonzero_dynamics"
+    ],
+    [
+      "selected_incumbent",
+      "zero_dynamics",
+      "nonzero_dynamics",
+      "published_baseline"
+    ],
+    [
+      "zero_dynamics",
+      "nonzero_dynamics",
+      "published_baseline",
+      "selected_incumbent"
+    ]
+  ],
+  "ordered_runs": [
+    {
+      "name": "published_baseline",
+      "seconds": 4.409284752,
+      "rows": 160000,
+      "callbacks_per_second": 36287.064455845335,
+      "startup_seconds": 0.0030571670000014706,
+      "sequence_seconds": [
+        0.5759172509999999,
+        0.5421624170000001,
+        0.5516319999999997,
+        0.5519700840000006,
+        0.5606511259999998,
+        0.5466474579999989,
+        0.5442203759999984,
+        0.5360753749999994
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399867904,
+          "process_peak_bytes": 399867904
+        },
+        "after_startup": {
+          "current_bytes": 406130688,
+          "process_peak_bytes": 406130688
+        },
+        "after_warmup": {
+          "current_bytes": 406319104,
+          "process_peak_bytes": 406319104
+        },
+        "after_callbacks": {
+          "current_bytes": 406319104,
+          "process_peak_bytes": 406319104
+        }
+      },
+      "validation_policy": "published_baseline_checks",
+      "current_strict_wrapper": false,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.20708662499999875,
+      "rss_before_load": {
+        "current_bytes": 76845056,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399736832,
+        "process_peak_bytes": 399736832
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406450176
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:04.646702+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 1
+    },
+    {
+      "name": "selected_incumbent",
+      "seconds": 4.373749585000002,
+      "rows": 160000,
+      "callbacks_per_second": 36581.884008341076,
+      "startup_seconds": 0.0029983750000006637,
+      "sequence_seconds": [
+        0.5060512919999987,
+        0.5132162079999993,
+        0.5044316259999988,
+        0.4981945010000004,
+        0.5625787090000003,
+        0.5461799999999997,
+        0.7311137499999987,
+        0.5119630839999978
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399990784,
+          "process_peak_bytes": 399990784
+        },
+        "after_startup": {
+          "current_bytes": 406253568,
+          "process_peak_bytes": 406253568
+        },
+        "after_warmup": {
+          "current_bytes": 406441984,
+          "process_peak_bytes": 406441984
+        },
+        "after_callbacks": {
+          "current_bytes": 406441984,
+          "process_peak_bytes": 406441984
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.19173550000000006,
+      "rss_before_load": {
+        "current_bytes": 76980224,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399859712,
+        "process_peak_bytes": 399859712
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406573056
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:09.402703+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 1
+    },
+    {
+      "name": "zero_dynamics",
+      "seconds": 5.376904044,
+      "rows": 160000,
+      "callbacks_per_second": 29756.90075379742,
+      "startup_seconds": 0.0035763749999979666,
+      "sequence_seconds": [
+        0.6704072089999968,
+        0.7025031250000033,
+        0.6753835830000021,
+        0.6560505009999993,
+        0.6593382500000011,
+        0.6758362919999996,
+        0.6621186670000014,
+        0.6752542919999982
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399998976,
+          "process_peak_bytes": 399998976
+        },
+        "after_startup": {
+          "current_bytes": 406261760,
+          "process_peak_bytes": 406261760
+        },
+        "after_warmup": {
+          "current_bytes": 406773760,
+          "process_peak_bytes": 406773760
+        },
+        "after_callbacks": {
+          "current_bytes": 406773760,
+          "process_peak_bytes": 406773760
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.19268366700000072,
+      "rss_before_load": {
+        "current_bytes": 76976128,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399867904,
+        "process_peak_bytes": 399867904
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406773760
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:14.109314+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 1
+    },
+    {
+      "name": "nonzero_dynamics",
+      "seconds": 5.546770877,
+      "rows": 160000,
+      "callbacks_per_second": 28845.611897085757,
+      "startup_seconds": 0.00458041699999967,
+      "sequence_seconds": [
+        0.6721368759999997,
+        0.6649551670000022,
+        0.6657592079999972,
+        0.6728193329999996,
+        0.8227013330000013,
+        0.6686444169999959,
+        0.6811173339999996,
+        0.6986249169999965
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399953920,
+          "process_peak_bytes": 399953920
+        },
+        "after_startup": {
+          "current_bytes": 406216704,
+          "process_peak_bytes": 406216704
+        },
+        "after_warmup": {
+          "current_bytes": 406728704,
+          "process_peak_bytes": 406728704
+        },
+        "after_callbacks": {
+          "current_bytes": 406728704,
+          "process_peak_bytes": 406728704
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.1934716250000008,
+      "rss_before_load": {
+        "current_bytes": 76943360,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399822848,
+        "process_peak_bytes": 399822848
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406728704
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:19.819674+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 1
+    },
+    {
+      "name": "selected_incumbent",
+      "seconds": 4.116883210000005,
+      "rows": 160000,
+      "callbacks_per_second": 38864.35243325735,
+      "startup_seconds": 0.0031522079999959374,
+      "sequence_seconds": [
+        0.5314205419999993,
+        0.5160409590000015,
+        0.5135250009999979,
+        0.5098874170000016,
+        0.5156126259999994,
+        0.5080698329999933,
+        0.5107789580000031,
+        0.5115374169999996
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399958016,
+          "process_peak_bytes": 399958016
+        },
+        "after_startup": {
+          "current_bytes": 406220800,
+          "process_peak_bytes": 406220800
+        },
+        "after_warmup": {
+          "current_bytes": 406409216,
+          "process_peak_bytes": 406409216
+        },
+        "after_callbacks": {
+          "current_bytes": 406409216,
+          "process_peak_bytes": 406409216
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.19485237500000352,
+      "rss_before_load": {
+        "current_bytes": 76947456,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399826944,
+        "process_peak_bytes": 399826944
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406540288
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:25.721362+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 2
+    },
+    {
+      "name": "zero_dynamics",
+      "seconds": 5.890387961000002,
+      "rows": 160000,
+      "callbacks_per_second": 27162.89674964585,
+      "startup_seconds": 0.0033969589999998107,
+      "sequence_seconds": [
+        0.6592102919999974,
+        0.6694975419999949,
+        0.6511164580000042,
+        0.6728260840000004,
+        1.047071584000001,
+        0.6829180840000006,
+        0.6958058749999978,
+        0.8119271670000003
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399990784,
+          "process_peak_bytes": 399990784
+        },
+        "after_startup": {
+          "current_bytes": 406253568,
+          "process_peak_bytes": 406253568
+        },
+        "after_warmup": {
+          "current_bytes": 406765568,
+          "process_peak_bytes": 406765568
+        },
+        "after_callbacks": {
+          "current_bytes": 406765568,
+          "process_peak_bytes": 406765568
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.18982670900000187,
+      "rss_before_load": {
+        "current_bytes": 76980224,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399859712,
+        "process_peak_bytes": 399859712
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406765568
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:30.172263+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 2
+    },
+    {
+      "name": "nonzero_dynamics",
+      "seconds": 5.428815669000002,
+      "rows": 160000,
+      "callbacks_per_second": 29472.358200268805,
+      "startup_seconds": 0.0034212910000022134,
+      "sequence_seconds": [
+        0.6815506260000035,
+        0.6730667510000004,
+        0.6509502920000045,
+        0.6374879170000014,
+        0.686768917000002,
+        0.6877952500000006,
+        0.741174749999999,
+        0.6700091259999965
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399941632,
+          "process_peak_bytes": 399941632
+        },
+        "after_startup": {
+          "current_bytes": 406204416,
+          "process_peak_bytes": 406204416
+        },
+        "after_warmup": {
+          "current_bytes": 406716416,
+          "process_peak_bytes": 406716416
+        },
+        "after_callbacks": {
+          "current_bytes": 406716416,
+          "process_peak_bytes": 406716416
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.1957105420000005,
+      "rss_before_load": {
+        "current_bytes": 76931072,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399810560,
+        "process_peak_bytes": 399810560
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406716416
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:36.399527+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 2
+    },
+    {
+      "name": "published_baseline",
+      "seconds": 4.5802733769999975,
+      "rows": 160000,
+      "callbacks_per_second": 34932.412725285256,
+      "startup_seconds": 0.0024665420000005156,
+      "sequence_seconds": [
+        0.5678176669999999,
+        0.68174475,
+        0.5539630840000029,
+        0.5554892080000045,
+        0.5628549579999955,
+        0.5551460840000004,
+        0.5520772499999964,
+        0.5511726249999995
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399986688,
+          "process_peak_bytes": 399986688
+        },
+        "after_startup": {
+          "current_bytes": 406249472,
+          "process_peak_bytes": 406249472
+        },
+        "after_warmup": {
+          "current_bytes": 406437888,
+          "process_peak_bytes": 406437888
+        },
+        "after_callbacks": {
+          "current_bytes": 406437888,
+          "process_peak_bytes": 406437888
+        }
+      },
+      "validation_policy": "published_baseline_checks",
+      "current_strict_wrapper": false,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.18958170900000226,
+      "rss_before_load": {
+        "current_bytes": 76976128,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399855616,
+        "process_peak_bytes": 399855616
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406437888
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:42.159067+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 2
+    },
+    {
+      "name": "zero_dynamics",
+      "seconds": 5.143233877,
+      "rows": 160000,
+      "callbacks_per_second": 31108.832269032744,
+      "startup_seconds": 0.0036476250000063715,
+      "sequence_seconds": [
+        0.6476625419999991,
+        0.6392817919999985,
+        0.6412537920000005,
+        0.6418734169999993,
+        0.6373618329999999,
+        0.6411090420000036,
+        0.6483267500000025,
+        0.6463546250000007
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399945728,
+          "process_peak_bytes": 399945728
+        },
+        "after_startup": {
+          "current_bytes": 406208512,
+          "process_peak_bytes": 406208512
+        },
+        "after_warmup": {
+          "current_bytes": 406720512,
+          "process_peak_bytes": 406720512
+        },
+        "after_callbacks": {
+          "current_bytes": 406720512,
+          "process_peak_bytes": 406720512
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.18977570900000273,
+      "rss_before_load": {
+        "current_bytes": 76922880,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399814656,
+        "process_peak_bytes": 399814656
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406720512
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:47.064459+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 3
+    },
+    {
+      "name": "nonzero_dynamics",
+      "seconds": 5.370921209999999,
+      "rows": 160000,
+      "callbacks_per_second": 29790.047878955953,
+      "startup_seconds": 0.0033584579999939024,
+      "sequence_seconds": [
+        0.7182014589999994,
+        0.6440230009999937,
+        0.6638197089999949,
+        0.6722451250000034,
+        0.6684304170000033,
+        0.6624497090000006,
+        0.6743471669999934,
+        0.6673947509999891
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399921152,
+          "process_peak_bytes": 399921152
+        },
+        "after_startup": {
+          "current_bytes": 406183936,
+          "process_peak_bytes": 406183936
+        },
+        "after_warmup": {
+          "current_bytes": 406695936,
+          "process_peak_bytes": 406695936
+        },
+        "after_callbacks": {
+          "current_bytes": 406695936,
+          "process_peak_bytes": 406695936
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.1882950839999964,
+      "rss_before_load": {
+        "current_bytes": 76910592,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399790080,
+        "process_peak_bytes": 399790080
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406695936
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:52.535276+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 3
+    },
+    {
+      "name": "published_baseline",
+      "seconds": 4.456510211000008,
+      "rows": 160000,
+      "callbacks_per_second": 35902.531897059685,
+      "startup_seconds": 0.0023820829999863236,
+      "sequence_seconds": [
+        0.5264436670000094,
+        0.5765891260000018,
+        0.5789039170000052,
+        0.5786320840000059,
+        0.5808447919999935,
+        0.5379450840000004,
+        0.5422560009999984,
+        0.5348862910000065
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399990784,
+          "process_peak_bytes": 399990784
+        },
+        "after_startup": {
+          "current_bytes": 406253568,
+          "process_peak_bytes": 406253568
+        },
+        "after_warmup": {
+          "current_bytes": 406441984,
+          "process_peak_bytes": 406441984
+        },
+        "after_callbacks": {
+          "current_bytes": 406441984,
+          "process_peak_bytes": 406441984
+        }
+      },
+      "validation_policy": "published_baseline_checks",
+      "current_strict_wrapper": false,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.19588595799999098,
+      "rss_before_load": {
+        "current_bytes": 76980224,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399859712,
+        "process_peak_bytes": 399859712
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406573056
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:24:58.239530+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 3
+    },
+    {
+      "name": "selected_incumbent",
+      "seconds": 4.1623728350000135,
+      "rows": 160000,
+      "callbacks_per_second": 38439.612774380286,
+      "startup_seconds": 0.0034495419999984733,
+      "sequence_seconds": [
+        0.5007087920000117,
+        0.4983772499999901,
+        0.5053046670000043,
+        0.5280762919999944,
+        0.5246677920000025,
+        0.5433562500000022,
+        0.5644615000000073,
+        0.4974079579999966
+      ],
+      "rss": {
+        "before_startup": {
+          "current_bytes": 399990784,
+          "process_peak_bytes": 399990784
+        },
+        "after_startup": {
+          "current_bytes": 406253568,
+          "process_peak_bytes": 406253568
+        },
+        "after_warmup": {
+          "current_bytes": 406441984,
+          "process_peak_bytes": 406441984
+        },
+        "after_callbacks": {
+          "current_bytes": 406441984,
+          "process_peak_bytes": 406441984
+        }
+      },
+      "validation_policy": "current_strict_wrapper",
+      "current_strict_wrapper": true,
+      "output_ownership_checked": true,
+      "load_seconds_excluded": 0.24250612500000557,
+      "rss_before_load": {
+        "current_bytes": 76984320,
+        "process_peak_bytes": 89591808
+      },
+      "rss_after_load": {
+        "current_bytes": 399859712,
+        "process_peak_bytes": 399859712
+      },
+      "environment": {
+        "python": "3.11.16",
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "numpy": "2.2.6",
+        "onnxruntime": "1.23.2",
+        "peak_rss_bytes": 406573056
+      },
+      "constraints": {
+        "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+        "architecture": "aarch64",
+        "python": "3.11.16",
+        "judge_runtime_verified": false,
+        "host_exclusive": false,
+        "native_promoted": false,
+        "hardware_counters": {
+          "collected": false,
+          "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+        },
+        "cpu.max": "100000 100000",
+        "memory.max": "16000000000",
+        "memory.swap.max": "0",
+        "cpuset.cpus.effective": "0-3",
+        "network_interfaces": {
+          "lo": {
+            "flags": 9,
+            "up": true
+          },
+          "tunl0": {
+            "flags": 128,
+            "up": false
+          },
+          "gre0": {
+            "flags": 128,
+            "up": false
+          },
+          "gretap0": {
+            "flags": 4098,
+            "up": false
+          },
+          "erspan0": {
+            "flags": 4098,
+            "up": false
+          },
+          "ip_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6_vti0": {
+            "flags": 128,
+            "up": false
+          },
+          "sit0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6tnl0": {
+            "flags": 128,
+            "up": false
+          },
+          "ip6gre0": {
+            "flags": 128,
+            "up": false
+          }
+        },
+        "active_non_loopback_interfaces": [],
+        "utc": "2026-09-13T07:25:03.021041+00:00"
+      },
+      "scoring_performed": false,
+      "judge_runtime_verified": false,
+      "repetition": 3
+    }
+  ],
+  "summaries": {
+    "published_baseline": {
+      "seconds": [
+        4.409284752,
+        4.5802733769999975,
+        4.456510211000008
+      ],
+      "median_seconds": 4.456510211000008,
+      "median_callbacks_per_second": 35902.531897059685,
+      "median_microseconds_per_callback": 27.853188818750052,
+      "startup_seconds": [
+        0.0030571670000014706,
+        0.0024665420000005156,
+        0.0023820829999863236
+      ],
+      "peak_rss_bytes": [
+        406319104,
+        406437888,
+        406441984
+      ]
+    },
+    "selected_incumbent": {
+      "seconds": [
+        4.373749585000002,
+        4.116883210000005,
+        4.1623728350000135
+      ],
+      "median_seconds": 4.1623728350000135,
+      "median_callbacks_per_second": 38439.612774380286,
+      "median_microseconds_per_callback": 26.014830218750085,
+      "startup_seconds": [
+        0.0029983750000006637,
+        0.0031522079999959374,
+        0.0034495419999984733
+      ],
+      "peak_rss_bytes": [
+        406441984,
+        406409216,
+        406441984
+      ]
+    },
+    "zero_dynamics": {
+      "seconds": [
+        5.376904044,
+        5.890387961000002,
+        5.143233877
+      ],
+      "median_seconds": 5.376904044,
+      "median_callbacks_per_second": 29756.90075379742,
+      "median_microseconds_per_callback": 33.605650274999995,
+      "startup_seconds": [
+        0.0035763749999979666,
+        0.0033969589999998107,
+        0.0036476250000063715
+      ],
+      "peak_rss_bytes": [
+        406773760,
+        406765568,
+        406720512
+      ]
+    },
+    "nonzero_dynamics": {
+      "seconds": [
+        5.546770877,
+        5.428815669000002,
+        5.370921209999999
+      ],
+      "median_seconds": 5.428815669000002,
+      "median_callbacks_per_second": 29472.358200268805,
+      "median_microseconds_per_callback": 33.93009793125002,
+      "startup_seconds": [
+        0.00458041699999967,
+        0.0034212910000022134,
+        0.0033584579999939024
+      ],
+      "peak_rss_bytes": [
+        406728704,
+        406716416,
+        406695936
+      ]
+    }
+  },
+  "nonzero_throughput_ratio_vs_actual_baseline": 0.8208991578859235,
+  "nonzero_throughput_ratio_vs_selected": 0.7667183947261798,
+  "timed_domain": "Complete public DataPoint callback, including each arm's own validation/copies/state updates; features preloaded, startup and 256-row warm-up excluded.",
+  "rss_scope": "Fresh process per repetition/arm; peak includes imports, feature preload, startup and callbacks. Current Linux RSS sampled outside timed loops.",
+  "order_balance": "Three cyclic rotations, one occurrence of each arm per repetition and three distinct positions per arm; not perfect four-position balance.",
+  "fixture_note": "Untrained synthetic zero/nonzero output fixtures with identity normalization; no statistics were fitted.",
+  "normalization_timing_limit": "ORT may remove identity normalization; nonidentity training normalization must be remeasured.",
+  "scoring_performed": false,
+  "candidate_registration_performed": false,
+  "profiled": false,
+  "host_exclusive": false,
+  "judge_runtime_verified": false,
+  "hidden_test_rows": null,
+  "promotion_certified": false
+}

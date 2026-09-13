@@ -1,0 +1,99 @@
+{
+  "passed": true,
+  "bitwise_equal": true,
+  "rows": 160000,
+  "groups": [
+    1562,
+    595,
+    750,
+    1192,
+    561,
+    1128,
+    584,
+    658
+  ],
+  "all_row_hidden_states_checked": true,
+  "output_ownership_checked": true,
+  "raw_prediction_sha256": "0807d6387fab36168b995f8bfe01ebe89270efef09c30e18cb2b0832700bc374",
+  "selected_model_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "zero_model_sha256": "a34a14ea56d8077e2abde4c4bd3953de72176be76e7b226a17af6f0c3282c844",
+  "load_seconds_excluded": 0.35543195900000013,
+  "rss_before_load": {
+    "current_bytes": 76734464,
+    "process_peak_bytes": 89591808
+  },
+  "rss_after_load": {
+    "current_bytes": 399581184,
+    "process_peak_bytes": 399581184
+  },
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 406589440
+  },
+  "constraints": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "hardware_counters": {
+      "collected": false,
+      "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+    },
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-13T07:23:53.661503+00:00"
+  },
+  "scoring_performed": false,
+  "judge_runtime_verified": false
+}

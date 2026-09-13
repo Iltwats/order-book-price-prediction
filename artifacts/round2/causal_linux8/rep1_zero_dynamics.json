@@ -1,0 +1,117 @@
+{
+  "name": "zero_dynamics",
+  "seconds": 5.376904044,
+  "rows": 160000,
+  "callbacks_per_second": 29756.90075379742,
+  "startup_seconds": 0.0035763749999979666,
+  "sequence_seconds": [
+    0.6704072089999968,
+    0.7025031250000033,
+    0.6753835830000021,
+    0.6560505009999993,
+    0.6593382500000011,
+    0.6758362919999996,
+    0.6621186670000014,
+    0.6752542919999982
+  ],
+  "rss": {
+    "before_startup": {
+      "current_bytes": 399998976,
+      "process_peak_bytes": 399998976
+    },
+    "after_startup": {
+      "current_bytes": 406261760,
+      "process_peak_bytes": 406261760
+    },
+    "after_warmup": {
+      "current_bytes": 406773760,
+      "process_peak_bytes": 406773760
+    },
+    "after_callbacks": {
+      "current_bytes": 406773760,
+      "process_peak_bytes": 406773760
+    }
+  },
+  "validation_policy": "current_strict_wrapper",
+  "current_strict_wrapper": true,
+  "output_ownership_checked": true,
+  "load_seconds_excluded": 0.19268366700000072,
+  "rss_before_load": {
+    "current_bytes": 76976128,
+    "process_peak_bytes": 89591808
+  },
+  "rss_after_load": {
+    "current_bytes": 399867904,
+    "process_peak_bytes": 399867904
+  },
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 406773760
+  },
+  "constraints": {
+    "platform": "Linux-6.10.14-linuxkit-aarch64-with-glibc2.36",
+    "architecture": "aarch64",
+    "python": "3.11.16",
+    "judge_runtime_verified": false,
+    "host_exclusive": false,
+    "native_promoted": false,
+    "hardware_counters": {
+      "collected": false,
+      "reason": "No cache/performance counters were collected; perf is not installed in this inference image"
+    },
+    "cpu.max": "100000 100000",
+    "memory.max": "16000000000",
+    "memory.swap.max": "0",
+    "cpuset.cpus.effective": "0-3",
+    "network_interfaces": {
+      "lo": {
+        "flags": 9,
+        "up": true
+      },
+      "tunl0": {
+        "flags": 128,
+        "up": false
+      },
+      "gre0": {
+        "flags": 128,
+        "up": false
+      },
+      "gretap0": {
+        "flags": 4098,
+        "up": false
+      },
+      "erspan0": {
+        "flags": 4098,
+        "up": false
+      },
+      "ip_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6_vti0": {
+        "flags": 128,
+        "up": false
+      },
+      "sit0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6tnl0": {
+        "flags": 128,
+        "up": false
+      },
+      "ip6gre0": {
+        "flags": 128,
+        "up": false
+      }
+    },
+    "active_non_loopback_interfaces": [],
+    "utc": "2026-09-13T07:24:14.109314+00:00"
+  },
+  "scoring_performed": false,
+  "judge_runtime_verified": false
+}
