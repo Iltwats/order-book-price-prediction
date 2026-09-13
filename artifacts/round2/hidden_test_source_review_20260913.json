@@ -1,0 +1,58 @@
+{
+  "verified_date": "2026-09-13",
+  "method": "Exa discovery followed by official page fetch attempts and successful rendered browser reads",
+  "search_queries": 3,
+  "numResults_each": 5,
+  "requested_result_slots": 15,
+  "official_pages_reviewed": 4,
+  "sources": [
+    {
+      "url": "https://wundernn.io/connectome/docs/rules",
+      "facts": [
+        "Public leaderboard provides feedback on a sample of test data.",
+        "Final ranking uses a separate private hidden dataset and selected previously scored submissions."
+      ],
+      "undisclosed": [
+        "Sampling proportions and method",
+        "Whether every submission executes private data"
+      ]
+    },
+    {
+      "url": "https://wundernn.io/connectome/docs/data_overview",
+      "facts": [
+        "Test has validation-like sequence format: independent 20000 rows; 99 warmup rows; 112 FP32 features.",
+        "Two target indicators describe future movement of instrument i0; i1 supplies features only.",
+        "Test scoring mask is hidden and applied after inference; callback does not receive mask or labels.",
+        "Targets and predictions are clipped to [-2,2]; row weights use absolute clipped targets; eligible sequences have equal final weight."
+      ],
+      "undisclosed": [
+        "Instrument identities, dates and target horizons",
+        "Test sequence selection and market regimes",
+        "Mask generation and matching selection mechanisms across splits",
+        "Hidden row and sequence counts"
+      ]
+    },
+    {
+      "url": "https://wundernn.io/connectome/docs/submission_guide",
+      "facts": [
+        "Organizer-managed scoring Docker image is based on python:3.11-slim-bookworm.",
+        "Python 3.11, 1 vCPU, 16 GB RAM, no GPU, no Internet, 60-minute inference limit, 20 MB ZIP limit."
+      ],
+      "undisclosed": [
+        "CPU architecture/model, cloud provider, geographical region, physical-core exclusivity",
+        "Definition of UI duration and memory accounting"
+      ]
+    },
+    {
+      "url": "https://wundernn.io/connectome/docs/faq",
+      "facts": [
+        "Confirms scoring and execution limits."
+      ],
+      "undisclosed": [
+        "Additional hidden data selection details"
+      ]
+    }
+  ],
+  "excluded_search_claim": "Approximately 1500 public/private sequences appeared for Predictorium, a different competition. It was excluded.",
+  "scope": "Publicly documented evaluation facts only. No private data or infrastructure probing. No new models, submissions, or scoring."
+}
