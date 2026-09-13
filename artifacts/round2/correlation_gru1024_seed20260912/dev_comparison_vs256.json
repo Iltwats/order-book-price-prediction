@@ -1,0 +1,14 @@
+{
+  "delta": 0.0005496921345060968,
+  "ci_low": 0.00046596531325790273,
+  "ci_high": 0.0006302584079164935,
+  "confidence": 0.95,
+  "candidate_wp": 0.6300190940589716,
+  "baseline_wp": 0.6294694019244654,
+  "sequences": 1399,
+  "win_fraction": 0.7112223016440314,
+  "n_resamples": 10000,
+  "seed": 20260913,
+  "method": "paired sequence percentile bootstrap",
+  "assumption": "sequences are sufficiently independent; search bias is not corrected"
+}

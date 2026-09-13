@@ -1,0 +1,94 @@
+{
+  "candidate": "correlation_gru1024_seed20260912",
+  "status": "experimental latest archive; highest development WP among feasible completed round-two candidates",
+  "archive": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/dist/submission_correlation1024.zip",
+  "archive_sha256": "cd0c97462685c9256c91908fc285f5acf2e13499678d5ffb088b2a63846486c4",
+  "archive_bytes": 722509,
+  "archive_entries": [
+    "MANIFEST.json",
+    "MODEL.md",
+    "connectome/__init__.py",
+    "connectome/native.py",
+    "connectome/runtime.py",
+    "model.onnx",
+    "solution.py",
+    "submission_config.json"
+  ],
+  "model_sha256": "15c3dad6c0f9964df7489c5dc8c3b5d5774907d6dc33ac80d8fe5533a61f6cde",
+  "development": {
+    "t0": 0.6300329916291778,
+    "t1": 0.6300051964887657,
+    "weighted_pearson": 0.6300190940589718,
+    "blocks": 1400,
+    "eligible_blocks": 1399,
+    "seconds": 276.9334012500476
+  },
+  "incumbent_comparison": {
+    "delta": 0.0007635592687269507,
+    "ci_low": 0.0006552369119954012,
+    "ci_high": 0.0008683898580948155,
+    "confidence": 0.95,
+    "candidate_wp": 0.6300190940589716,
+    "baseline_wp": 0.6292555347902447,
+    "sequences": 1399,
+    "win_fraction": 0.7262330235882773,
+    "n_resamples": 10000,
+    "seed": 20260913,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "interim256_comparison": {
+    "delta": 0.0005496921345060968,
+    "ci_low": 0.00046596531325790273,
+    "ci_high": 0.0006302584079164935,
+    "confidence": 0.95,
+    "candidate_wp": 0.6300190940589716,
+    "baseline_wp": 0.6294694019244654,
+    "sequences": 1399,
+    "win_fraction": 0.7112223016440314,
+    "n_resamples": 10000,
+    "seed": 20260913,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "checks": {
+    "candidate_numerical_bridge": true,
+    "byte_exact_callback_bulk_32_sequences": true,
+    "three_linux_callback_repetitions": true,
+    "sustained_linux_256_sequences": true,
+    "fresh_host_zip": true,
+    "fresh_offline_linux_zip": true,
+    "archive_manifest_hashes_and_crc": true,
+    "datasets_excluded": true
+  },
+  "caps": {
+    "screen": 12,
+    "dev": 4
+  },
+  "consumed": {
+    "screen": 12,
+    "dev": 4
+  },
+  "confirmation_reused": false,
+  "judge_runtime_verified": false,
+  "live_target_achieved": false,
+  "live_score_last_reported": 0.6083,
+  "baseline_default_replaced": false,
+  "preserved_originals": {
+    "baseline/baseline.onnx": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+    "artifacts/selected/model.onnx": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "dist/submission.zip": "9d8862659bbe823532879708fa2765ac023d2cae8984501919e1293a022c8de4",
+    "dist/submission_correlation256.zip": "da54694005d2e96b65c3a8f8de83b6793144aa47c4a59a4752afea25908104a2"
+  },
+  "evidence": {
+    "artifacts/round2/registry_after_correlation1024_dev.json": "a1f582edede668edc002413990fd7575bab0d66ce530f36cbf0be4297810a419",
+    "artifacts/round2/correlation1024_package_report.json": "cc17053006a4a8168e46f108974653e2a77596fc792c00f7b33767c7962a94cd",
+    "artifacts/round2/correlation1024_zip_linux/fresh_zip.json": "93eb53685a205b5b158e605b77eeb9774a35e9dc98f48531970262fd59080552",
+    "artifacts/round2/correlation1024_dev_gate.json": "43d3dfdee3fd624c41eac0bf0adae475462b0a39226bd19b74eb5d282b9041c1",
+    "artifacts/round2/correlation_gru1024_seed20260912/dev_report.json": "3608895d47fb6cffd3bf95c80a01886219f3392fa1c01a47e472661e1828a9cf",
+    "artifacts/round2/correlation_gru1024_seed20260912/dev_comparison.json": "39f20a7b163a6a1864a1b64372b745ebd2a2d18e78fdb89270f40142f2570d5c",
+    "artifacts/round2/correlation_gru1024_seed20260912/dev_comparison_vs256.json": "6b4d77653856841e28fcfe4e90a2037d26a185ff6699601b5b00ee1bf6226388",
+    "artifacts/round2/correlation_gru1024_seed20260912/parity.json": "7823654bac1da6d396212f668b5e723cf6d9d8c3e1df3f989709f38452bf14fe",
+    "artifacts/round2/correlation_gru1024_seed20260912/bridge/report.json": "bba8a1567b1ab6b3a18970e037a0a902ad823203b4e0d7ea1bdf6194f9fed53e"
+  }
+}

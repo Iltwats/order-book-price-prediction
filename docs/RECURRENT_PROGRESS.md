@@ -1,6 +1,6 @@
 # Recurrent model progress
 
-Direct correlation training has produced a measured local improvement while reusing the supplied GRU. The stronger 256-sequence candidate reached **0.629469402 full-development WP**, versus **0.629255535** for the calibrated incumbent, a gain of **0.000213867**. An interim submission ZIP is available below. **The 0.75 live leaderboard target remains unmet; the two 1,024-sequence expansion runs and their results are pending.**
+Direct correlation training has produced a measured local improvement while reusing the supplied GRU. The selected 1,024-sequence candidate reached **0.630019094 full-development WP**, versus **0.629255535** for the calibrated incumbent: **+0.000763559**. The [latest ZIP](../dist/submission_correlation1024.zip) passed fresh offline host and Linux verification. **The 0.75 live target remains unmet.**
 
 ## What changed
 
@@ -67,8 +67,21 @@ The [paired development comparison](../artifacts/round2/correlation_gru_lr3e-5/d
 
 This is an interim experimental archive. No new live leaderboard result is established, and hidden-judge runtime remains unverified. The original submission stays available.
 
-## 1,024-sequence expansion: pending
+## Completed 1,024-sequence expansion
 
-The [prospective expansion policy](../artifacts/round2/correlation_expansion_policy.json) fixes the first 1,024 training-anchor sequences, one epoch and learning rate `3e-5`, with seeds **20260912** and **20260913**. Each run starts independently from the selected pretrained source, rather than continuing the screened checkpoint. The unchanged selected model remains the teacher. These runs test broader training and seed sensitivity; they are not independent data holdouts.
+Both independent seeds completed the [frozen expansion policy](../artifacts/round2/correlation_expansion_policy.json): the full 1,024 training-anchor sequences, one epoch and learning rate `3e-5`, starting from the selected pretrained source each time. Training took **758.503** and **757.710 seconds**. Both candidate numerical checks and byte-exact callback/bulk checks on 32 complete sequences passed.
 
-Both training jobs are in progress; their completed training reports, numerical checks, screen results and any final development comparison are **pending**. The declared caps remain **12 screens / four full-development trials**. The completed correlation-256 stage brings usage to ten screens and three full-development trials; the policy allocates two final screens and at most one final development evaluation to the best feasible expansion. No expansion gain, revised archive or achievement of the 0.75 live target is claimed here. Confirmation remains consumed and has not been reused for these comparisons.
+| Seed | Screen t0 | Screen t1 | Screen WP | Paired improvement over incumbent |
+|---|---:|---:|---:|---:|
+| 20260912 | 0.639011531 | 0.640095874 | 0.639553702 | +0.000637617 |
+| 20260913 | 0.639025299 | 0.640068100 | 0.639546699 | +0.000630614 |
+
+Both also improved over the interim 256-sequence model with positive [paired intervals](../artifacts/round2/correlation1024_screen_vs256.json). The [immutable selector](../artifacts/round2/correlation_expansion_selection.json) chose seed 20260912 for performance checks after both screens completed. Its embedded registry snapshot is preserved separately in [the pre-development registry](../artifacts/round2/registry_before_correlation1024_dev.json); the live registry naturally changed when final development was reserved.
+
+Linux testing used one CPU quota, 16 GB memory, no extra swap and no network. All three complete-callback comparisons beat the original baseline, with median **38,859.7 versus 34,267.6 callbacks/second**, a **13.40%** gain. Sustained inference processed **5.12 million rows in 140.293 seconds**, at **36,495 rows/second**, with **370,384,896 bytes** peak process RSS. Linux screen WP differed from the Mac bulk evaluation by only **8.22e-9**. These are local Linux ARM64 measurements, not verified judge timing. [Performance gate](../artifacts/round2/correlation1024_dev_gate.json)
+
+Only seed 20260912 used the final full-development slot. It scored **0.630019094**, with target scores **0.630032992** and **0.630005196**. The paired gain over the incumbent is **+0.000763559**, with 95% interval **[+0.000655237, +0.000868390]**. The gain over the interim 256-sequence ZIP is **+0.000549692**, interval **[+0.000465965, +0.000630258]**. All 1,400 sequences were processed; 1,399 were eligible. Evaluation took **276.933 seconds** using the parity-checked bulk evaluator. [Incumbent comparison](../artifacts/round2/correlation_gru1024_seed20260912/dev_comparison.json), [interim comparison](../artifacts/round2/correlation_gru1024_seed20260912/dev_comparison_vs256.json)
+
+The new experimental [submission_correlation1024.zip](../dist/submission_correlation1024.zip) is **722,509 bytes**. Fresh extracted Python 3.11 processes passed on both Mac and offline Linux, checking warm-up, finite predictions, sequence resets and output ownership. Earlier archives and the default selected baseline remain available. [Package receipt](../artifacts/round2/correlation1024_package_report.json), [Linux ZIP verification](../artifacts/round2/correlation1024_zip_linux/fresh_zip.json)
+
+The unchanged round-two budget is now fully consumed: **12 screens and four full-development evaluations**. Confirmation was not reused. This finishes the declared expansion cycle; any further fitted candidate needs a prospective evaluation plan. The next [TRAIN-only diagnostic](CORRELATION_NEXT_EXPERIMENT.md) separates longer backward credit assignment from lower-layer adaptation. The results support further investigation, not a promise of live WP 0.75.

@@ -1,0 +1,57 @@
+{
+  "archive": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/dist/submission_correlation1024.zip",
+  "size_bytes": 722509,
+  "sha256": "cd0c97462685c9256c91908fc285f5acf2e13499678d5ffb088b2a63846486c4",
+  "files": {
+    "MODEL.md": "05f3ca1914e9d93e79f7573e85ae6feb3ab76888a340de97a7eceb7008ee92cb",
+    "connectome/__init__.py": "ea78d2847e3336ad17c2441e5f8282b444a44655e5e107f9f46cfb1ec8c7dd48",
+    "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+    "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+    "model.onnx": "15c3dad6c0f9964df7489c5dc8c3b5d5774907d6dc33ac80d8fe5533a61f6cde",
+    "solution.py": "a9a88b3aa5dd27ec84a052be0847987ed77ff57d19e684823bff12028d0b184b",
+    "submission_config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac"
+  },
+  "verified": true,
+  "judge_runtime_verified": false,
+  "verification": {
+    "passed": true,
+    "rows": 768,
+    "resets": 2,
+    "independent_output_ownership": true,
+    "network_disabled": true,
+    "python": "3.11.16"
+  },
+  "candidate": "correlation_gru1024_seed20260912",
+  "status": "experimental; full development and CPU gates passed; live result unknown",
+  "development_comparison": {
+    "delta": 0.0007635592687269507,
+    "ci_low": 0.0006552369119954012,
+    "ci_high": 0.0008683898580948155,
+    "confidence": 0.95,
+    "candidate_wp": 0.6300190940589716,
+    "baseline_wp": 0.6292555347902447,
+    "sequences": 1399,
+    "win_fraction": 0.7262330235882773,
+    "n_resamples": 10000,
+    "seed": 20260913,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "development_comparison_vs256": {
+    "delta": 0.0005496921345060968,
+    "ci_low": 0.00046596531325790273,
+    "ci_high": 0.0006302584079164935,
+    "confidence": 0.95,
+    "candidate_wp": 0.6300190940589716,
+    "baseline_wp": 0.6294694019244654,
+    "sequences": 1399,
+    "win_fraction": 0.7112223016440314,
+    "n_resamples": 10000,
+    "seed": 20260913,
+    "method": "paired sequence percentile bootstrap",
+    "assumption": "sequences are sufficiently independent; search bias is not corrected"
+  },
+  "confirmation_reused": false,
+  "live_target_achieved": false,
+  "baseline_default_replaced": false
+}
