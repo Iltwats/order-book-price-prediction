@@ -1,0 +1,5410 @@
+{
+  "protocol_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/correlation_training_bridge/protocol.json",
+  "protocol_sha256": "72635b5006e7b2cb95f7c1807967f5dc4b9791e50de16915e87ab1532f681969",
+  "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "zero_update_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "teacher_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "procedure": {
+    "version": "correlation_ort_forward_gradient.v1",
+    "objective": {
+      "version": "full_sequence_clipped_correlation.v1",
+      "label_clip": [
+        -2.0,
+        2.0
+      ],
+      "prediction_clip": [
+        -2.0,
+        2.0
+      ],
+      "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+      "rho_bound": [
+        -1.0,
+        1.0
+      ],
+      "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+      "weight": "absolute clipped target; normalized separately per complete sequence and target",
+      "weight_sum_floor": 1e-08,
+      "std_floor": 1e-08,
+      "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+      "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+      "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+      "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+      "teacher_denominator_floor": 1e-12,
+      "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+      "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+      "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+      "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+      "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+    },
+    "gradient": {
+      "atol": 1e-06,
+      "rtol": 0.0001
+    },
+    "gradient_chunk_starts": [
+      0,
+      19744
+    ],
+    "teacher_weight": 0.1,
+    "chunk_size": 256,
+    "forward": "current-student ORT full trajectory; Torch chunk-local gradient and exact ORT forward proxies",
+    "new_evidence": "correlation-specific full-sequence coefficients and FP32/FP64 gradients; MSE gradient evidence is not relabeled",
+    "scope": "TRAIN-only approximation check; not masked WP or a model improvement score"
+  },
+  "budget": {
+    "version": "approximate_training_bridge.v1",
+    "strict": {
+      "atol": 1e-06,
+      "rtol": 1e-05
+    },
+    "common_state": {
+      "normalized_max": 1.52587890625e-05,
+      "normalized_rms": 9.5367431640625e-07
+    },
+    "carried_state": {
+      "normalized_max": 6.103515625e-05,
+      "normalized_rms": 3.814697265625e-06
+    },
+    "wp": {
+      "max_sequence_target_drift": 2e-05,
+      "max_mean_target_drift": 2e-06
+    },
+    "fp64_equation": {
+      "atol": 1e-12,
+      "rtol": 1e-10
+    },
+    "normalization": "per coordinate max(1, reference RMS); RMS bound applies to every coordinate",
+    "rationale": "Prospective engineering limits informed by the existing roughly 1e-5 FP32 discrepancy; not formal roundoff bounds or a claim that strict parity passes. Common-state limits are tighter because recurrence cannot accumulate error. State scale stays one for bounded GRU states; the RMS floor prevents unstable relative errors near zero. WP limits constrain task-level drift, per sequence as well as per-target means to prevent cancellation. These diagnostics use training data only and do not establish generalization or release fitness."
+  },
+  "mode": "initial_source",
+  "sequences": [
+    {
+      "row_group": 2309,
+      "seq_ix": 480770951,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 7.494005416219807e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.942890293094024e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 2.9578804969787598e-06,
+              "rms_error": 7.197921376307945e-08,
+              "normalized_max": 2.9578804969787598e-06,
+              "normalized_rms": 1.9652748822128412e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 3,
+              "strict_max_tolerance_ratio": 1.4130019772275477,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 4.76837158203125e-07,
+              "rms_error": 8.803396183733516e-08,
+              "normalized_max": 4.76837158203125e-07,
+              "normalized_rms": 9.069550287477324e-08,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0089711503069296,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.2920063381727738,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.2250093457556464,
+              "t1": 0.33658966271926055,
+              "weighted_pearson": 0.2807995042374535,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.22500934520076712,
+              "t1": 0.3365896674081932,
+              "weighted_pearson": 0.28079950630448014,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              5.548792814114023e-10,
+              -4.688932631058407e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 9.499490261077881e-06,
+              "rms_error": 3.7156045787390564e-07,
+              "normalized_max": 9.499490261077881e-06,
+              "normalized_rms": 1.283206985082109e-06,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 7428,
+              "strict_max_tolerance_ratio": 5.319450349497901,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.4901161193847656e-06,
+              "rms_error": 2.3185172523729619e-07,
+              "normalized_max": 1.4901161193847656e-06,
+              "normalized_rms": 2.3304196542894128e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0089711503069296,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.6907176072436938,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.22500930229185723,
+              "t1": 0.3365896021917389,
+              "weighted_pearson": 0.28079945224179803,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.22500934520076712,
+              "t1": 0.3365896674081932,
+              "weighted_pearson": 0.28079950630448014,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -4.290890989744334e-08,
+              -6.521645429247158e-08
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.7192004936955199,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.7192004936955199,
+            "correlation_loss": 0.7192004936955199,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.28079950630448014,
+            "rho_per_sequence_target": [
+              [
+                0.22500934520076704,
+                0.3365896674081933
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                13926.78880828619,
+                13366.739270627499
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                0.9999999999999999,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.40948873677597003,
+                0.4363272653166758
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0002512436560976835,
+                0.0006532335058539772
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0005653172337145426,
+                "l2": 0.01692466847867538,
+                "per_sequence_target_l1": [
+                  [
+                    1.0270289335934053,
+                    0.8577169869388923
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0005653172337145426,
+                "l2": 0.01692466847867538,
+                "per_sequence_target_l1": [
+                  [
+                    1.0270289335934053,
+                    0.8577169869388923
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 4.049113509817324e-09,
+              "rms_error": 2.209001864739115e-10,
+              "max_tolerance_ratio": 0.003959763248048814,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 3.993589117211381e-09,
+              "rms_error": 2.170509960810809e-10,
+              "max_tolerance_ratio": 0.003970141942652363,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 3.293623722659591e-09,
+              "rms_error": 4.404460002243618e-10,
+              "max_tolerance_ratio": 0.003207739747055385,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 3.351831383464638e-09,
+              "rms_error": 3.579960761410215e-10,
+              "max_tolerance_ratio": 0.003264429594733764,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 1.8457175982034002e-08,
+              "rms_error": 3.838210842922715e-09,
+              "max_tolerance_ratio": 0.0036570050889657394,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 1.3387762010097504e-09,
+              "rms_error": 1.0406400064693953e-09,
+              "max_tolerance_ratio": 0.00025575030007701994,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "34b25c6a4afed5a3da050bd3a96748204390f081a18f8928dffed62782b1170c",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.7192004936955199,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.7192004936955199,
+            "correlation_loss": 0.7192004936955199,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.28079950630448014,
+            "rho_per_sequence_target": [
+              [
+                0.22500934520076704,
+                0.3365896674081933
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                13926.78880828619,
+                13366.739270627499
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                0.9999999999999999,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.40948873677597003,
+                0.4363272653166758
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0002512436560976835,
+                0.0006532335058539772
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0005653172337145426,
+                "l2": 0.01692466847867538,
+                "per_sequence_target_l1": [
+                  [
+                    1.0270289335934053,
+                    0.8577169869388923
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0005653172337145426,
+                "l2": 0.01692466847867538,
+                "per_sequence_target_l1": [
+                  [
+                    1.0270289335934053,
+                    0.8577169869388923
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 4.082767112145838e-10,
+              "rms_error": 1.9231728432526668e-11,
+              "max_tolerance_ratio": 0.0004081140296781175,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 4.3020300169618983e-10,
+              "rms_error": 1.843035928857924e-11,
+              "max_tolerance_ratio": 0.00043005401129482464,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 4.0865504061669204e-10,
+              "rms_error": 3.261228005627897e-11,
+              "max_tolerance_ratio": 0.00040849220743704784,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 4.082002932641115e-10,
+              "rms_error": 2.8964721540978503e-11,
+              "max_tolerance_ratio": 0.0004080376412836451,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 2.0287226724924334e-09,
+              "rms_error": 5.163936847237427e-10,
+              "max_tolerance_ratio": 0.0014024275600529094,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 4.540083864412736e-10,
+              "rms_error": 3.3279696236109465e-10,
+              "max_tolerance_ratio": 0.00031078630179101646,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "34b25c6a4afed5a3da050bd3a96748204390f081a18f8928dffed62782b1170c",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 9078,
+      "seq_ix": 1855651319,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 8.326672684688674e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.9984014443252818e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.4901161193847656e-06,
+              "rms_error": 7.35894358358588e-08,
+              "normalized_max": 1.4901161193847656e-06,
+              "normalized_rms": 1.8281192505083572e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 1,
+              "strict_max_tolerance_ratio": 1.1961378323582013,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 7.152557373046875e-07,
+              "rms_error": 1.4965032246070913e-07,
+              "normalized_max": 7.152557373046875e-07,
+              "normalized_rms": 1.5426365502435223e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.44106597707471373,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.48243694461261905,
+              "t1": 0.5259217945013814,
+              "weighted_pearson": 0.5041793695570003,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.4824369472082523,
+              "t1": 0.5259217854448448,
+              "weighted_pearson": 0.5041793663265486,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -2.595633263879904e-09,
+              9.056536631746326e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.1146068572998047e-05,
+              "rms_error": 3.465039971597941e-07,
+              "normalized_max": 1.1146068572998047e-05,
+              "normalized_rms": 1.262714834861331e-06,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 3926,
+              "strict_max_tolerance_ratio": 3.2485194864807565,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.6689300537109375e-06,
+              "rms_error": 2.561357472430482e-07,
+              "normalized_max": 1.6689300537109375e-06,
+              "normalized_rms": 2.7679619877811577e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.7013165347763,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.48243697393531504,
+              "t1": 0.5259218138010199,
+              "weighted_pearson": 0.5041793938681675,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.4824369472082523,
+              "t1": 0.5259217854448448,
+              "weighted_pearson": 0.5041793663265486,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              2.6727062729658968e-08,
+              2.835617507468413e-08
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.49582063367345147,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.49582063367345147,
+            "correlation_loss": 0.49582063367345147,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.5041793663265486,
+            "rho_per_sequence_target": [
+              [
+                0.48243694720825236,
+                0.5259217854448447
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                11619.463714033365,
+                10595.201834350824
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.8403969719105051,
+                1.037869936451282
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.004170644691221546,
+                0.06879051303954575
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00026878952218577137,
+                "l2": 0.007416208027803792,
+                "per_sequence_target_l1": [
+                  [
+                    0.4357361971354531,
+                    0.3166066613834315
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00026878952218577137,
+                "l2": 0.007416208027803792,
+                "per_sequence_target_l1": [
+                  [
+                    0.4357361971354531,
+                    0.3166066613834315
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 4.3303685185681266e-10,
+              "rms_error": 2.1008187481638146e-11,
+              "max_tolerance_ratio": 0.00043229822662717505,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 3.345033606930257e-10,
+              "rms_error": 2.0326413667941914e-11,
+              "max_tolerance_ratio": 0.00033132986658168044,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 2.710986785129906e-10,
+              "rms_error": 3.532938923170327e-11,
+              "max_tolerance_ratio": 0.00026853553813512595,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 2.856505938226726e-10,
+              "rms_error": 2.9198680250079034e-11,
+              "max_tolerance_ratio": 0.0002829498703259595,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 2.0585828814159712e-09,
+              "rms_error": 4.4910741920060733e-10,
+              "max_tolerance_ratio": 0.0013583266871067625,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 4.852438451052876e-10,
+              "rms_error": 3.446429927045053e-10,
+              "max_tolerance_ratio": 0.0003096859036164788,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "8c95629dc6c481b75fb05eb5a54bb0d832fe895d4afb5f4dae497535624385ae",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.49582063367345147,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.49582063367345147,
+            "correlation_loss": 0.49582063367345147,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.5041793663265486,
+            "rho_per_sequence_target": [
+              [
+                0.48243694720825236,
+                0.5259217854448447
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                11619.463714033365,
+                10595.201834350824
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.8403969719105051,
+                1.037869936451282
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.004170644691221546,
+                0.06879051303954575
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00026878952218577137,
+                "l2": 0.007416208027803792,
+                "per_sequence_target_l1": [
+                  [
+                    0.4357361971354531,
+                    0.3166066613834315
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00026878952218577137,
+                "l2": 0.007416208027803792,
+                "per_sequence_target_l1": [
+                  [
+                    0.4357361971354531,
+                    0.3166066613834315
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 5.434653496804524e-10,
+              "rms_error": 3.046303355658818e-11,
+              "max_tolerance_ratio": 0.0005433216676500364,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 5.441174319331049e-10,
+              "rms_error": 2.309046207037683e-11,
+              "max_tolerance_ratio": 0.0005439750062377817,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 5.430664635036101e-10,
+              "rms_error": 4.857100069653651e-11,
+              "max_tolerance_ratio": 0.0005429227341851016,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 5.421569688005667e-10,
+              "rms_error": 3.705672192349111e-11,
+              "max_tolerance_ratio": 0.0005420134801911844,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 3.344719998361889e-09,
+              "rms_error": 4.681203789933179e-10,
+              "max_tolerance_ratio": 0.002307558502375326,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 2.3021584638627246e-11,
+              "rms_error": 1.6497823761872937e-11,
+              "max_tolerance_ratio": 1.5691399229954152e-05,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "8c95629dc6c481b75fb05eb5a54bb0d832fe895d4afb5f4dae497535624385ae",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 4507,
+      "seq_ix": 919552685,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 8.604228440844963e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.2212453270876722e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.4454126358032227e-06,
+              "rms_error": 7.457904210461883e-08,
+              "normalized_max": 1.4454126358032227e-06,
+              "normalized_rms": 1.6408705136914731e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.8981040824518061,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 7.152557373046875e-07,
+              "rms_error": 8.70539049445303e-08,
+              "normalized_max": 7.152557373046875e-07,
+              "normalized_rms": 8.944470880544498e-08,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.2952210211537671,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.31848329957977084,
+              "t1": 0.26814246090975846,
+              "weighted_pearson": 0.29331288024476465,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.3184832984680905,
+              "t1": 0.2681424633453859,
+              "weighted_pearson": 0.2933128809067382,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              1.1116803588784308e-09,
+              -2.4356274219705654e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 3.375113010406494e-06,
+              "rms_error": 2.92347239814735e-07,
+              "normalized_max": 3.375113010406494e-06,
+              "normalized_rms": 7.437733666417704e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 2073,
+              "strict_max_tolerance_ratio": 2.7974539859064382,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.5497207641601562e-06,
+              "rms_error": 2.2129428474341225e-07,
+              "normalized_max": 1.5497207641601562e-06,
+              "normalized_rms": 2.4094924228010226e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.9779148852796544,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.31848330224614785,
+              "t1": 0.26814244139487936,
+              "weighted_pearson": 0.2933128718205136,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.3184832984680905,
+              "t1": 0.2681424633453859,
+              "weighted_pearson": 0.2933128809067382,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              3.778057366954357e-09,
+              -2.1950506523538138e-08
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.7066871190932618,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.7066871190932618,
+            "correlation_loss": 0.7066871190932618,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.29331288090673824,
+            "rho_per_sequence_target": [
+              [
+                0.31848329846809054,
+                0.2681424633453859
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                19336.51891320944,
+                19960.066605985165
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0000000000000004,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.5443311929381052,
+                0.5001359340436317
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.00020099492487814683,
+                0.0024621878297572987
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0002480608711335225,
+                "l2": 0.012399034130650036,
+                "per_sequence_target_l1": [
+                  [
+                    0.7639322301407169,
+                    0.8126331065497253
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0002480608711335225,
+                "l2": 0.012399034130650036,
+                "per_sequence_target_l1": [
+                  [
+                    0.7639322301407169,
+                    0.8126331065497253
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 2.0752278234595703e-09,
+              "rms_error": 1.270490926496996e-10,
+              "max_tolerance_ratio": 0.002052484012487567,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.8197621117507865e-09,
+              "rms_error": 9.338006819955521e-11,
+              "max_tolerance_ratio": 0.0018124384596205309,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.6041114342868132e-09,
+              "rms_error": 1.8945262444460003e-10,
+              "max_tolerance_ratio": 0.0015600491192040748,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.5944182036394146e-09,
+              "rms_error": 1.6025702093664916e-10,
+              "max_tolerance_ratio": 0.0015643079589021515,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 4.751221031190633e-09,
+              "rms_error": 1.2192146398375847e-09,
+              "max_tolerance_ratio": 0.002594725112170753,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 5.838955985382199e-10,
+              "rms_error": 4.355672880532999e-10,
+              "max_tolerance_ratio": 0.00025607102315943256,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "c254fa309d49c6bf948bac77e5885dff2a0a27dda0e22759eefabe8dc968e461",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.7066871190932618,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.7066871190932618,
+            "correlation_loss": 0.7066871190932618,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.29331288090673824,
+            "rho_per_sequence_target": [
+              [
+                0.31848329846809054,
+                0.2681424633453859
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                19336.51891320944,
+                19960.066605985165
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0000000000000004,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.5443311929381052,
+                0.5001359340436317
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.00020099492487814683,
+                0.0024621878297572987
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0002480608711335225,
+                "l2": 0.012399034130650036,
+                "per_sequence_target_l1": [
+                  [
+                    0.7639322301407169,
+                    0.8126331065497253
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0002480608711335225,
+                "l2": 0.012399034130650036,
+                "per_sequence_target_l1": [
+                  [
+                    0.7639322301407169,
+                    0.8126331065497253
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 9.394369634455285e-10,
+              "rms_error": 7.280332111105349e-11,
+              "max_tolerance_ratio": 0.0009390363878325269,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 8.790307761877671e-10,
+              "rms_error": 5.800903477708849e-11,
+              "max_tolerance_ratio": 0.0008712912086220263,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 8.172937692151874e-10,
+              "rms_error": 1.114969768480958e-10,
+              "max_tolerance_ratio": 0.0008144081288988939,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 8.163054687770639e-10,
+              "rms_error": 9.569594262969472e-11,
+              "max_tolerance_ratio": 0.0008134278698382358,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 4.658252294315046e-09,
+              "rms_error": 7.050457701521391e-10,
+              "max_tolerance_ratio": 0.00242292024685056,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 2.2038371128019207e-10,
+              "rms_error": 2.0769416659378798e-10,
+              "max_tolerance_ratio": 0.00019551025619421979,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "c254fa309d49c6bf948bac77e5885dff2a0a27dda0e22759eefabe8dc968e461",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 3165,
+      "seq_ix": 652237022,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 1.2490009027033011e-15,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.717376241217039e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.6689300537109375e-06,
+              "rms_error": 7.60700861248827e-08,
+              "normalized_max": 1.6689300537109375e-06,
+              "normalized_rms": 1.973121295339078e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 3,
+              "strict_max_tolerance_ratio": 1.0436414689765243,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 4.76837158203125e-07,
+              "rms_error": 9.257639463197079e-08,
+              "normalized_max": 4.76837158203125e-07,
+              "normalized_rms": 9.547075247763907e-08,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.2458878736542864,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.31263463915319817,
+              "t1": 0.34613629624728376,
+              "weighted_pearson": 0.32938546770024096,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.312634636230281,
+              "t1": 0.3461362949440724,
+              "weighted_pearson": 0.3293854655871767,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              2.9229171860656322e-09,
+              1.3032113721500593e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 4.023313522338867e-06,
+              "rms_error": 3.1467167009330843e-07,
+              "normalized_max": 4.023313522338867e-06,
+              "normalized_rms": 9.083264790649786e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 2986,
+              "strict_max_tolerance_ratio": 2.53610213587949,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.430511474609375e-06,
+              "rms_error": 2.447200331877135e-07,
+              "normalized_max": 1.430511474609375e-06,
+              "normalized_rms": 2.565012324597884e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 5,
+              "strict_max_tolerance_ratio": 1.1704676954817608,
+              "strict_passed": false,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.31263466034631776,
+              "t1": 0.34613633723087495,
+              "weighted_pearson": 0.32938549878859635,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.312634636230281,
+              "t1": 0.3461362949440724,
+              "weighted_pearson": 0.3293854655871767,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              2.411603677865415e-08,
+              4.228680255957684e-08
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.6706145344128234,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.6706145344128234,
+            "correlation_loss": 0.6706145344128234,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.3293854655871767,
+            "rho_per_sequence_target": [
+              [
+                0.312634636230281,
+                0.3461362949440724
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                18549.658270597458,
+                17544.436839342117
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.5262705858657926,
+                0.5542793105885572
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.002210944173659615,
+                0.004924375659514597
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00024378540113456298,
+                "l2": 0.01238067682181263,
+                "per_sequence_target_l1": [
+                  [
+                    0.7562326488863389,
+                    0.7282383253223098
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00024378540113456298,
+                "l2": 0.01238067682181263,
+                "per_sequence_target_l1": [
+                  [
+                    0.7562326488863389,
+                    0.7282383253223098
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 7.354186540070497e-11,
+              "rms_error": 5.427542249748799e-12,
+              "max_tolerance_ratio": 7.284973296077554e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.1169879767219254e-10,
+              "rms_error": 5.583796207379725e-12,
+              "max_tolerance_ratio": 0.00011061008536462821,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 4.815135228679302e-11,
+              "rms_error": 8.247321114298161e-12,
+              "max_tolerance_ratio": 4.807497385436468e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 4.997034168017448e-11,
+              "rms_error": 7.30956420755542e-12,
+              "max_tolerance_ratio": 4.9891077938157265e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 9.099681923772918e-10,
+              "rms_error": 2.0730141987154073e-10,
+              "max_tolerance_ratio": 0.0007176923004667558,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 3.8554048842343036e-11,
+              "rms_error": 3.029983676570814e-11,
+              "max_tolerance_ratio": 3.5106791386221846e-05,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "ed9315149ecafe7d96ebbe3298da9480b23098818b143e4bee91b54fbe94774a",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.6706145344128234,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.6706145344128234,
+            "correlation_loss": 0.6706145344128234,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.3293854655871767,
+            "rho_per_sequence_target": [
+              [
+                0.312634636230281,
+                0.3461362949440724
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                18549.658270597458,
+                17544.436839342117
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.5262705858657926,
+                0.5542793105885572
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.002210944173659615,
+                0.004924375659514597
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00024378540113456298,
+                "l2": 0.01238067682181263,
+                "per_sequence_target_l1": [
+                  [
+                    0.7562326488863389,
+                    0.7282383253223098
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00024378540113456298,
+                "l2": 0.01238067682181263,
+                "per_sequence_target_l1": [
+                  [
+                    0.7562326488863389,
+                    0.7282383253223098
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.063492698659879e-09,
+              "rms_error": 7.55059308209319e-11,
+              "max_tolerance_ratio": 0.0010631137987012,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.051080743322524e-09,
+              "rms_error": 6.728530016181075e-11,
+              "max_tolerance_ratio": 0.0010508809664810032,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 7.541062181527222e-10,
+              "rms_error": 1.2442611395077213e-10,
+              "max_tolerance_ratio": 0.0007537466630756121,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 7.509229866939758e-10,
+              "rms_error": 1.0569445657328658e-10,
+              "max_tolerance_ratio": 0.0007505649493699423,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 6.593355255865574e-09,
+              "rms_error": 1.8296023811226688e-09,
+              "max_tolerance_ratio": 0.0027791054275113866,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 5.994706953060813e-10,
+              "rms_error": 5.206428295558685e-10,
+              "max_tolerance_ratio": 0.00026329212791975767,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "ed9315149ecafe7d96ebbe3298da9480b23098818b143e4bee91b54fbe94774a",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 3508,
+      "seq_ix": 717052999,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 9.71445146547012e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 2.275957200481571e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.7583370208740234e-06,
+              "rms_error": 7.654029396629013e-08,
+              "normalized_max": 1.7583370208740234e-06,
+              "normalized_rms": 2.3166051323316809e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 12,
+              "strict_max_tolerance_ratio": 1.4275760767864174,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 8.344650268554688e-07,
+              "rms_error": 1.508207321884975e-07,
+              "normalized_max": 8.344650268554688e-07,
+              "normalized_rms": 1.5629776761836385e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.3583560523604779,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.67787378139172,
+              "t1": 0.45170172621082977,
+              "weighted_pearson": 0.5647877538012749,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.6778737820696359,
+              "t1": 0.45170172308758066,
+              "weighted_pearson": 0.5647877525786082,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -6.779158345793235e-10,
+              3.123249103786918e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 6.467103958129883e-06,
+              "rms_error": 3.073431497923007e-07,
+              "normalized_max": 6.467103958129883e-06,
+              "normalized_rms": 7.245795893079832e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 2693,
+              "strict_max_tolerance_ratio": 3.894247530367511,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.7881393432617188e-06,
+              "rms_error": 2.635714258071765e-07,
+              "normalized_max": 1.7881393432617188e-06,
+              "normalized_rms": 2.7970602881026976e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 1,
+              "strict_max_tolerance_ratio": 1.0406274844981191,
+              "strict_passed": false,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.6778737756436617,
+              "t1": 0.45170172580072104,
+              "weighted_pearson": 0.5647877507221913,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.6778737820696359,
+              "t1": 0.45170172308758066,
+              "weighted_pearson": 0.5647877525786082,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -6.42597419719948e-09,
+              2.713140379029255e-09
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.4352122474213917,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.4352122474213917,
+            "correlation_loss": 0.4352122474213917,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.5647877525786082,
+            "rho_per_sequence_target": [
+              [
+                0.677873782069636,
+                0.4517017230875806
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                11861.572687923908,
+                10390.87608321011
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0000000000000002
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                1.0359805918241425,
+                0.9500257304638317
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.009195517813175217,
+                0.04547510175368072
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0002677956974202845,
+                "l2": 0.0064955901691122,
+                "per_sequence_target_l1": [
+                  [
+                    0.2750485618274017,
+                    0.3654002550607182
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0002677956974202845,
+                "l2": 0.0064955901691122,
+                "per_sequence_target_l1": [
+                  [
+                    0.2750485618274017,
+                    0.3654002550607182
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.2752748842695524e-10,
+              "rms_error": 7.517188459787966e-12,
+              "max_tolerance_ratio": 0.00012729850088426627,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.24427546890206e-10,
+              "rms_error": 6.148647135811642e-12,
+              "max_tolerance_ratio": 0.00012433554907630888,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 7.369003144129885e-11,
+              "rms_error": 1.2396643781568059e-11,
+              "max_tolerance_ratio": 7.367569758539207e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 7.414477879091476e-11,
+              "rms_error": 9.039221229811991e-12,
+              "max_tolerance_ratio": 7.413035647958387e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 3.74169486627024e-10,
+              "rms_error": 1.0219714673764493e-10,
+              "max_tolerance_ratio": 0.0003403710137270634,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 5.947908832126814e-12,
+              "rms_error": 5.748650705097059e-12,
+              "max_tolerance_ratio": 5.339027175946135e-06,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "650e187f00d3d5a500f7f2875c238b90aa58d2efdca94ed2ba9ae659fdd6f065",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.4352122474213917,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.4352122474213917,
+            "correlation_loss": 0.4352122474213917,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.5647877525786082,
+            "rho_per_sequence_target": [
+              [
+                0.677873782069636,
+                0.4517017230875806
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                11861.572687923908,
+                10390.87608321011
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0000000000000002
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                1.0359805918241425,
+                0.9500257304638317
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.009195517813175217,
+                0.04547510175368072
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0002677956974202845,
+                "l2": 0.0064955901691122,
+                "per_sequence_target_l1": [
+                  [
+                    0.2750485618274017,
+                    0.3654002550607182
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0002677956974202845,
+                "l2": 0.0064955901691122,
+                "per_sequence_target_l1": [
+                  [
+                    0.2750485618274017,
+                    0.3654002550607182
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 9.977772488343034e-11,
+              "rms_error": 5.163652807646131e-12,
+              "max_tolerance_ratio": 9.97691140777887e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 6.90543267209195e-11,
+              "rms_error": 4.299420610971583e-12,
+              "max_tolerance_ratio": 6.904078836219739e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 6.783047537669093e-11,
+              "rms_error": 7.14561007210864e-12,
+              "max_tolerance_ratio": 6.781553892215362e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 6.73757280266515e-11,
+              "rms_error": 6.219489943984899e-12,
+              "max_tolerance_ratio": 6.736089170871329e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 4.3755655164661594e-10,
+              "rms_error": 1.2358327275971956e-10,
+              "max_tolerance_ratio": 0.0003989432033420961,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 6.063238799924875e-11,
+              "rms_error": 5.497376615732169e-11,
+              "max_tolerance_ratio": 5.515174148739492e-05,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "650e187f00d3d5a500f7f2875c238b90aa58d2efdca94ed2ba9ae659fdd6f065",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 2523,
+      "seq_ix": 523915547,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 8.847089727481716e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.3322676295501878e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.521781086921692e-06,
+              "rms_error": 7.61401461399913e-08,
+              "normalized_max": 1.521781086921692e-06,
+              "normalized_rms": 2.3165435484419793e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 3,
+              "strict_max_tolerance_ratio": 1.33650722282265,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.430511474609375e-06,
+              "rms_error": 1.4700680894747698e-07,
+              "normalized_max": 1.430511474609375e-06,
+              "normalized_rms": 1.6687823660251984e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.5059805210992191,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.5004417944105246,
+              "t1": 0.6207854201297418,
+              "weighted_pearson": 0.5606136072701332,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.5004417951618486,
+              "t1": 0.6207854178427132,
+              "weighted_pearson": 0.5606136065022809,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -7.513240030121437e-10,
+              2.287028566527738e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 5.0961971282958984e-06,
+              "rms_error": 3.026444806586357e-07,
+              "normalized_max": 5.0961971282958984e-06,
+              "normalized_rms": 9.45540284069358e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 4409,
+              "strict_max_tolerance_ratio": 2.9796342295424063,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.9073486328125e-06,
+              "rms_error": 2.7962151071836894e-07,
+              "normalized_max": 1.9073486328125e-06,
+              "normalized_rms": 3.051466032651074e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.9750668319670874,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.5004417953073488,
+              "t1": 0.6207854185044972,
+              "weighted_pearson": 0.560613606905923,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.5004417951618486,
+              "t1": 0.6207854178427132,
+              "weighted_pearson": 0.5606136065022809,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              1.4550016746994743e-10,
+              6.617839609646126e-10
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.43938639349771913,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.43938639349771913,
+            "correlation_loss": 0.43938639349771913,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.5606136065022809,
+            "rho_per_sequence_target": [
+              [
+                0.5004417951618485,
+                0.6207854178427132
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                12144.821450471878,
+                10500.90996131301
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.802772399003688,
+                0.9462783095522549
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0035174111853675696,
+                0.023868147329279936
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00037176306858908845,
+                "l2": 0.0072104877806572175,
+                "per_sequence_target_l1": [
+                  [
+                    0.4063637102052481,
+                    0.32776800871479195
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00037176306858908845,
+                "l2": 0.0072104877806572175,
+                "per_sequence_target_l1": [
+                  [
+                    0.4063637102052481,
+                    0.32776800871479195
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.848584872552123e-10,
+              "rms_error": 1.223575084099198e-11,
+              "max_tolerance_ratio": 0.00018447904639718073,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.690769076996348e-10,
+              "rms_error": 9.844258929085475e-12,
+              "max_tolerance_ratio": 0.00016898401733622735,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.6173637354123223e-10,
+              "rms_error": 2.2341356947300128e-11,
+              "max_tolerance_ratio": 0.00016124954672689786,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.5100643119224095e-10,
+              "rms_error": 1.6258650328408507e-11,
+              "max_tolerance_ratio": 0.0001508007690432501,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 5.248363584009486e-10,
+              "rms_error": 1.1377221531188294e-10,
+              "max_tolerance_ratio": 0.00044754786206688344,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 1.0481926437932998e-10,
+              "rms_error": 7.458844316831307e-11,
+              "max_tolerance_ratio": 8.93833490930944e-05,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "0d14a05f5f177a475f44c8812a76f7e8308b5536567e984dff8680c5e4eea2de",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.43938639349771913,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.43938639349771913,
+            "correlation_loss": 0.43938639349771913,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.5606136065022809,
+            "rho_per_sequence_target": [
+              [
+                0.5004417951618485,
+                0.6207854178427132
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                12144.821450471878,
+                10500.90996131301
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.802772399003688,
+                0.9462783095522549
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0035174111853675696,
+                0.023868147329279936
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00037176306858908845,
+                "l2": 0.0072104877806572175,
+                "per_sequence_target_l1": [
+                  [
+                    0.4063637102052481,
+                    0.32776800871479195
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00037176306858908845,
+                "l2": 0.0072104877806572175,
+                "per_sequence_target_l1": [
+                  [
+                    0.4063637102052481,
+                    0.32776800871479195
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 7.958315662693434e-10,
+              "rms_error": 6.071602066394285e-11,
+              "max_tolerance_ratio": 0.0007922030813021705,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.0456489629647207e-09,
+              "rms_error": 5.763699008843172e-11,
+              "max_tolerance_ratio": 0.0010386812531101503,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 7.652296207786191e-10,
+              "rms_error": 1.0175841694629101e-10,
+              "max_tolerance_ratio": 0.0007640173909607135,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 7.634106313649089e-10,
+              "rms_error": 8.687721491534664e-11,
+              "max_tolerance_ratio": 0.0007622012830784363,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 2.0365940687355755e-09,
+              "rms_error": 3.98101104399206e-10,
+              "max_tolerance_ratio": 0.001418885703079868,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 1.2185275011233898e-10,
+              "rms_error": 1.0571180361616585e-10,
+              "max_tolerance_ratio": 8.000272791111495e-05,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "0d14a05f5f177a475f44c8812a76f7e8308b5536567e984dff8680c5e4eea2de",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 1866,
+      "seq_ix": 390992812,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 1.2212453270876722e-15,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.2802259252708836e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.4901161193847656e-06,
+              "rms_error": 7.005255051156953e-08,
+              "normalized_max": 1.4901161193847656e-06,
+              "normalized_rms": 1.9254422534798837e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 5,
+              "strict_max_tolerance_ratio": 1.3655252069409305,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 4.76837158203125e-07,
+              "rms_error": 8.558508881380524e-08,
+              "normalized_max": 4.76837158203125e-07,
+              "normalized_rms": 8.896579775012247e-08,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.34132399349527487,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.2644631944214538,
+              "t1": 0.44725692229336855,
+              "weighted_pearson": 0.3558600583574112,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.2644631933821872,
+              "t1": 0.44725692193593486,
+              "weighted_pearson": 0.35586005765906104,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              1.039266561697616e-09,
+              3.574336937539613e-10
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 8.340924978256226e-06,
+              "rms_error": 3.103229591415387e-07,
+              "normalized_max": 8.340924978256226e-06,
+              "normalized_rms": 1.0004899261096872e-06,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 6171,
+              "strict_max_tolerance_ratio": 7.109216031408523,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.5497207641601562e-06,
+              "rms_error": 2.4743085387159617e-07,
+              "normalized_max": 1.5497207641601562e-06,
+              "normalized_rms": 2.4781630130901645e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.9750151786921789,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.26446309648504646,
+              "t1": 0.4472568214798243,
+              "weighted_pearson": 0.3558599589824354,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.2644631933821872,
+              "t1": 0.44725692193593486,
+              "weighted_pearson": 0.35586005765906104,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -9.689714075555855e-08,
+              -1.0045611054110282e-07
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.6441399423409391,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.6441399423409391,
+            "correlation_loss": 0.6441399423409391,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.35586005765906104,
+            "rho_per_sequence_target": [
+              [
+                0.26446319338218716,
+                0.44725692193593486
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                12562.322971045971,
+                11956.878549218178
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                0.9999999999999998,
+                1.0000000000000004
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.4498814337543953,
+                0.5032108913934722
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0,
+                0.00010049746243907341
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00047467101611026473,
+                "l2": 0.014671983918381405,
+                "per_sequence_target_l1": [
+                  [
+                    0.8644745132769298,
+                    0.739707922597013
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00047467101611026473,
+                "l2": 0.014671983918381405,
+                "per_sequence_target_l1": [
+                  [
+                    0.8644745132769298,
+                    0.739707922597013
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.5601448034949922e-09,
+              "rms_error": 6.974183260386995e-11,
+              "max_tolerance_ratio": 0.0014845793730366888,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.2614464092427016e-09,
+              "rms_error": 7.02521307264307e-11,
+              "max_tolerance_ratio": 0.001195426609505319,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.1423408880070415e-09,
+              "rms_error": 1.2721776958484443e-10,
+              "max_tolerance_ratio": 0.0010845966931924366,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 9.677179055919e-10,
+              "rms_error": 1.1086323072350608e-10,
+              "max_tolerance_ratio": 0.0009188007287204932,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 1.0249052932731484e-08,
+              "rms_error": 1.7150733224698226e-09,
+              "max_tolerance_ratio": 0.003476769073849078,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 8.967617759481072e-10,
+              "rms_error": 7.105866610069624e-10,
+              "max_tolerance_ratio": 0.0004989270372731707,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "549f32dbd8484b599c67f249a0bae245f9e6850eb3c924d69aaa5dba305b50f6",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.6441399423409391,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.6441399423409391,
+            "correlation_loss": 0.6441399423409391,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.35586005765906104,
+            "rho_per_sequence_target": [
+              [
+                0.26446319338218716,
+                0.44725692193593486
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                12562.322971045971,
+                11956.878549218178
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                0.9999999999999998,
+                1.0000000000000004
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.4498814337543953,
+                0.5032108913934722
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0,
+                0.00010049746243907341
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.00047467101611026473,
+                "l2": 0.014671983918381405,
+                "per_sequence_target_l1": [
+                  [
+                    0.8644745132769298,
+                    0.739707922597013
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.00047467101611026473,
+                "l2": 0.014671983918381405,
+                "per_sequence_target_l1": [
+                  [
+                    0.8644745132769298,
+                    0.739707922597013
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 3.096416349364394e-09,
+              "rms_error": 2.2984929514809645e-10,
+              "max_tolerance_ratio": 0.0030904387528420895,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 2.699811451489995e-09,
+              "rms_error": 1.866431110631319e-10,
+              "max_tolerance_ratio": 0.0026957570900402166,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 2.5643203077998535e-09,
+              "rms_error": 3.8308598571623907e-10,
+              "max_tolerance_ratio": 0.0025430444731749545,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 2.5570443501721175e-09,
+              "rms_error": 2.939581205210928e-10,
+              "max_tolerance_ratio": 0.00253582888322857,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 7.031415383967898e-09,
+              "rms_error": 1.4748979795323409e-09,
+              "max_tolerance_ratio": 0.0023092106862683125,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 3.186002572874713e-10,
+              "rms_error": 3.107752443710226e-10,
+              "max_tolerance_ratio": 0.00024637207013016455,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "549f32dbd8484b599c67f249a0bae245f9e6850eb3c924d69aaa5dba305b50f6",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 5932,
+      "seq_ix": 1222968840,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 1.2212453270876722e-15,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.27675647831893e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 4.440892098500626e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.2665987014770508e-06,
+              "rms_error": 6.986663964136293e-08,
+              "normalized_max": 1.2665987014770508e-06,
+              "normalized_rms": 1.838599043346081e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.9289935295015058,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 7.152557373046875e-07,
+              "rms_error": 8.865765152654154e-08,
+              "normalized_max": 7.152557373046875e-07,
+              "normalized_rms": 9.249865054504983e-08,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.27700115886204824,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.4513952730732812,
+              "t1": 0.36762027663893193,
+              "weighted_pearson": 0.40950777485610657,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.4513952748158746,
+              "t1": 0.36762027422484045,
+              "weighted_pearson": 0.4095077745203575,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -1.742593402909165e-09,
+              2.4140914822723403e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 6.735324859619141e-06,
+              "rms_error": 3.1297392727098737e-07,
+              "normalized_max": 6.735324859619141e-06,
+              "normalized_rms": 9.111495745710522e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 3560,
+              "strict_max_tolerance_ratio": 2.6809823773777657,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.3113021850585938e-06,
+              "rms_error": 2.3101481224752337e-07,
+              "normalized_max": 1.3113021850585938e-06,
+              "normalized_rms": 2.3947478083657075e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.9213418238053537,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.45139530418250184,
+              "t1": 0.36762031050756094,
+              "weighted_pearson": 0.4095078073450314,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.4513952748158746,
+              "t1": 0.36762027422484045,
+              "weighted_pearson": 0.4095077745203575,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              2.9366627241067533e-08,
+              3.6282720494718035e-08
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "objective_loss": 0.5904922254796424,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.5904922254796424,
+            "correlation_loss": 0.5904922254796424,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.4095077745203576,
+            "rho_per_sequence_target": [
+              [
+                0.4513952748158747,
+                0.36762027422484045
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                14232.645665764809,
+                16266.187069952488
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.5909888571800954,
+                0.5502436818907643
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0023616903673182254,
+                0.0033164162604894225
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0002613185247224875,
+                "l2": 0.011537901289374859,
+                "per_sequence_target_l1": [
+                  [
+                    0.6314739829313721,
+                    0.7137776162419394
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0002613185247224875,
+                "l2": 0.011537901289374859,
+                "per_sequence_target_l1": [
+                  [
+                    0.6314739829313721,
+                    0.7137776162419394
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 6.745985163913288e-11,
+              "rms_error": 4.603064417302851e-12,
+              "max_tolerance_ratio": 6.742351946435294e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 7.7271451483422e-11,
+              "rms_error": 4.5976991752623354e-12,
+              "max_tolerance_ratio": 7.726377147751725e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 6.767999004469099e-11,
+              "rms_error": 8.240562272885094e-12,
+              "max_tolerance_ratio": 6.764645608480964e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 6.767999004892616e-11,
+              "rms_error": 6.701503318464794e-12,
+              "max_tolerance_ratio": 6.764645608904271e-05,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 4.4545981768735754e-10,
+              "rms_error": 9.030226805205177e-11,
+              "max_tolerance_ratio": 0.00040321607429168996,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 6.24140739091672e-11,
+              "rms_error": 4.413458630763476e-11,
+              "max_tolerance_ratio": 5.500781044518804e-05,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "0dfe096566647adbfeceaf42dd6ce42a3ff8df2c006f4d0afdf9a510b3ce4553",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "objective_loss": 0.5904922254796424,
+          "objective_report": {
+            "objective": {
+              "version": "full_sequence_clipped_correlation.v1",
+              "label_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip": [
+                -2.0,
+                2.0
+              ],
+              "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+              "rho_bound": [
+                -1.0,
+                1.0
+              ],
+              "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+              "weight": "absolute clipped target; normalized separately per complete sequence and target",
+              "weight_sum_floor": 1e-08,
+              "std_floor": 1e-08,
+              "degenerate_policy": "rho0 and zero correlation gradient when weight<floor or either std<=floor; side retained with correlation loss1",
+              "aggregation": "equal mean over all batch*2 sequence-target sides, including degenerate and one-sign sides",
+              "domain": "all TRAIN post-warmup rows; no validation mask or sign-eligibility filtering",
+              "teacher": "raw selected-ORT predictions, unclipped weighted MSE with same label weights and full-sequence denominator",
+              "teacher_denominator_floor": 1e-12,
+              "accumulation": "FP64; current ORT FP32 input values preserved; FP64 inputs accepted for derivative audits",
+              "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), already includes teacher weight and batch*2 mean",
+              "chunk_rule": "compute once per complete batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+              "gradient_scale": "correlation contains inverse prediction standard deviation; previous MSE learning rates are not equivalent",
+              "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+            },
+            "loss": 0.5904922254796424,
+            "correlation_loss": 0.5904922254796424,
+            "teacher_loss": 0.0,
+            "teacher_weight": 0.1,
+            "mean_rho": 0.4095077745203576,
+            "rho_per_sequence_target": [
+              [
+                0.4513952748158747,
+                0.36762027422484045
+              ]
+            ],
+            "target_weight_sum": [
+              [
+                14232.645665764809,
+                16266.187069952488
+              ]
+            ],
+            "normalized_weight_sum": [
+              [
+                1.0,
+                1.0
+              ]
+            ],
+            "prediction_std_after_clip": [
+              [
+                0.5909888571800954,
+                0.5502436818907643
+              ]
+            ],
+            "correlation_active": [
+              [
+                true,
+                true
+              ]
+            ],
+            "degenerate_sides": 0,
+            "degenerate_reasons": {
+              "low_weight": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "target_std": [
+                [
+                  false,
+                  false
+                ]
+              ],
+              "prediction_std": [
+                [
+                  false,
+                  false
+                ]
+              ]
+            },
+            "prediction_at_or_outside_clip_fraction": [
+              [
+                0.0023616903673182254,
+                0.0033164162604894225
+              ]
+            ],
+            "warmup": 99,
+            "rows_per_sequence": 20000,
+            "batch_size": 1,
+            "sequence_target_denominator": 2,
+            "gradient_scale": {
+              "correlation": {
+                "max_absolute": 0.0002613185247224875,
+                "l2": 0.011537901289374859,
+                "per_sequence_target_l1": [
+                  [
+                    0.6314739829313721,
+                    0.7137776162419394
+                  ]
+                ]
+              },
+              "teacher": {
+                "max_absolute": 0.0,
+                "l2": 0.0,
+                "per_sequence_target_l1": [
+                  [
+                    0.0,
+                    0.0
+                  ]
+                ]
+              },
+              "total": {
+                "max_absolute": 0.0002613185247224875,
+                "l2": 0.011537901289374859,
+                "per_sequence_target_l1": [
+                  [
+                    0.6314739829313721,
+                    0.7137776162419394
+                  ]
+                ]
+              }
+            }
+          },
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.6670536377439617e-09,
+              "rms_error": 9.802033994452558e-11,
+              "max_tolerance_ratio": 0.0016659963855637017,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.5978984958656996e-09,
+              "rms_error": 8.559538295050066e-11,
+              "max_tolerance_ratio": 0.0015898297104295306,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.515485850608336e-09,
+              "rms_error": 1.6104501163498654e-10,
+              "max_tolerance_ratio": 0.001505176528818754,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.5154858506218885e-09,
+              "rms_error": 1.3487892347884406e-10,
+              "max_tolerance_ratio": 0.0015051765288322141,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 1.015509541388293e-08,
+              "rms_error": 1.9434272182515166e-09,
+              "max_tolerance_ratio": 0.0035952475886124693,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 4.883986548520625e-10,
+              "rms_error": 3.5689353179018485e-10,
+              "max_tolerance_ratio": 0.00017211262367095265,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "0dfe096566647adbfeceaf42dd6ce42a3ff8df2c006f4d0afdf9a510b3ce4553",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "sequences": 2,
+      "summary": {
+        "branches": {
+          "common_state": {
+            "mean_target_wp_drift": [
+              -1.0203769912342509e-09,
+              2.1838020003439595e-09
+            ],
+            "approximate_passed": true,
+            "strict_passed": false
+          },
+          "reanchored256": {
+            "mean_target_wp_drift": [
+              -8.090923583892184e-09,
+              -1.8430139608893725e-08
+            ],
+            "approximate_passed": true,
+            "strict_passed": false
+          }
+        },
+        "approximate_passed": true,
+        "strict_passed": false
+      }
+    },
+    {
+      "sequences": 8,
+      "summary": {
+        "branches": {
+          "common_state": {
+            "mean_target_wp_drift": [
+              -1.7340389540931866e-11,
+              1.4271238496510463e-09
+            ],
+            "approximate_passed": true,
+            "strict_passed": false
+          },
+          "reanchored256": {
+            "mean_target_wp_drift": [
+              -7.762342570799552e-09,
+              -9.665306111017458e-09
+            ],
+            "approximate_passed": true,
+            "strict_passed": false
+          }
+        },
+        "approximate_passed": true,
+        "strict_passed": false
+      }
+    }
+  ],
+  "encoder": {
+    "kind": "original_onnx_bulk",
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/correlation_training_bridge/encoder.onnx",
+    "sha256": "72042347f13af6b3f6c30ef052e4c2509e9557628044a4383f6188a2701032df",
+    "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+    "onnxruntime": "1.23.2",
+    "compute_threads": 1
+  },
+  "approximate_training_accepted": true,
+  "approximate_candidate_export_accepted": false,
+  "torch": "2.5.1",
+  "threads": 1,
+  "strict_historical_status": "Historical strict and conventional carried-state failures remain unchanged",
+  "summary": {
+    "branches": {
+      "common_state": {
+        "mean_target_wp_drift": [
+          -1.7340389540931866e-11,
+          1.4271238496510463e-09
+        ],
+        "approximate_passed": true,
+        "strict_passed": false
+      },
+      "reanchored256": {
+        "mean_target_wp_drift": [
+          -7.762342570799552e-09,
+          -9.665306111017458e-09
+        ],
+        "approximate_passed": true,
+        "strict_passed": false
+      }
+    },
+    "approximate_passed": true,
+    "strict_passed": false
+  },
+  "completed_sequences": 8,
+  "seconds": 5.373491375008598
+}

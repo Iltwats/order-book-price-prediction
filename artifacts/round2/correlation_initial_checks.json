@@ -1,0 +1,25 @@
+{
+  "targeted_tests": {
+    "passed": 35,
+    "seconds": 2.79
+  },
+  "bridge": {
+    "path": "artifacts/round2/correlation_training_bridge/report.json",
+    "sha256": "705b08ffac94efbeb49c4d73bbeece2e3f54ba1a96d221ac130ab7df97030aeb",
+    "accepted": true,
+    "sequences": 8,
+    "seconds": 5.373491375008598,
+    "gradient_tensors": 96,
+    "maximum_gradient_absolute_error": 1.8457175982034002e-08,
+    "maximum_gradient_tolerance_ratio": 0.003970141942652363
+  },
+  "full_host_suite_before_new_objective": {
+    "passed": 210,
+    "warnings": 12
+  },
+  "offline_linux_inference_suite": {
+    "passed": 140,
+    "skipped_training_modules": 8
+  },
+  "note": "Objective-only additions are training code; unchanged deployment remains the existing selected ONNX model."
+}
