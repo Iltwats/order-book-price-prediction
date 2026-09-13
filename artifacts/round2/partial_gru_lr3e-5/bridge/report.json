@@ -1,0 +1,987 @@
+{
+  "protocol_path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/partial_gru_lr3e-5/bridge/protocol.json",
+  "protocol_sha256": "0b15cc1bc72aba2a21e070016af4b4daf089b812ef21c4ccd2d4f2a4325fe415",
+  "source_sha256": "d1468ead95ac329bba5a212dc9ee962ce8147aa209c9881e82f99a055f4903bd",
+  "teacher_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "zero_update_sha256": "d1468ead95ac329bba5a212dc9ee962ce8147aa209c9881e82f99a055f4903bd",
+  "budget": {
+    "version": "approximate_training_bridge.v1",
+    "strict": {
+      "atol": 1e-06,
+      "rtol": 1e-05
+    },
+    "common_state": {
+      "normalized_max": 1.52587890625e-05,
+      "normalized_rms": 9.5367431640625e-07
+    },
+    "carried_state": {
+      "normalized_max": 6.103515625e-05,
+      "normalized_rms": 3.814697265625e-06
+    },
+    "wp": {
+      "max_sequence_target_drift": 2e-05,
+      "max_mean_target_drift": 2e-06
+    },
+    "fp64_equation": {
+      "atol": 1e-12,
+      "rtol": 1e-10
+    },
+    "normalization": "per coordinate max(1, reference RMS); RMS bound applies to every coordinate",
+    "rationale": "Prospective engineering limits informed by the existing roughly 1e-5 FP32 discrepancy; not formal roundoff bounds or a claim that strict parity passes. Common-state limits are tighter because recurrence cannot accumulate error. State scale stays one for bounded GRU states; the RMS floor prevents unstable relative errors near zero. WP limits constrain task-level drift, per sequence as well as per-target means to prevent cancellation. These diagnostics use training data only and do not establish generalization or release fitness."
+  },
+  "procedure": {
+    "version": "ort_forward_local_gradient.v1",
+    "chunk_size": 256,
+    "gradient_chunk_starts": [
+      0,
+      19744
+    ],
+    "teacher_weight": 0.1,
+    "forward": "Current-student original-graph ORT carries all 20000 rows; lower GRU remains frozen",
+    "gradient": {
+      "atol": 1e-06,
+      "rtol": 0.0001
+    },
+    "backward": "Torch upper GRU starts each 256-row chunk from detached current-student ORT prior h1",
+    "state_proxy": "ort_u + (torch_u - torch_u.detach())",
+    "prediction_proxy": "ort_p + (head(state_proxy) - head(state_proxy).detach())",
+    "gradient_loss": "sequence-target mean clipped-label weighted MSE plus .1 raw selected-ORT-teacher weighted MSE",
+    "gradient_residual": "FP64 analytic loss coefficients computed at FP32 ORT outputs, rounded once to FP32 then shared exactly across precisions",
+    "limits": "Unchanged old common-state limits; unchanged carried-state limits applied within reanchored chunks",
+    "design_basis": "New path motivated by the already-inspected failed TRAIN group2309; not an independent statistical holdout",
+    "scope": "Local surrogate-gradient approximation, not exact ORT derivatives or a strict conventional-parity pass"
+  },
+  "mode": "candidate_export",
+  "sequences": [
+    {
+      "row_group": 2309,
+      "seq_ix": 480770951,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 7.494005416219807e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.3877787807814457e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 6.661338147750939e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "ort_student_domain": {
+        "domain": "all TRAIN post-warmup rows; not comparable to masked development scores",
+        "weighting": "both WP variants clip targets and weight by absolute clipped target; only prediction clipping differs",
+        "rows": 19901,
+        "eligible": true,
+        "targets": {
+          "t0": {
+            "target_clip_fraction": 0.006532335058539772,
+            "prediction_clip_fraction": 0.0001507461936586101,
+            "target_rms": 0.9777331407098387,
+            "clipped_target_rms": 0.9679849122726238,
+            "prediction_rms": 0.9632422374632953,
+            "clipped_prediction_rms": 0.9632295606497738,
+            "raw_prediction_wp": 0.22675877813158155,
+            "clipped_prediction_wp": 0.22677429551338033
+          },
+          "t1": {
+            "target_clip_fraction": 0.027184563589769357,
+            "prediction_clip_fraction": 0.0001507461936586101,
+            "target_rms": 0.9673893044990758,
+            "clipped_target_rms": 0.9256937404579896,
+            "prediction_rms": 0.8970369501674754,
+            "clipped_prediction_rms": 0.8970249900129507,
+            "raw_prediction_wp": 0.3349554406221879,
+            "clipped_prediction_wp": 0.3350132477916911
+          }
+        }
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 2.086162567138672e-06,
+              "rms_error": 7.161710411880294e-08,
+              "normalized_max": 2.086162567138672e-06,
+              "normalized_rms": 1.9705533595896934e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.9389496557932372,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 4.76837158203125e-07,
+              "rms_error": 8.513193928785514e-08,
+              "normalized_max": 4.76837158203125e-07,
+              "normalized_rms": 8.846220899510629e-08,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.2714737648296616,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.22677429741125502,
+              "t1": 0.3350132456461922,
+              "weighted_pearson": 0.28089377152872363,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.22677429551338033,
+              "t1": 0.3350132477916911,
+              "weighted_pearson": 0.2808937716525357,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              1.8978746907372113e-09,
+              -2.1454988896607574e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 8.910894393920898e-06,
+              "rms_error": 3.6498530840674344e-07,
+              "normalized_max": 8.910894393920898e-06,
+              "normalized_rms": 1.3812176933634484e-06,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 7119,
+              "strict_max_tolerance_ratio": 5.114775739816146,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 1.2516975402832031e-06,
+              "rms_error": 2.309203098656119e-07,
+              "normalized_max": 1.2516975402832031e-06,
+              "normalized_rms": 2.37290500146182e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.6824269598424881,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.22677425416244903,
+              "t1": 0.335013196271278,
+              "weighted_pearson": 0.2808937252168635,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.22677429551338033,
+              "t1": 0.3350132477916911,
+              "weighted_pearson": 0.2808937716525357,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -4.135093129020717e-08,
+              -5.152041310241273e-08
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 2.1366174792966652e-09,
+              "rms_error": 1.8173274661259975e-10,
+              "reference_max": 0.0017234059547236848,
+              "max_tolerance_ratio": 0.002084302842326198,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 2.800498288319962e-09,
+              "rms_error": 1.7177819359814346e-10,
+              "reference_max": 0.001529306909671263,
+              "max_tolerance_ratio": 0.002787386015374715,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 2.020244261918998e-09,
+              "rms_error": 3.361985206955563e-10,
+              "reference_max": 0.0017056494595824223,
+              "max_tolerance_ratio": 0.001989819445302947,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.7512173871127908e-09,
+              "rms_error": 2.583908669608765e-10,
+              "reference_max": 0.001408588128543107,
+              "max_tolerance_ratio": 0.001741601064607041,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 2.3610614144353725e-08,
+              "rms_error": 4.465143434749145e-09,
+              "reference_max": 0.05308426176770044,
+              "max_tolerance_ratio": 0.003757196444642215,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 1.8299033399671316e-09,
+              "rms_error": 1.345916956675496e-09,
+              "reference_max": 0.05308526806766167,
+              "max_tolerance_ratio": 0.0005069781060967586,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "efdbc8b494ffc45cdf91d4ba07e50b7b5307c998275fe1e63dea7a183c329130",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.1157838895009047e-10,
+              "rms_error": 7.94061926195513e-12,
+              "reference_max": 0.00010384072664923716,
+              "max_tolerance_ratio": 0.00011156891877580428,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 1.1940237000808386e-10,
+              "rms_error": 7.299757300332302e-12,
+              "reference_max": 0.00010256566325104604,
+              "max_tolerance_ratio": 0.00011940093345005037,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.1103449333328116e-10,
+              "rms_error": 1.2502019774978354e-11,
+              "reference_max": 8.027776514023043e-05,
+              "max_tolerance_ratio": 0.00011102506930525354,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 1.1114818017047338e-10,
+              "rms_error": 1.1111572745434746e-11,
+              "reference_max": 7.971459003860023e-05,
+              "max_tolerance_ratio": 0.00011113874649330064,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 1.2620997235594095e-09,
+              "rms_error": 2.7542128022395303e-10,
+              "reference_max": 0.002348375955029057,
+              "max_tolerance_ratio": 0.0011632940474449102,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 5.5848659030743875e-11,
+              "rms_error": 4.183495092342272e-11,
+              "reference_max": 0.0021050618402966847,
+              "max_tolerance_ratio": 4.613661604340476e-05,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "19de56f9d6539648694cf1c17aad0939358360209eca302944b88c60b450de23",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "row_group": 9078,
+      "seq_ix": 1855651319,
+      "rows": 20000,
+      "equations": {
+        "rows": [
+          0,
+          317,
+          634,
+          952,
+          1269,
+          1587,
+          1904,
+          2222,
+          2539,
+          2857,
+          3174,
+          3491,
+          3809,
+          4126,
+          4444,
+          4761,
+          5079,
+          5396,
+          5714,
+          6031,
+          6348,
+          6666,
+          6983,
+          7301,
+          7618,
+          7936,
+          8253,
+          8571,
+          8888,
+          9205,
+          9523,
+          9840,
+          10158,
+          10475,
+          10793,
+          11110,
+          11428,
+          11745,
+          12062,
+          12380,
+          12697,
+          13015,
+          13332,
+          13650,
+          13967,
+          14285,
+          14602,
+          14919,
+          15237,
+          15554,
+          15872,
+          16189,
+          16507,
+          16824,
+          17142,
+          17459,
+          17776,
+          18094,
+          18411,
+          18729,
+          19046,
+          19364,
+          19681,
+          19999
+        ],
+        "outputs": {
+          "h0": {
+            "max_absolute_error": 8.326672684688674e-16,
+            "passed": true
+          },
+          "h1": {
+            "max_absolute_error": 1.887379141862766e-15,
+            "passed": true
+          },
+          "prediction": {
+            "max_absolute_error": 6.661338147750939e-16,
+            "passed": true
+          }
+        },
+        "passed": true
+      },
+      "ort_student_domain": {
+        "domain": "all TRAIN post-warmup rows; not comparable to masked development scores",
+        "weighting": "both WP variants clip targets and weight by absolute clipped target; only prediction clipping differs",
+        "rows": 19901,
+        "eligible": true,
+        "targets": {
+          "t0": {
+            "target_clip_fraction": 0.054821365760514544,
+            "prediction_clip_fraction": 0.002763680217074519,
+            "target_rms": 0.8664296284990207,
+            "clipped_target_rms": 0.791078064772401,
+            "prediction_rms": 0.8951289265738884,
+            "clipped_prediction_rms": 0.8943392999879511,
+            "raw_prediction_wp": 0.48324452314174127,
+            "clipped_prediction_wp": 0.48304196966674645
+          },
+          "t1": {
+            "target_clip_fraction": 0.005527360434149038,
+            "prediction_clip_fraction": 0.05135420330636652,
+            "target_rms": 0.690151359071483,
+            "clipped_target_rms": 0.6808057942227859,
+            "prediction_rms": 0.967975814533773,
+            "clipped_prediction_rms": 0.9568002988917997,
+            "raw_prediction_wp": 0.5227646602492051,
+            "clipped_prediction_wp": 0.5241428860518889
+          }
+        }
+      },
+      "exact_forward": true,
+      "branches": {
+        "common_state": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.5795230865478516e-06,
+              "rms_error": 7.385491498366287e-08,
+              "normalized_max": 1.5795230865478516e-06,
+              "normalized_rms": 1.8768555263536597e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 1,
+              "strict_max_tolerance_ratio": 1.0004302951066046,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 9.5367431640625e-07,
+              "rms_error": 1.4419682069605513e-07,
+              "normalized_max": 9.5367431640625e-07,
+              "normalized_rms": 1.5206384940032875e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.3549280217802764,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.48304196695269136,
+              "t1": 0.5241428957096881,
+              "weighted_pearson": 0.5035924313311897,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.48304196966674645,
+              "t1": 0.5241428860518889,
+              "weighted_pearson": 0.5035924278593177,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              -2.714055091779244e-09,
+              9.657799227014152e-09
+            ],
+            "passed": true
+          }
+        },
+        "reanchored256": {
+          "outputs": {
+            "h0": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 0.0,
+              "rms_error": 0.0,
+              "normalized_max": 0.0,
+              "normalized_rms": 0.0,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.0,
+              "strict_passed": true,
+              "approximate_passed": true
+            },
+            "h1": {
+              "finite": true,
+              "values": 2560000,
+              "max_absolute_error": 1.2695789337158203e-05,
+              "rms_error": 3.534422073512433e-07,
+              "normalized_max": 1.2695789337158203e-05,
+              "normalized_rms": 1.4628487323327005e-06,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 4690,
+              "strict_max_tolerance_ratio": 3.6754375639670673,
+              "strict_passed": false,
+              "approximate_passed": true
+            },
+            "prediction": {
+              "finite": true,
+              "values": 40000,
+              "max_absolute_error": 2.1457672119140625e-06,
+              "rms_error": 2.746984911896938e-07,
+              "normalized_max": 2.1457672119140625e-06,
+              "normalized_rms": 3.0327454472607723e-07,
+              "reference_scale_min": 1.0,
+              "reference_scale_max": 1.0,
+              "strict_violations": 0,
+              "strict_max_tolerance_ratio": 0.8087201871621129,
+              "strict_passed": true,
+              "approximate_passed": true
+            }
+          },
+          "wp": {
+            "eligible": true,
+            "torch": {
+              "t0": 0.48304198412784516,
+              "t1": 0.5241429202068411,
+              "weighted_pearson": 0.5035924521673432,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "ort": {
+              "t0": 0.48304196966674645,
+              "t1": 0.5241428860518889,
+              "weighted_pearson": 0.5035924278593177,
+              "blocks": 1,
+              "eligible_blocks": 1,
+              "excluded_blocks": 0,
+              "selected_rows": 19901,
+              "effective_scored_rows": 19901,
+              "metric_clip": [
+                -2.0,
+                2.0
+              ],
+              "aggregation": "equal mean of eligible block-wise two-target clipped Weighted Pearson"
+            },
+            "drift": [
+              1.4461098707396758e-08,
+              3.415495219982745e-08
+            ],
+            "passed": true
+          }
+        }
+      },
+      "gradients": [
+        {
+          "start": 0,
+          "rows": 256,
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 5.504550542219649e-10,
+              "rms_error": 3.456267885754445e-11,
+              "reference_max": 0.0008764690195439008,
+              "max_tolerance_ratio": 0.0005493260155550343,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 5.312359143146259e-10,
+              "rms_error": 3.197370390281211e-11,
+              "reference_max": 0.0003542513229517627,
+              "max_tolerance_ratio": 0.0005286624676387659,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 3.766232984660743e-10,
+              "rms_error": 5.600273684876999e-11,
+              "reference_max": 0.0008785509570223553,
+              "max_tolerance_ratio": 0.00037035543083525696,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 3.603239225003982e-10,
+              "rms_error": 4.715448677552427e-11,
+              "reference_max": 0.0002975644363828763,
+              "max_tolerance_ratio": 0.000358505369435385,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 3.5921023551488407e-09,
+              "rms_error": 9.585697368765106e-10,
+              "reference_max": 0.012275859846742326,
+              "max_tolerance_ratio": 0.0017593253157339552,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 5.622382559522521e-10,
+              "rms_error": 4.1727956462233974e-10,
+              "reference_max": 0.012244184870553454,
+              "max_tolerance_ratio": 0.00025275741018342975,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "ee0e75253c19b5a3e9dfa638d8dac2a43c7270c19a169b29c2cc07a3892af0e1",
+          "passed": true
+        },
+        {
+          "start": 19744,
+          "rows": 256,
+          "identical_forward_values": {
+            "torch.float32": true,
+            "torch.float64": true
+          },
+          "gradient_tensors": {
+            "gru1.weight_ih_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 7.622594697370005e-10,
+              "rms_error": 5.758460784741012e-11,
+              "reference_max": 0.0008259438182069344,
+              "max_tolerance_ratio": 0.0007212807144787398,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.weight_hh_l0": {
+              "values": 49152,
+              "finite": true,
+              "max_absolute_error": 6.873866469887877e-10,
+              "rms_error": 4.29593968997512e-11,
+              "reference_max": 0.00040634397876874464,
+              "max_tolerance_ratio": 0.0006860122972984973,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_ih_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 6.492602717629093e-10,
+              "rms_error": 8.770688294377316e-11,
+              "reference_max": 0.0008259490534802441,
+              "max_tolerance_ratio": 0.0006478386890139962,
+              "violations": 0,
+              "passed": true
+            },
+            "gru1.bias_hh_l0": {
+              "values": 384,
+              "finite": true,
+              "max_absolute_error": 6.528982505733891e-10,
+              "rms_error": 6.667189838929204e-11,
+              "reference_max": 0.0003552338901070127,
+              "max_tolerance_ratio": 0.0006514687023164312,
+              "violations": 0,
+              "passed": true
+            },
+            "head.weight": {
+              "values": 256,
+              "finite": true,
+              "max_absolute_error": 4.2075293023996485e-09,
+              "rms_error": 9.34644051275498e-10,
+              "reference_max": 0.010053444279368332,
+              "max_tolerance_ratio": 0.00216050393067075,
+              "violations": 0,
+              "passed": true
+            },
+            "head.bias": {
+              "values": 2,
+              "finite": true,
+              "max_absolute_error": 3.582272256608121e-10,
+              "rms_error": 2.5350498297762026e-10,
+              "reference_max": 0.010053442432877091,
+              "max_tolerance_ratio": 0.00017863627497367138,
+              "violations": 0,
+              "passed": true
+            }
+          },
+          "coefficient_sha256": "c7151515d4fd02a6212745e3072f35780b94f23dfeb0e7d32c4d6e5d4fce6308",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "encoder": {
+    "kind": "original_onnx_bulk",
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/partial_gru_lr3e-5/bridge/encoder.onnx",
+    "sha256": "f09eab385f174b2a96442e61a99f537944ff8e8613cb21feb6a2d431dadf3a4c",
+    "source_sha256": "d1468ead95ac329bba5a212dc9ee962ce8147aa209c9881e82f99a055f4903bd",
+    "onnxruntime": "1.23.2",
+    "compute_threads": 1
+  },
+  "approximate_training_accepted": false,
+  "approximate_candidate_export_accepted": true,
+  "strict_historical_status": "Both historical strict and conventional approximate carried-state bridges remain failed",
+  "torch": "2.5.1",
+  "threads": 1,
+  "stages": [
+    {
+      "sequences": 2,
+      "summary": {
+        "branches": {
+          "common_state": {
+            "mean_target_wp_drift": [
+              -4.080902005210163e-10,
+              3.756150168676697e-09
+            ],
+            "approximate_passed": true,
+            "strict_passed": false
+          },
+          "reanchored256": {
+            "mean_target_wp_drift": [
+              -1.3444916291405207e-08,
+              -8.682730451292642e-09
+            ],
+            "approximate_passed": true,
+            "strict_passed": false
+          }
+        },
+        "approximate_passed": true,
+        "strict_passed": false
+      }
+    }
+  ],
+  "summary": {
+    "branches": {
+      "common_state": {
+        "mean_target_wp_drift": [
+          -4.080902005210163e-10,
+          3.756150168676697e-09
+        ],
+        "approximate_passed": true,
+        "strict_passed": false
+      },
+      "reanchored256": {
+        "mean_target_wp_drift": [
+          -1.3444916291405207e-08,
+          -8.682730451292642e-09
+        ],
+        "approximate_passed": true,
+        "strict_passed": false
+      }
+    },
+    "approximate_passed": true,
+    "strict_passed": false
+  },
+  "completed_sequences": 2,
+  "seconds": 1.9682592919562012
+}

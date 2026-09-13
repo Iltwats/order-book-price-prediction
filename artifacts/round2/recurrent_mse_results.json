@@ -1,0 +1,92 @@
+{
+  "kind": "completed_upper_gru_mse_screen_results",
+  "candidates": [
+    {
+      "candidate": "partial_gru_lr1e-5",
+      "t0": 0.6383621644715662,
+      "t1": 0.6392617154340913,
+      "wp": 0.6388119399528287,
+      "comparison": {
+        "delta": -0.00010414535230534032,
+        "ci_low": -0.0001579970569262772,
+        "ci_high": -4.976354263700039e-05,
+        "confidence": 0.95,
+        "candidate_wp": 0.6388119399528285,
+        "baseline_wp": 0.6389160853051339,
+        "sequences": 256,
+        "win_fraction": 0.35546875,
+        "n_resamples": 10000,
+        "seed": 20260913,
+        "method": "paired sequence percentile bootstrap",
+        "assumption": "sequences are sufficiently independent; search bias is not corrected"
+      },
+      "training_seconds": 189.70010287500918,
+      "training_groups": 256,
+      "lower_unchanged": true,
+      "evidence": {
+        "artifacts/round2/partial_gru_lr1e-5/model.onnx": "f16c94b60e5322d8893ae6f040d016afab015b21e8da4adb50260c29e6e023ae",
+        "artifacts/round2/partial_gru_lr1e-5/config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac",
+        "artifacts/round2/partial_gru_lr1e-5/report.json": "d75d91bbee2005f163e6c3af0336fb75bcfe38a8c2c4fe877ed6e42c441237c0",
+        "artifacts/round2/partial_gru_lr1e-5/screen_report.json": "71f6936e5aaee2cab313e06f63d3b5255124f7e82e0ab662699b8c89534929b1",
+        "artifacts/round2/partial_gru_lr1e-5/screen_comparison.json": "9c32a0e4ea212f43555da186ccd8a241845fb09af2971d5fa17fc68524488788",
+        "artifacts/round2/partial_gru_lr1e-5/parity.json": "abc669a43231864138db6b5b4040fbfe75e821e5f320d5a08126fbe2b8f84e51",
+        "artifacts/round2/partial_gru_lr1e-5/bridge/protocol.json": "bfc99f57bad2bc7869347c64ae93f93f0eb92d90c092bfd1de85796cf6a33343",
+        "artifacts/round2/partial_gru_lr1e-5/bridge/report.json": "e2a01e48d40529bf0f03125b5ec7cfbb00f59bedcb5dc466eb86eeb3a0af2911"
+      },
+      "advance_to_dev": false
+    },
+    {
+      "candidate": "partial_gru_lr3e-5",
+      "t0": 0.6381601326738638,
+      "t1": 0.6390365302017719,
+      "wp": 0.6385983314378179,
+      "comparison": {
+        "delta": -0.0003177538673159695,
+        "ci_low": -0.0004746424924531933,
+        "ci_high": -0.00015909463862556295,
+        "confidence": 0.95,
+        "candidate_wp": 0.6385983314378179,
+        "baseline_wp": 0.6389160853051339,
+        "sequences": 256,
+        "win_fraction": 0.33984375,
+        "n_resamples": 10000,
+        "seed": 20260913,
+        "method": "paired sequence percentile bootstrap",
+        "assumption": "sequences are sufficiently independent; search bias is not corrected"
+      },
+      "training_seconds": 190.32459491700865,
+      "training_groups": 256,
+      "lower_unchanged": true,
+      "evidence": {
+        "artifacts/round2/partial_gru_lr3e-5/model.onnx": "d1468ead95ac329bba5a212dc9ee962ce8147aa209c9881e82f99a055f4903bd",
+        "artifacts/round2/partial_gru_lr3e-5/config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac",
+        "artifacts/round2/partial_gru_lr3e-5/report.json": "a51c9ba1f5d0de54752d7440c30718ffe10e2704382c9867ff8f435d850e41f7",
+        "artifacts/round2/partial_gru_lr3e-5/screen_report.json": "bdc78bc871259def493358444fa273294c4564d3815e90f4e0c3937fb233fdbe",
+        "artifacts/round2/partial_gru_lr3e-5/screen_comparison.json": "ba38781a2c5952aa71fc476c1e874560a67acccda35c98ce490058c796d6a979",
+        "artifacts/round2/partial_gru_lr3e-5/parity.json": "1caa7828ce2a395455746772346d000a50546d70c38e5fb303727193927870a6",
+        "artifacts/round2/partial_gru_lr3e-5/bridge/protocol.json": "0b15cc1bc72aba2a21e070016af4b4daf089b812ef21c4ccd2d4f2a4325fe415",
+        "artifacts/round2/partial_gru_lr3e-5/bridge/report.json": "65a9e52a6bdf36ae6b5b52f75ec16f8e035d65e78ed095ddda488a11ca3a1a33"
+      },
+      "advance_to_dev": false
+    }
+  ],
+  "incumbent_screen_wp": 0.6389160853051339,
+  "decision": "Neither MSE candidate advances: both mean changes and full bootstrap intervals are negative. Preserve incumbent.",
+  "caps": {
+    "screen": 12,
+    "dev": 4
+  },
+  "consumed": {
+    "screen": 8,
+    "dev": 2
+  },
+  "confirmation_reused": false,
+  "live_score": {
+    "value": 0.6083,
+    "source": "user supplied prior leaderboard screenshot",
+    "target": 0.75,
+    "new_submission": false
+  },
+  "registry_snapshot": "artifacts/round2/registry_after_mse.json",
+  "registry_sha256": "6c340fe46c32e33db0fff63edf89c2342953a5af8f8919fa8ee605c580f223a3"
+}
