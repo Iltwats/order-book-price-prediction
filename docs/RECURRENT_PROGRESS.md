@@ -1,6 +1,6 @@
 # Recurrent model progress
 
-The supplied GRU now has a tested path for updating its upper recurrent layer and prediction head. The timing pilot and two 256-sequence MSE training trials completed. **Both scored below the incumbent on the fixed screen; neither advances to full development. The 0.75 live target remains unmet.**
+Direct correlation training has produced a measured local improvement while reusing the supplied GRU. The stronger 256-sequence candidate reached **0.629469402 full-development WP**, versus **0.629255535** for the calibrated incumbent, a gain of **0.000213867**. An interim submission ZIP is available below. **The 0.75 live leaderboard target remains unmet; the two 1,024-sequence expansion runs and their results are pending.**
 
 ## What changed
 
@@ -29,7 +29,7 @@ The [pilot report](../artifacts/round2/partial_gru_pilot16/report.json) records 
 
 The pilot measured **13.158 seconds**, with one Torch CPU thread on macOS ARM64. The [timing receipt](../artifacts/round2/partial_gru_pilot16/timing_projection.json) reports process peak RSS of 2,170,109,952 bytes, approximately 2.02 GiB.
 
-Linear scaling gives **210.53 seconds, about 3.51 minutes**, for one 256-sequence configuration, and **421.07 seconds, about 7.02 minutes**, for two. These are planning estimates from a small pilot, not measured larger runs. They exclude subsequent candidate numerical audits, validation, packaging and deployment testing. They also do not measure inference speed or establish the hidden judge's one-CPU runtime; its hardware and workload remain unknown.
+At the pilot stage, linear scaling estimated **210.53 seconds, about 3.51 minutes**, for one 256-sequence configuration, and **421.07 seconds, about 7.02 minutes**, for two. The completed training measurements are now recorded in the tables below. The earlier estimates excluded subsequent candidate numerical audits, validation, packaging and deployment testing. Neither training timing nor these estimates measure inference speed or establish the hidden judge's one-CPU runtime; its hardware and workload remain unknown.
 
 Training uses all post-warmup training rows and never uses a validation scoring mask. Development selection must compare actual clipped WP against the selected incumbent, with the existing sequence eligibility rules. Previously consumed confirmation results cannot become independent again.
 
@@ -46,8 +46,29 @@ Intervals use 10,000 paired sequence resamples, seed 20260913. They assume suffi
 
 The host suite passed **210 tests**. The offline Linux one-CPU/16-GB suite passed **140 tests**, with eight Torch-dependent training modules intentionally skipped in the inference image. The separate [causal dynamics prototype](CAUSAL_BRANCH_RESULTS.md) failed the speed gate: nonzero throughput was 17.91% below the original baseline. It was not fitted or scored.
 
-## Next objective experiment, declared before its outcomes
+## Completed direct-correlation trials
 
-Use two remaining screen slots for direct clipped, sequence-weighted Pearson training at `1e-5` and `3e-5`. Keep the same first 256 training-anchor groups, seed 20260912, one epoch, batch eight, 256-row chunks, teacher strength 0.1, relative anchor 0.001 and original inference graph. This replaces the unscored slow causal branch fitting allocation and uses the conditional objective-refinement direction. The existing registry caps stay **12 screens / four full-development trials**; eight screens and two full-development trials have now been consumed. Two screens and two full-development slots remain after these objective trials for justified selection/expansion or repetition. Confirmation remains consumed.
+The [completed screen receipt](../artifacts/round2/correlation_screen_results.json) records two prospectively declared one-epoch fits on the same first 256 training-anchor sequences, with seed 20260912. Both use batch eight, 256-row chunks, teacher strength 0.1, relative anchor 0.001 and the original inference graph. The lower pretrained GRU layer remains bitwise unchanged; learning updates the supplied model's upper layer and head. No external pretrained model or data was substituted.
 
-Compute the full-sequence training surrogate and its prediction gradient once from current-student ORT outputs, then accumulate chunk gradients without changing parameters between chunks. Use all post-warmup training rows; this is not the masked official validation score. Freeze the clipping derivative and degenerate-sequence policy before data diagnostics. Require independent gradient tests and a separate prospective objective-specific numerical bridge before training. Do not widen previous limits. Retain the incumbent unless measured candidate improvements justify the next stage.
+The new objective computes clipped, sequence-weighted Pearson loss and its prediction gradient over each complete training sequence, then accumulates chunk gradients without changing parameters between chunks. Training uses all post-warmup rows, retains degenerate sides in the mean, and applies the declared clipping derivative. This remains a training surrogate: development uses the actual supplied mask and eligibility rules. A [separate objective-specific bridge](../artifacts/round2/correlation_training_bridge/report.json) records its numerical and gradient checks; earlier failed gates remain unchanged.
+
+| Learning rate | Training seconds | Screen t0 | Screen t1 | Screen WP | Paired change | 95% sequence-bootstrap interval |
+|---|---:|---:|---:|---:|---:|---|
+| `1e-5` | 192.803 | 0.638508810 | 0.639451859 | 0.638980335 | +0.000064249 | [+0.000042167, +0.000086939] |
+| `3e-5` | 193.374 | 0.638601365 | 0.639597554 | 0.639099460 | +0.000183374 | [+0.000119643, +0.000249044] |
+
+Both comparisons use the same 256-sequence screen incumbent, **0.638916085305**. The stronger `3e-5` candidate advanced to [full development](../artifacts/round2/correlation_gru_lr3e-5/dev_report.json): 1,400 sequences processed, 1,399 eligible. Its target scores are **0.629507554** and **0.629431250**, averaging **0.629469402**.
+
+The [paired development comparison](../artifacts/round2/correlation_gru_lr3e-5/dev_comparison.json) gives **+0.000213867**, with a 95% interval of **[+0.000182717, +0.000244814]**, against the calibrated incumbent's **0.629255535**. The candidate improved 71.62% of eligible sequences. These intervals use 10,000 paired sequence resamples, assume sufficiently independent sequences, and do not correct for adaptive search. The screen and full-development scores concern different subsets; neither is a live leaderboard score or new independent confirmation result.
+
+## Interim submission
+
+[Download submission_correlation256.zip](../dist/submission_correlation256.zip) contains the measured `correlation_gru_lr3e-5` model and is **722,519 bytes** compressed. The [package receipt](../artifacts/round2/correlation256_package_report.json) records successful Python 3.11 verification with networking disabled: 768 rows, two resets and independent output ownership. Its model hash matches the full-development candidate. The receipt's “full development pending” status was written before the completed development comparison above; the frozen receipt is preserved.
+
+This is an interim experimental archive. No new live leaderboard result is established, and hidden-judge runtime remains unverified. The original submission stays available.
+
+## 1,024-sequence expansion: pending
+
+The [prospective expansion policy](../artifacts/round2/correlation_expansion_policy.json) fixes the first 1,024 training-anchor sequences, one epoch and learning rate `3e-5`, with seeds **20260912** and **20260913**. Each run starts independently from the selected pretrained source, rather than continuing the screened checkpoint. The unchanged selected model remains the teacher. These runs test broader training and seed sensitivity; they are not independent data holdouts.
+
+Both training jobs are in progress; their completed training reports, numerical checks, screen results and any final development comparison are **pending**. The declared caps remain **12 screens / four full-development trials**. The completed correlation-256 stage brings usage to ten screens and three full-development trials; the policy allocates two final screens and at most one final development evaluation to the best feasible expansion. No expansion gain, revised archive or achievement of the 0.75 live target is claimed here. Confirmation remains consumed and has not been reused for these comparisons.
