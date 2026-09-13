@@ -1,6 +1,6 @@
 # What we are doing
 
-Our target is at least 0.75 on the live leaderboard. The latest reported live score remains 0.6083. We have improved local development performance, but that is a different dataset. We cannot honestly claim that the current changes will achieve the live target.
+Our target is at least 0.75 on the live leaderboard. The latest reported live score is 0.6092. We have improved local development performance, but that is a different dataset. We cannot honestly claim that the current changes will achieve the live target.
 
 Yes, we are still using the supplied pretrained GRU. Its first recurrent layer stays unchanged. We train its second layer and prediction head using only the supplied training data. The final model keeps the same architecture, input features, memory state and number of inference operations.
 

@@ -2,6 +2,10 @@
 
 Direct correlation training has produced a measured local improvement while reusing the supplied GRU. The selected 1,024-sequence candidate reached **0.630019094 full-development WP**, versus **0.629255535** for the calibrated incumbent: **+0.000763559**. The [latest ZIP](../dist/submission_correlation1024.zip) passed fresh offline host and Linux verification. **The 0.75 live target remains unmet.**
 
+## Subsequent public result
+
+The [user's submission-history screenshot](../artifacts/round2/public_submissions_20260913.json) reports **0.6092**, **22m55s** and **MAX 624 MB** for `submission_correlation1024.zip`. The earlier archives show public scores 0.6083, 0.6085 and 0.6086. Filenames match our local archives, although uploaded checksums are not independently verified. These are public results; final private ranking uses a separate hidden dataset. The new [hidden-test analysis](HIDDEN_TEST_ANALYSIS.md) records the stable local/public offset, cached weak-sequence analysis and runtime implications. Historical release receipts below retain their original observation dates and pending statuses.
+
 ## What changed
 
 Training starts from the selected calibrated checkpoint, which preserves the supplied two-layer GRU-128 recurrence. The lower layer remains frozen; the upper layer and head can learn. The selected original ONNX model also remains the unchanged teacher. No external weights or data enter this work.
@@ -65,7 +69,7 @@ The [paired development comparison](../artifacts/round2/correlation_gru_lr3e-5/d
 
 [Download submission_correlation256.zip](../dist/submission_correlation256.zip) contains the measured `correlation_gru_lr3e-5` model and is **722,519 bytes** compressed. The [package receipt](../artifacts/round2/correlation256_package_report.json) records successful Python 3.11 verification with networking disabled: 768 rows, two resets and independent output ownership. Its model hash matches the full-development candidate. The receipt's “full development pending” status was written before the completed development comparison above; the frozen receipt is preserved.
 
-This is an interim experimental archive. No new live leaderboard result is established, and hidden-judge runtime remains unverified. The original submission stays available.
+This was the interim experimental archive. At packaging time no new live result was established. The subsequent screenshot reports public WP 0.6086 for its filename; exact private-test runtime remains unknown. The original submission stays available.
 
 ## Completed 1,024-sequence expansion
 
