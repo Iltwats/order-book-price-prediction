@@ -1,0 +1,6 @@
+{
+  "reason": "Supplemental source receipt: registry validation imports selection._validate_report; file unchanged throughout this round. Original ten-source candidate declarations remain unchanged.",
+  "files": {
+    "connectome/selection.py": "aaa0f2b8e45d9f997092aa7125ed6c895b15491c63c0a6a8e612ba8f5ddf42a7"
+  }
+}

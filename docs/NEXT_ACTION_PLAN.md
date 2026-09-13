@@ -11,7 +11,7 @@ The first implementation should improve the current GRU readout, add a small sou
 - Validation: existing 32-sequence correctness set, 256-sequence screen, then 1,400-sequence development set with 1,399 eligible blocks under the official mask.
 - Confirmation: already consumed. Preserve its receipt and historical results; do not reset the ledger or create a renamed copy to regain access.
 
-The tasks below are a prospective implementation plan. Research is complete; these new model experiments have not been run.
+The tasks below define the bounded implementation cycle. On 2026-09-13, Step 1's registry and conversion checks were implemented and Step 2's five head candidates were declared before fitting and screening. Later steps remain conditional. The user-provided leaderboard screenshot records the previous submission at **0.6083, rank 26**; its exact uploaded ZIP hash is not established by the screenshot.
 
 ## Step 1: establish round-two evidence and conversion checks
 
@@ -33,7 +33,9 @@ Use the current model's original ONNX recurrence to extract representations. Beg
 | Final-state linear correction | 3 | Correlation surrogate with correction penalties `1e-4`, `1e-3`, `1e-2` |
 | Conditional exact-clipped refinement | At most 1 | Refine only a promising readout using complete-sequence clipped correlation |
 
-For the 128-state surrogate, accumulate target-specific per-sequence weighted covariance and cross-covariance in FP64. Never pool all sequences before computing correlation. Freeze the selected intercept initially; use a parameter anchor to control the scale ambiguity. Limit optimization to 200 deterministic iterations per candidate. Handle zero weights and variance explicitly.
+For the 128-state surrogate, accumulate target-specific per-sequence weighted covariance and cross-covariance in FP64. Never pool all sequences before computing correlation. Use a parameter anchor to control the scale ambiguity. Limit optimization to 200 deterministic iterations per candidate. Handle zero weights and variance explicitly.
+
+**Implementation clarification, declared before scoring:** freeze the selected intercept in training-centered coordinates. Each target's center is the equal-sequence mean of its label-weighted training feature means. As coefficients change, fold `b = b0 + (beta0 - beta) @ center` into the one global output bias. This preserves the selected weighted training prediction mean and makes the anchor insensitive to feature translation. It does not estimate a bias separately for validation sequences. Both affine controls and all three hidden-state heads use this same convention; it adds no inference work. The complete method is documented in `ROUND2_HEAD_METHOD.md`.
 
 The 1,024-sequence dense covariance pilot needs approximately 268 MB plus vectors and metadata. Time extraction on 32 sequences before extrapolating. This method avoids storing every hidden-state row, but covariance accumulation costs O(rows × width²); it is not as cheap as fitting six affine coefficients.
 
