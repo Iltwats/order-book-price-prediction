@@ -1,0 +1,22 @@
+{
+  "kind": "prospective_orchestration_correction_before_any_recurrent_candidate_fit_or_validation",
+  "old_runner_archive": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/source_ort_pilot_v1/partial_gru_cycle.py",
+  "old_runner_sha256": "3448445133d9f71a19829cc84531b44440e28a54479580022ebeb068234dd78e",
+  "new_runner_sha256": "d951f55bbda525209080c726b45cff05481135483e2e9adde3d6d0d67d13702a",
+  "new_parity_sha256": "9a01cc8fb4446edbc137173e48a719252546cf5477a5765d04dcdcfd6e9dd826",
+  "pilot_declaration_sha256": "42d08f45eecd10cfdd9183ea8d815445ea91b6be3c9f9b5d302af8947609ec8b",
+  "pilot_report_sha256": "75d670a18e2dfb148f62c3fb2506af18b33857fd12b47c55e80659f7e531a632",
+  "changes": [
+    "Require actual byte parity for every bulk prediction and final recurrent state before scoring",
+    "Reject fit/resume after evaluation reservation; reuse complete unscored training reports without rewriting them"
+  ],
+  "training_implementation_unchanged": true,
+  "pilot_not_scored": true,
+  "candidate_parameters_and_group_budget_unchanged": true,
+  "tests": {
+    "command": ".venv/bin/python -m pytest -q tests native/test_model_io.py",
+    "passed": 210,
+    "warnings": 12,
+    "seconds": 7.3
+  }
+}
