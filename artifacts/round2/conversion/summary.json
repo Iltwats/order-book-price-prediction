@@ -1,0 +1,18 @@
+{
+  "fp64_gradients_passed": true,
+  "roundtrips": {
+    "original": {
+      "passed": true,
+      "rows": 640000,
+      "seconds": 12.276847957866266,
+      "artifact_bytes_identical": true
+    },
+    "selected": {
+      "passed": true,
+      "rows": 640000,
+      "seconds": 12.153772291028872,
+      "artifact_bytes_identical": true
+    }
+  },
+  "passed": true
+}

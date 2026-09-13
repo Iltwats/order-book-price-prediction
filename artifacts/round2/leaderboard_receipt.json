@@ -1,0 +1,13 @@
+{
+  "recorded_date": "2026-09-13",
+  "evidence": "User-provided screenshot of the live leaderboard",
+  "screenshot_sha256": "afdebacf7f32f867c7069ab9de451359ef8de3b90427802447ad3a93320d7778",
+  "display_name": "Atul",
+  "rank_at_capture": 26,
+  "weighted_pearson_displayed": 0.6083,
+  "submission_count_displayed": 1,
+  "relative_time_displayed": "24 minutes ago",
+  "submitted_archive_sha256": null,
+  "association": "User identifies this as the previous trained model; exact uploaded artifact not independently established.",
+  "interpretation": "Public leaderboard evidence only. Do not compare directly with local development WP or treat the leaderboard as an independent tuning holdout."
+}

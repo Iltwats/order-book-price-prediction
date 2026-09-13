@@ -1,0 +1,256 @@
+{
+  "kind": "FP64_equation_and_gradient_audit",
+  "seed": 20260912,
+  "cases": [
+    {
+      "steps": 1,
+      "saturated_gates": false,
+      "forward": [
+        {
+          "values": 4,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 1.1102230246251565e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        {
+          "values": 4,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 1.1102230246251565e-16,
+          "bitwise_equal": false,
+          "passed": true
+        }
+      ],
+      "gradients": {
+        "input": {
+          "values": 6,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 6.938893903907228e-18,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "initial_state": {
+          "values": 4,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.7755575615628914e-17,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "weight_ih_l0": {
+          "values": 18,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 5.551115123125783e-17,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "weight_hh_l0": {
+          "values": 12,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.7755575615628914e-17,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "bias_ih_l0": {
+          "values": 6,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 5.551115123125783e-17,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "bias_hh_l0": {
+          "values": 6,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.7755575615628914e-17,
+          "bitwise_equal": false,
+          "passed": true
+        }
+      },
+      "finite_difference": {
+        "native": true,
+        "reference": true
+      },
+      "passed": true
+    },
+    {
+      "steps": 5,
+      "saturated_gates": false,
+      "forward": [
+        {
+          "values": 20,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.220446049250313e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        {
+          "values": 4,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 1.6653345369377348e-16,
+          "bitwise_equal": false,
+          "passed": true
+        }
+      ],
+      "gradients": {
+        "input": {
+          "values": 30,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 1.1622647289044608e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "initial_state": {
+          "values": 4,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.7755575615628914e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "weight_ih_l0": {
+          "values": 18,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 4.440892098500626e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "weight_hh_l0": {
+          "values": 12,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 4.440892098500626e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "bias_ih_l0": {
+          "values": 6,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 4.440892098500626e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "bias_hh_l0": {
+          "values": 6,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.220446049250313e-16,
+          "bitwise_equal": false,
+          "passed": true
+        }
+      },
+      "finite_difference": {
+        "native": true,
+        "reference": true
+      },
+      "passed": true
+    },
+    {
+      "steps": 5,
+      "saturated_gates": true,
+      "forward": [
+        {
+          "values": 20,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.220446049250313e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        {
+          "values": 4,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.220446049250313e-16,
+          "bitwise_equal": false,
+          "passed": true
+        }
+      ],
+      "gradients": {
+        "input": {
+          "values": 30,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 1.1102230246251565e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "initial_state": {
+          "values": 4,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 6.661338147750939e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "weight_ih_l0": {
+          "values": 18,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.8341044788771086e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "weight_hh_l0": {
+          "values": 12,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.220446049250313e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "bias_ih_l0": {
+          "values": 6,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.179246366695864e-16,
+          "bitwise_equal": false,
+          "passed": true
+        },
+        "bias_hh_l0": {
+          "values": 6,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 2.220446049250313e-16,
+          "bitwise_equal": false,
+          "passed": true
+        }
+      },
+      "finite_difference": {
+        "native": true,
+        "reference": true
+      },
+      "passed": true
+    }
+  ],
+  "audit_code_sha256": "4a998c452426cf4ec40babe34fe14680738844d5c06de8eabf7b94d49accaa7d",
+  "torch": "2.5.1",
+  "tolerances": {
+    "forward": {
+      "atol": 1e-12,
+      "rtol": 1e-10
+    },
+    "gradient": {
+      "atol": 1e-10,
+      "rtol": 1e-08
+    },
+    "finite_difference": {
+      "eps": 1e-06,
+      "atol": 1e-06,
+      "rtol": 0.0001
+    }
+  },
+  "passed": true,
+  "scope": "tiny nonzero-state GRUs, all input/state/parameter derivatives; no training or FP32 parity claim"
+}

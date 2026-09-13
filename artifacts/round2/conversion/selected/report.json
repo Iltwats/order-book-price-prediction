@@ -1,0 +1,1114 @@
+{
+  "kind": "zero_update_original_graph_roundtrip",
+  "source": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/model.onnx",
+  "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "roundtrip": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/conversion/selected/roundtrip.onnx",
+  "roundtrip_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+  "artifact_bytes_identical": true,
+  "structure_sha256": "ed22709d002d27df1a8518b4541ac75f9bb0e328cb2d2d21fea7ce0bf6f936d3",
+  "structure_identical": true,
+  "parameters": {
+    "w0": {
+      "values": 43008,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "6018ec2dd24948363ce8a3d446db68a566c86b93938388bff807448e338eafbd"
+    },
+    "r0": {
+      "values": 49152,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "bdcbcc2054a4f3ca485577df1e2eb6e9c712f4ef9008a913e3d061779d73ec04"
+    },
+    "b0": {
+      "values": 768,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "a43bb9afdc6753641b2607efd96ef73621d17c3bcb779f967765a75f61019535"
+    },
+    "w1": {
+      "values": 49152,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "4fd54aa23bdec1e685f1610198c52df9501f4b58f1b501a91c23ba581ebb1b80"
+    },
+    "r1": {
+      "values": 49152,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "d713934877bfbd2d42a6f6a6bcc4013236614c57ebdff8ed08d2d0f534d7583b"
+    },
+    "b1": {
+      "values": 768,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "9dd480b6dd4f14380cc6c377125d3c4d29db8bd2b7dcd20f297ec15118228d05"
+    },
+    "head_w": {
+      "values": 256,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "eca15a2451cdba4fb1cf7f1431565e0543ce839c1b8ba765d131322b22dba197"
+    },
+    "head_b": {
+      "values": 2,
+      "finite": true,
+      "violations": 0,
+      "max_absolute_error": 0.0,
+      "bitwise_equal": true,
+      "passed": true,
+      "sha256": "687c445bb225d42a24a938e3f92095b4bb8cfc92ddabcf6cd227f7713ce831ef"
+    }
+  },
+  "sequences": [
+    {
+      "row_group": 1562,
+      "seq_ix": 1788254407,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 595,
+      "seq_ix": 684493166,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 750,
+      "seq_ix": 862694575,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1192,
+      "seq_ix": 1380882112,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 561,
+      "seq_ix": 639923134,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1128,
+      "seq_ix": 1300756693,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 584,
+      "seq_ix": 671790888,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 658,
+      "seq_ix": 748740261,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 387,
+      "seq_ix": 418167267,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1038,
+      "seq_ix": 1202301445,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1868,
+      "seq_ix": 2143779206,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1664,
+      "seq_ix": 1909437861,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 405,
+      "seq_ix": 443640466,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1781,
+      "seq_ix": 2040000134,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 562,
+      "seq_ix": 640379769,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1796,
+      "seq_ix": 2058126046,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 72,
+      "seq_ix": 68650176,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1005,
+      "seq_ix": 1154290666,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 639,
+      "seq_ix": 726733422,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1422,
+      "seq_ix": 1631108463,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1305,
+      "seq_ix": 1508425159,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 941,
+      "seq_ix": 1075650342,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1439,
+      "seq_ix": 1645584382,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 252,
+      "seq_ix": 264262177,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1408,
+      "seq_ix": 1615095265,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 742,
+      "seq_ix": 850700091,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 695,
+      "seq_ix": 797038369,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1259,
+      "seq_ix": 1461831983,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 571,
+      "seq_ix": 648503247,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 761,
+      "seq_ix": 881257626,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 1700,
+      "seq_ix": 1957393725,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    },
+    {
+      "row_group": 409,
+      "seq_ix": 449178381,
+      "rows": 20000,
+      "outputs": {
+        "h0": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "h1": {
+          "values": 2560000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        },
+        "prediction": {
+          "values": 40000,
+          "finite": true,
+          "violations": 0,
+          "max_absolute_error": 0.0,
+          "bitwise_equal": true,
+          "passed": true
+        }
+      }
+    }
+  ],
+  "sequence_count": 32,
+  "rows": 640000,
+  "manifest_sha256": "a875de5f280c8456d70d8cdcb8598827d4c59a51bcd886320f2539d09dd94999",
+  "audit_code_sha256": "4a998c452426cf4ec40babe34fe14680738844d5c06de8eabf7b94d49accaa7d",
+  "mode": "actual full-sequence bulk ORT comparison, all predictions and both state sequences",
+  "bulk_callback_parity_basis": "original-graph OnnxSequenceEncoder; existing test_training.py and selected/parity_smoke32.json",
+  "encoder_provenance": {
+    "source": {
+      "kind": "original_onnx_bulk",
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/conversion/selected/source_bulk.onnx",
+      "sha256": "72042347f13af6b3f6c30ef052e4c2509e9557628044a4383f6188a2701032df",
+      "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+      "onnxruntime": "1.23.2",
+      "compute_threads": 1
+    },
+    "roundtrip": {
+      "kind": "original_onnx_bulk",
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/round2/conversion/selected/roundtrip_bulk.onnx",
+      "sha256": "72042347f13af6b3f6c30ef052e4c2509e9557628044a4383f6188a2701032df",
+      "source_sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+      "onnxruntime": "1.23.2",
+      "compute_threads": 1
+    }
+  },
+  "environment": {
+    "torch": "2.5.1",
+    "onnxruntime": "1.23.2",
+    "threads": 1
+  },
+  "seconds": 12.153772291028872,
+  "strict_fp32_audit": {
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/training_smoke/torch_strict_parity_audit.json",
+    "sha256": "050691eab8e71944f0c4f098da2c2219799d67733cb7a56d3a71a622c9a9c1da",
+    "status": "unchanged; failed Torch/ORT gate is not superseded by this audit"
+  },
+  "passed": true
+}
