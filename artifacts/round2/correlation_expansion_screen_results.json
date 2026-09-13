@@ -1,0 +1,95 @@
+{
+  "candidates": [
+    {
+      "candidate": "correlation_gru1024_seed20260912",
+      "seed": 20260912,
+      "training_seconds": 758.5033573340625,
+      "training_groups": 1024,
+      "lower_recurrence_bitwise_equal": true,
+      "model_sha256": "15c3dad6c0f9964df7489c5dc8c3b5d5774907d6dc33ac80d8fe5533a61f6cde",
+      "screen": {
+        "t0": 0.6390115309826621,
+        "t1": 0.6400958739597047,
+        "weighted_pearson": 0.6395537024711834,
+        "blocks": 256,
+        "eligible_blocks": 256
+      },
+      "paired_comparison": {
+        "delta": 0.0006376171660492511,
+        "ci_low": 0.00040571985954253765,
+        "ci_high": 0.0008788319732003687,
+        "confidence": 0.95,
+        "candidate_wp": 0.639553702471183,
+        "baseline_wp": 0.6389160853051339,
+        "sequences": 256,
+        "win_fraction": 0.703125,
+        "n_resamples": 10000,
+        "seed": 20260913,
+        "method": "paired sequence percentile bootstrap",
+        "assumption": "sequences are sufficiently independent; search bias is not corrected"
+      },
+      "evidence": {
+        "artifacts/round2/correlation_gru1024_seed20260912/report.json": "aeeff94f33289f098ba03ea515bf100195d6495f7f8356e3e1ad0b085caaf5d3",
+        "artifacts/round2/correlation_gru1024_seed20260912/screen_report.json": "f5f2775c7e60c411e2f4ced44b5c22df6729b5f136dad851b6b6de1df413f586",
+        "artifacts/round2/correlation_gru1024_seed20260912/screen_comparison.json": "b8af25b361bba72b3f19ae46680c05597c6772cb70f5ff07a2933c83128a1fd9",
+        "artifacts/round2/correlation_gru1024_seed20260912/parity.json": "7823654bac1da6d396212f668b5e723cf6d9d8c3e1df3f989709f38452bf14fe",
+        "artifacts/round2/correlation_gru1024_seed20260912/bridge/report.json": "bba8a1567b1ab6b3a18970e037a0a902ad823203b4e0d7ea1bdf6194f9fed53e",
+        "artifacts/round2/correlation_gru1024_seed20260912/model.onnx": "15c3dad6c0f9964df7489c5dc8c3b5d5774907d6dc33ac80d8fe5533a61f6cde",
+        "artifacts/round2/correlation_gru1024_seed20260912/sequence.onnx": "5dad49e29daff20628cd4d5983154f667be4a24d6be9b154860252c54107a57c"
+      }
+    },
+    {
+      "candidate": "correlation_gru1024_seed20260913",
+      "seed": 20260913,
+      "training_seconds": 757.7096730829217,
+      "training_groups": 1024,
+      "lower_recurrence_bitwise_equal": true,
+      "model_sha256": "c019dea283df63e69f27711b8fe8b839fe2c6f0a7f8156b8d12415b7f06eabb8",
+      "screen": {
+        "t0": 0.6390252990035964,
+        "t1": 0.6400680999215491,
+        "weighted_pearson": 0.6395466994625727,
+        "blocks": 256,
+        "eligible_blocks": 256
+      },
+      "paired_comparison": {
+        "delta": 0.0006306141574391202,
+        "ci_low": 0.0003787096847306392,
+        "ci_high": 0.0008897336902027961,
+        "confidence": 0.95,
+        "candidate_wp": 0.639546699462573,
+        "baseline_wp": 0.6389160853051339,
+        "sequences": 256,
+        "win_fraction": 0.69921875,
+        "n_resamples": 10000,
+        "seed": 20260913,
+        "method": "paired sequence percentile bootstrap",
+        "assumption": "sequences are sufficiently independent; search bias is not corrected"
+      },
+      "evidence": {
+        "artifacts/round2/correlation_gru1024_seed20260913/report.json": "e138129d0516f7710b42339883ca7e9051236c0cb9dd953c35dbc9454f73a984",
+        "artifacts/round2/correlation_gru1024_seed20260913/screen_report.json": "959b56cd9fb15cf07e6630c854215de1d313a656f549d966e1bdd700574d4244",
+        "artifacts/round2/correlation_gru1024_seed20260913/screen_comparison.json": "c52f056d3ef2153e9e91b02a3503869a679461efa836fa3436a24bcb002eed01",
+        "artifacts/round2/correlation_gru1024_seed20260913/parity.json": "7b15966b022ee51a134ef0c006ce6d7441afdf470f934cd129cb93083073dc09",
+        "artifacts/round2/correlation_gru1024_seed20260913/bridge/report.json": "31a0794eec26826f0746849161b00b3496f11bb13b094ae2b4c65a9ba4adf18b",
+        "artifacts/round2/correlation_gru1024_seed20260913/model.onnx": "c019dea283df63e69f27711b8fe8b839fe2c6f0a7f8156b8d12415b7f06eabb8",
+        "artifacts/round2/correlation_gru1024_seed20260913/sequence.onnx": "88b6ee9213468d1da715f96368199ab15814711393c2a78874c38278c31a01f4"
+      }
+    }
+  ],
+  "selected_for_performance": "correlation_gru1024_seed20260912",
+  "selection_receipt": "artifacts/round2/correlation_expansion_selection.json",
+  "selection_sha256": "b722ab99afa5319787d95c68af413b9be8b28d4c4cc2da1bcbc6e53fa0e59609",
+  "caps": {
+    "screen": 12,
+    "dev": 4
+  },
+  "consumed": {
+    "screen": 12,
+    "dev": 3
+  },
+  "confirmation_reused": false,
+  "live_target_achieved": false,
+  "judge_runtime_verified": false,
+  "performance_and_development": "pending; screen winner only"
+}
