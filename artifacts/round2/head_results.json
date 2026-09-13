@@ -1,0 +1,363 @@
+{
+  "scope": "Six frozen-readout configurations including one predeclared training-subset sensitivity check; inspected development data only.",
+  "registry": {
+    "path": "artifacts/round2/registry.json",
+    "sha256": "342d1e13a9d9bfb4267f8966716d2350a52647bd472e296e81045e4b315fd1a4"
+  },
+  "incumbent": {
+    "model": {
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/model.onnx",
+      "sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45"
+    },
+    "config": {
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/submission_config.json",
+      "sha256": "4f3c27303d5d35b5fdc4a32e0365d084731654e1e50511118d0481d8e29b3904"
+    },
+    "report": {
+      "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/artifacts/selected/dev_report.json",
+      "sha256": "d034118549155711f250bd5b26085c69da4c7458af11d0939a063f509fa33bce"
+    },
+    "weighted_pearson": 0.6292555347902447
+  },
+  "used_slots": {
+    "screen": 6,
+    "dev": 2
+  },
+  "caps": {
+    "screen": 12,
+    "dev": 4
+  },
+  "candidates": {
+    "affine_mse": {
+      "parameters": {
+        "representation": "outputs",
+        "objective": "mse",
+        "penalty": 0.01,
+        "max_iterations": 200,
+        "threads": 1,
+        "offset_policy": "training_centered_selected"
+      },
+      "training_sequences": 1024,
+      "eligible_training_sequences": 1020,
+      "fit_seconds": 0.7602504580281675,
+      "model": {
+        "path": "artifacts/round2/affine_mse/model.onnx",
+        "sha256": "d705913bb13d7677e154521c7b8ee83a4cda894b744b3f8b55e71468d2225745"
+      },
+      "training_report": {
+        "path": "artifacts/round2/affine_mse/report.json",
+        "sha256": "e02c46bd5c9c2b326ea1cabfebe2b03a6e161e566547083e42b3edb1d5881bf3"
+      },
+      "parity": {
+        "path": "artifacts/round2/affine_mse/parity.json",
+        "sha256": "b7549bc422435c6be2581d13f1970718bfca164cf76adb80143f1606e2c826c5"
+      },
+      "recurrence_bitwise_equal": true,
+      "results": {
+        "screen": {
+          "report": {
+            "path": "artifacts/round2/affine_mse/screen_report.json",
+            "sha256": "9b96532645cc7ef9ae2193267e7f151e8ebc60cf2e9c705ee9afe861d653730b"
+          },
+          "comparison": {
+            "path": "artifacts/round2/affine_mse/screen_comparison.json",
+            "sha256": "3c7f49752a1f81414275c6e4d51e232e61c47801e669e23224a93ba6a446c2e9"
+          },
+          "weighted_pearson": 0.6387022605365196,
+          "t0": 0.6383737565924965,
+          "t1": 0.6390307644805427,
+          "seconds": 48.47256170795299,
+          "delta": -0.00021382476861425389,
+          "ci_low": -0.00038596646354342533,
+          "ci_high": -4.53165623503838e-05,
+          "win_fraction": 0.37890625,
+          "sequences": 256,
+          "n_resamples": 10000
+        }
+      }
+    },
+    "affine_rho": {
+      "parameters": {
+        "representation": "outputs",
+        "objective": "correlation",
+        "penalty": 0.01,
+        "max_iterations": 200,
+        "threads": 1,
+        "offset_policy": "training_centered_selected"
+      },
+      "training_sequences": 1024,
+      "eligible_training_sequences": 1020,
+      "fit_seconds": 0.1432066250126809,
+      "model": {
+        "path": "artifacts/round2/affine_rho/model.onnx",
+        "sha256": "4dd9a31de54098e46edc3d21e4262c94e57c0e0cff4c52397eb0a084424af82f"
+      },
+      "training_report": {
+        "path": "artifacts/round2/affine_rho/report.json",
+        "sha256": "c2a6d6847f1bfca9249900139dcb9bffe0675e97b003d6a6982c3e91719f452b"
+      },
+      "parity": {
+        "path": "artifacts/round2/affine_rho/parity.json",
+        "sha256": "1859102a0c4856bdc1b688c3e91a3e5281c5551a699807b3a7efcd92a2fdd27a"
+      },
+      "recurrence_bitwise_equal": true,
+      "results": {
+        "screen": {
+          "report": {
+            "path": "artifacts/round2/affine_rho/screen_report.json",
+            "sha256": "7dca32f6e7d700d87f536f1f1ece079aa2c8a63ca96f3b103252f2f89840536b"
+          },
+          "comparison": {
+            "path": "artifacts/round2/affine_rho/screen_comparison.json",
+            "sha256": "b98c835fba553d21400c2252e48309a386eec46753e466a59efabcc3976bcbc8"
+          },
+          "weighted_pearson": 0.6389236478711913,
+          "t0": 0.6383955267644977,
+          "t1": 0.6394517689778849,
+          "seconds": 48.46589962486178,
+          "delta": 7.562566057483188e-06,
+          "ci_low": -0.00017027535021384925,
+          "ci_high": 0.00017212784530256745,
+          "win_fraction": 0.51171875,
+          "sequences": 256,
+          "n_resamples": 10000
+        },
+        "dev": {
+          "report": {
+            "path": "artifacts/round2/affine_rho/dev_report.json",
+            "sha256": "5881f53f4978e73dd8d777972d2ed63ea7b2579aedc28ed07c9549bb90e9fc36"
+          },
+          "comparison": {
+            "path": "artifacts/round2/affine_rho/dev_comparison.json",
+            "sha256": "525d43254ab6171187ecfaab49c47b8639d3489e829c034c901a9a13b0fb9c8c"
+          },
+          "weighted_pearson": 0.6293069132111146,
+          "t0": 0.6293846027642703,
+          "t1": 0.6292292236579589,
+          "seconds": 273.31044079200365,
+          "delta": 5.137842087068925e-05,
+          "ci_low": -4.175082548290298e-05,
+          "ci_high": 0.00014174324325222484,
+          "win_fraction": 0.5325232308791994,
+          "sequences": 1399,
+          "n_resamples": 10000
+        }
+      }
+    },
+    "head_rho_p1e-4": {
+      "parameters": {
+        "representation": "hidden",
+        "objective": "correlation",
+        "penalty": 0.0001,
+        "max_iterations": 200,
+        "threads": 1,
+        "offset_policy": "training_centered_selected"
+      },
+      "training_sequences": 1024,
+      "eligible_training_sequences": 1020,
+      "fit_seconds": 4.8632230828516185,
+      "model": {
+        "path": "artifacts/round2/head_rho_p1e-4/model.onnx",
+        "sha256": "c376b3576133877cda6599828661227ad5e7bcd7bb119ee109eab5f3da7f482f"
+      },
+      "training_report": {
+        "path": "artifacts/round2/head_rho_p1e-4/report.json",
+        "sha256": "08e4c3c17713d64b8bc40c806be64b02c380c9260640096bf55a5c7362929671"
+      },
+      "parity": {
+        "path": "artifacts/round2/head_rho_p1e-4/parity.json",
+        "sha256": "aa712f5f1a57953e053ff74c58434dd852850935d3563841bf7c6c2fde3b5058"
+      },
+      "recurrence_bitwise_equal": true,
+      "results": {
+        "screen": {
+          "report": {
+            "path": "artifacts/round2/head_rho_p1e-4/screen_report.json",
+            "sha256": "93de1d3608490519f379148d85cfec10491847fbe0a7ccc9d8a3951d87407a5b"
+          },
+          "comparison": {
+            "path": "artifacts/round2/head_rho_p1e-4/screen_comparison.json",
+            "sha256": "425a81a3a88b65a6de76bf9be017969e6f26790e5b38cf737c6ce3f90272979e"
+          },
+          "weighted_pearson": 0.6364694415105421,
+          "t0": 0.6356911790068196,
+          "t1": 0.6372477040142646,
+          "seconds": 48.45723612513393,
+          "delta": -0.0024466437945915116,
+          "ci_low": -0.004889719273429359,
+          "ci_high": -7.608031832647227e-05,
+          "win_fraction": 0.421875,
+          "sequences": 256,
+          "n_resamples": 10000
+        }
+      }
+    },
+    "head_rho_p1e-3": {
+      "parameters": {
+        "representation": "hidden",
+        "objective": "correlation",
+        "penalty": 0.001,
+        "max_iterations": 200,
+        "threads": 1,
+        "offset_policy": "training_centered_selected"
+      },
+      "training_sequences": 1024,
+      "eligible_training_sequences": 1020,
+      "fit_seconds": 4.245517959119752,
+      "model": {
+        "path": "artifacts/round2/head_rho_p1e-3/model.onnx",
+        "sha256": "177f9ad391387f1043256b3a2d16d56eb82079cef91d8d72e59ae288baa60b9a"
+      },
+      "training_report": {
+        "path": "artifacts/round2/head_rho_p1e-3/report.json",
+        "sha256": "aed5b1f62d463f19b666995bff47ab778834d49b4e183ae44e8dd2d6b8cd0a9c"
+      },
+      "parity": {
+        "path": "artifacts/round2/head_rho_p1e-3/parity.json",
+        "sha256": "30f68c739d84c3343dabc1d57fc2f297fdba478bcbd8c239ec6bd1072185e609"
+      },
+      "recurrence_bitwise_equal": true,
+      "results": {
+        "screen": {
+          "report": {
+            "path": "artifacts/round2/head_rho_p1e-3/screen_report.json",
+            "sha256": "e978e21122fa4ac36150b254ddbfa0a048cb160e49df65b4c08a7f3d7b37a35f"
+          },
+          "comparison": {
+            "path": "artifacts/round2/head_rho_p1e-3/screen_comparison.json",
+            "sha256": "006dbfa34938e08b3c55083b9d9dc9329483bbb5f588b44af2e609556afa007f"
+          },
+          "weighted_pearson": 0.6364864133082772,
+          "t0": 0.6356285277457339,
+          "t1": 0.6373442988708204,
+          "seconds": 48.32607283303514,
+          "delta": -0.0024296719968566033,
+          "ci_low": -0.004842733354912783,
+          "ci_high": -7.662908898435301e-05,
+          "win_fraction": 0.421875,
+          "sequences": 256,
+          "n_resamples": 10000
+        }
+      }
+    },
+    "head_rho_p1e-2": {
+      "parameters": {
+        "representation": "hidden",
+        "objective": "correlation",
+        "penalty": 0.01,
+        "max_iterations": 200,
+        "threads": 1,
+        "offset_policy": "training_centered_selected"
+      },
+      "training_sequences": 1024,
+      "eligible_training_sequences": 1020,
+      "fit_seconds": 2.8701973750721663,
+      "model": {
+        "path": "artifacts/round2/head_rho_p1e-2/model.onnx",
+        "sha256": "65e94b04f507f949456ccf4464d7c9dc7d9633b858a5feb73cded47ef2b749b6"
+      },
+      "training_report": {
+        "path": "artifacts/round2/head_rho_p1e-2/report.json",
+        "sha256": "e027e82ca32facc34d588a5613723dbe48966fb8fcc31038a85a86175d5734fc"
+      },
+      "parity": {
+        "path": "artifacts/round2/head_rho_p1e-2/parity.json",
+        "sha256": "ac72b3de2a666f23ed89278f34e940d6d50988e27c831dcb6dd2867c8dbcae61"
+      },
+      "recurrence_bitwise_equal": true,
+      "results": {
+        "screen": {
+          "report": {
+            "path": "artifacts/round2/head_rho_p1e-2/screen_report.json",
+            "sha256": "ceca00a426fede429f685652578cb22cd92d85a301e8edb0aa8350557509cb30"
+          },
+          "comparison": {
+            "path": "artifacts/round2/head_rho_p1e-2/screen_comparison.json",
+            "sha256": "09a84844e21db01daf2d546097be1971987bf0f8bc20410d938e233685b23891"
+          },
+          "weighted_pearson": 0.6377526488049312,
+          "t0": 0.6369795732147028,
+          "t1": 0.6385257243951595,
+          "seconds": 48.617407207842916,
+          "delta": -0.0011634365002027717,
+          "ci_low": -0.003157061133994162,
+          "ci_high": 0.0007806124812558734,
+          "win_fraction": 0.4609375,
+          "sequences": 256,
+          "n_resamples": 10000
+        }
+      }
+    },
+    "affine_rho_subset512": {
+      "parameters": {
+        "representation": "outputs",
+        "objective": "correlation",
+        "penalty": 0.01,
+        "max_iterations": 200,
+        "threads": 1,
+        "offset_policy": "training_centered_selected"
+      },
+      "training_sequences": 512,
+      "eligible_training_sequences": 509,
+      "fit_seconds": 0.6681979577988386,
+      "model": {
+        "path": "artifacts/round2/affine_rho_subset512/model.onnx",
+        "sha256": "dc376dbdb95f9d49df5c3c94ffcc6c2b72d7040127b4c0e18e78daab55a9cfce"
+      },
+      "training_report": {
+        "path": "artifacts/round2/affine_rho_subset512/report.json",
+        "sha256": "b8b27a9491ee40ef9d407d460f3aa1d79c5abb0d95d17bab30d78e408ef63400"
+      },
+      "parity": {
+        "path": "artifacts/round2/affine_rho_subset512/parity.json",
+        "sha256": "161912668332f9cac59851e83c5e2213b2e3070d718d97304aea164c7d0832c8"
+      },
+      "recurrence_bitwise_equal": true,
+      "results": {
+        "screen": {
+          "report": {
+            "path": "artifacts/round2/affine_rho_subset512/screen_report.json",
+            "sha256": "8c3beae8b5370859e2198c72d3609699ed6fa8def1b726104a20174791674f18"
+          },
+          "comparison": {
+            "path": "artifacts/round2/affine_rho_subset512/screen_comparison.json",
+            "sha256": "8f0e5627c056adb5f5f9da0de05fe80be42f425f500949d1e5329e8d1d393ded"
+          },
+          "weighted_pearson": 0.6389164178021974,
+          "t0": 0.6384561442909409,
+          "t1": 0.639376691313454,
+          "seconds": 50.21507287491113,
+          "delta": 3.3249706350558616e-07,
+          "ci_low": -3.5706430677225545e-05,
+          "ci_high": 3.475575965434727e-05,
+          "win_fraction": 0.5,
+          "sequences": 256,
+          "n_resamples": 10000
+        },
+        "dev": {
+          "report": {
+            "path": "artifacts/round2/affine_rho_subset512/dev_report.json",
+            "sha256": "bf949461f7ee7100a19e5516e26ca86a5f19f71c9c2c75d3cbc41bbc0d9396b3"
+          },
+          "comparison": {
+            "path": "artifacts/round2/affine_rho_subset512/dev_comparison.json",
+            "sha256": "42062319730bf2b611fbcaecdcc2b927842f805ab20d15b0213fd735a4d5e0cb"
+          },
+          "weighted_pearson": 0.6292728059461585,
+          "t0": 0.6293661767814555,
+          "t1": 0.6291794351108615,
+          "seconds": 275.1818895409815,
+          "delta": 1.7271155913814067e-05,
+          "ci_low": -3.087525686787718e-06,
+          "ci_high": 3.63463742854993e-05,
+          "win_fraction": 0.5318084345961401,
+          "sequences": 1399,
+          "n_resamples": 10000
+        }
+      }
+    }
+  },
+  "selected_experimental_candidate": "affine_rho",
+  "default_release_changed": false,
+  "statistical_caveat": "Both positive full-development deltas have 95% intervals spanning zero. Training subset overlaps the main fit. Bootstrap does not correct selection bias. No confirmation or leaderboard reevaluation occurred."
+}

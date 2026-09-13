@@ -1,0 +1,54 @@
+{
+  "purpose": "Read-only hash audit of preserved baseline, release and already-consumed confirmation evidence; no confirmation predictions or scores evaluated.",
+  "files": {
+    "baseline/baseline.onnx": {
+      "sha256": "321ec67b93f3c5dde2c0901ca4532072dad5f65753c2e6519e93ea3555f6a6fd",
+      "size_bytes": 770975,
+      "matches_committed_bytes": true
+    },
+    "artifacts/selected/model.onnx": {
+      "sha256": "d920986b8c42b256c652e9f695e6ca52af1be7c3ecc88cd0596de41ed5653a45",
+      "size_bytes": 770975,
+      "matches_committed_bytes": true
+    },
+    "submission_config.json": {
+      "sha256": "4f3c27303d5d35b5fdc4a32e0365d084731654e1e50511118d0481d8e29b3904",
+      "size_bytes": 163,
+      "matches_committed_bytes": true
+    },
+    "dist/submission.zip": {
+      "sha256": "9d8862659bbe823532879708fa2765ac023d2cae8984501919e1293a022c8de4",
+      "size_bytes": 722475
+    },
+    "artifacts/baseline_confirmation.json": {
+      "sha256": "794716d8503cedf9c54df2c4e3d386aeb08ee21acb1a677fbdfd522bbf8a6844",
+      "size_bytes": 94971,
+      "matches_committed_bytes": true
+    },
+    "artifacts/confirmation_decision.json": {
+      "sha256": "61e91c18007d141fabe104f41a8d1b1c6c1256616a474fd4ea6731e9ac89956b",
+      "size_bytes": 1283,
+      "matches_committed_bytes": true
+    },
+    "artifacts/manifest.confirmation-access.decision.json": {
+      "sha256": "61e91c18007d141fabe104f41a8d1b1c6c1256616a474fd4ea6731e9ac89956b",
+      "size_bytes": 1283,
+      "matches_committed_bytes": true
+    },
+    "artifacts/manifest.confirmation-access.json": {
+      "sha256": "4d39273ea38c7c7740720305471741c22c9b51628a7c1b824bc66d893622750a",
+      "size_bytes": 5138,
+      "matches_committed_bytes": true
+    },
+    "artifacts/selected/confirmation_report.json": {
+      "sha256": "ebeedb06204bcce68312538148d392fd1bce7d3459cf23e571744a0c012802dd",
+      "size_bytes": 95630,
+      "matches_committed_bytes": true
+    },
+    "artifacts/selected/pre_confirmation_gates.json": {
+      "sha256": "aa3465e37679eeab5d8071cd4d4b873ddc9390f0a66f013e890e9af6fcb6f437",
+      "size_bytes": 834,
+      "matches_committed_bytes": true
+    }
+  }
+}

@@ -1,0 +1,217 @@
+{
+  "passed": true,
+  "mode": "iobinding",
+  "groups": [
+    1562,
+    595,
+    750,
+    1192,
+    561,
+    1128,
+    584,
+    658,
+    387,
+    1038,
+    1868,
+    1664,
+    405,
+    1781,
+    562,
+    1796,
+    72,
+    1005,
+    639,
+    1422,
+    1305,
+    941,
+    1439,
+    252,
+    1408,
+    742,
+    695,
+    1259,
+    571,
+    761,
+    1700,
+    409
+  ],
+  "bitwise_equal": true,
+  "max_output_absolute_error": 0.0,
+  "max_hidden_absolute_error": 0.0,
+  "max_bulk_absolute_error": 0.0,
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "per_sequence": [
+    {
+      "row_group": 1562,
+      "reference": 0.815554591301929,
+      "candidate": 0.815554591301929
+    },
+    {
+      "row_group": 595,
+      "reference": 0.8606608033451261,
+      "candidate": 0.8606608033451261
+    },
+    {
+      "row_group": 750,
+      "reference": 0.14979903617035412,
+      "candidate": 0.14979903617035412
+    },
+    {
+      "row_group": 1192,
+      "reference": 0.8098481748299938,
+      "candidate": 0.8098481748299938
+    },
+    {
+      "row_group": 561,
+      "reference": 0.777949693983897,
+      "candidate": 0.777949693983897
+    },
+    {
+      "row_group": 1128,
+      "reference": 0.6322007941839857,
+      "candidate": 0.6322007941839857
+    },
+    {
+      "row_group": 584,
+      "reference": 0.3477546792053918,
+      "candidate": 0.3477546792053918
+    },
+    {
+      "row_group": 658,
+      "reference": 0.7822658468807385,
+      "candidate": 0.7822658468807385
+    },
+    {
+      "row_group": 387,
+      "reference": 0.8449743584373755,
+      "candidate": 0.8449743584373755
+    },
+    {
+      "row_group": 1038,
+      "reference": 0.3042634413735545,
+      "candidate": 0.3042634413735545
+    },
+    {
+      "row_group": 1868,
+      "reference": 0.5996875979237561,
+      "candidate": 0.5996875979237561
+    },
+    {
+      "row_group": 1664,
+      "reference": 0.871921968170918,
+      "candidate": 0.871921968170918
+    },
+    {
+      "row_group": 405,
+      "reference": 0.7775328830658488,
+      "candidate": 0.7775328830658488
+    },
+    {
+      "row_group": 1781,
+      "reference": 0.7194419293911805,
+      "candidate": 0.7194419293911805
+    },
+    {
+      "row_group": 562,
+      "reference": 0.8564508701211002,
+      "candidate": 0.8564508701211002
+    },
+    {
+      "row_group": 1796,
+      "reference": 0.653878723239153,
+      "candidate": 0.653878723239153
+    },
+    {
+      "row_group": 72,
+      "reference": 0.5741809838153658,
+      "candidate": 0.5741809838153658
+    },
+    {
+      "row_group": 1005,
+      "reference": 0.7236607142588545,
+      "candidate": 0.7236607142588545
+    },
+    {
+      "row_group": 639,
+      "reference": 0.7389125375368675,
+      "candidate": 0.7389125375368675
+    },
+    {
+      "row_group": 1422,
+      "reference": 0.8646505536779836,
+      "candidate": 0.8646505536779836
+    },
+    {
+      "row_group": 1305,
+      "reference": 0.5332419329163199,
+      "candidate": 0.5332419329163199
+    },
+    {
+      "row_group": 941,
+      "reference": 0.766648572188859,
+      "candidate": 0.766648572188859
+    },
+    {
+      "row_group": 1439,
+      "reference": 0.8517948729663902,
+      "candidate": 0.8517948729663902
+    },
+    {
+      "row_group": 252,
+      "reference": 0.47487274042778227,
+      "candidate": 0.47487274042778227
+    },
+    {
+      "row_group": 1408,
+      "reference": 0.7220590127838025,
+      "candidate": 0.7220590127838025
+    },
+    {
+      "row_group": 742,
+      "reference": 0.385975389261194,
+      "candidate": 0.385975389261194
+    },
+    {
+      "row_group": 695,
+      "reference": 0.8032136578589593,
+      "candidate": 0.8032136578589593
+    },
+    {
+      "row_group": 1259,
+      "reference": 0.7779555163200014,
+      "candidate": 0.7779555163200014
+    },
+    {
+      "row_group": 571,
+      "reference": 0.49321501322535355,
+      "candidate": 0.49321501322535355
+    },
+    {
+      "row_group": 761,
+      "reference": 0.3674819769151477,
+      "candidate": 0.3674819769151477
+    },
+    {
+      "row_group": 1700,
+      "reference": 0.823755104771252,
+      "candidate": 0.823755104771252
+    },
+    {
+      "row_group": 409,
+      "reference": 0.85348282035028,
+      "candidate": 0.85348282035028
+    }
+  ],
+  "environment": {
+    "python": "3.11.16",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "architecture": "arm64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 1775747072
+  },
+  "original_sha256": "177f9ad391387f1043256b3a2d16d56eb82079cef91d8d72e59ae288baa60b9a",
+  "candidate_sha256": "177f9ad391387f1043256b3a2d16d56eb82079cef91d8d72e59ae288baa60b9a",
+  "bulk_model_sha256": "950049085927029d339caa930e4233fb7f83b16dfa92563c8905792980bc5cc0"
+}

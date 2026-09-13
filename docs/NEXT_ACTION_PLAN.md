@@ -13,6 +13,8 @@ The first implementation should improve the current GRU readout, add a small sou
 
 The tasks below define the bounded implementation cycle. On 2026-09-13, Step 1's registry and conversion checks were implemented and Step 2's five head candidates were declared before fitting and screening. Later steps remain conditional. The user-provided leaderboard screenshot records the previous submission at **0.6083, rank 26**; its exact uploaded ZIP hash is not established by the screenshot.
 
+**Completed head stage:** five primary screens plus one fixed training-subset repeat, and two full-development evaluations. The best affine correlation head gained `0.000051378` development WP; its repeat gained `0.000017271`. Both 95% intervals include zero. See [actual results](ROUND2_RESULTS.md) and the [300-word explanation](ROUND2_SIMPLE.md). The candidate is experimental, and the existing default release remains available. Six screen slots and two full-development slots remain under the original caps.
+
 ## Step 1: establish round-two evidence and conversion checks
 
 Create a new experiment registry separate from the old confirmation workflow. Each entry records hypothesis, parent model hash, code/config hash, training groups, validation groups, seed, teacher lineage, transformations, timing, score and failed gates. The incumbent comparator is the selected calibrated model. The current `compare_confirmation_once` logic uses the original raw baseline and cannot serve unchanged as the next-round selector.

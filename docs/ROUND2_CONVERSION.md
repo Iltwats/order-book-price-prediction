@@ -36,4 +36,4 @@ From the repository root, in the pinned environment:
   --output artifacts/round2/conversion_recheck
 ```
 
-The completed test run passed all 22 tests. The separate output directory preserves the recorded audit. Generated ONNX files and reports remain under ignored artifacts; neither supplied model was changed.
+The completed test run passed all 22 tests. The separate output directory preserves the recorded audit. Generated ONNX files remain ignored; curated small JSON evidence reports are committed. Neither supplied model was changed.

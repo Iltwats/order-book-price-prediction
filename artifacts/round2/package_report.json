@@ -1,0 +1,24 @@
+{
+  "archive": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/dist/submission_round2_affine_rho.zip",
+  "size_bytes": 722478,
+  "sha256": "26c00fed6e6ae0be0a42f67c84ecf554fe0d0afcffecb8755380588905b7fac6",
+  "files": {
+    "MODEL.md": "bc1e1b7033fd3a579e1d9c87adf3d698d648df6dda31d8a04d29f6fe3cc5445f",
+    "connectome/__init__.py": "ea78d2847e3336ad17c2441e5f8282b444a44655e5e107f9f46cfb1ec8c7dd48",
+    "connectome/native.py": "ff56837a0cadf8f718a27dab155244a3df63c1a5483f45c5d0539ad83b03912e",
+    "connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+    "model.onnx": "4dd9a31de54098e46edc3d21e4262c94e57c0e0cff4c52397eb0a084424af82f",
+    "solution.py": "a9a88b3aa5dd27ec84a052be0847987ed77ff57d19e684823bff12028d0b184b",
+    "submission_config.json": "0c88f85eaf68f14468b3065120bfca425305d9c3c2f336c01fb15b8f1e934fac"
+  },
+  "verified": true,
+  "judge_runtime_verified": false,
+  "verification": {
+    "passed": true,
+    "rows": 768,
+    "resets": 2,
+    "independent_output_ownership": true,
+    "network_disabled": true,
+    "python": "3.11.16"
+  }
+}

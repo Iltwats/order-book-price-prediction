@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-09-13T06:14:37.426411+00:00",
+  "registry_sha256_at_verification": "f5a43fb09d1f09bc4f82cba626eab4616dcc2b3a56f1aa7f51daa876e65ea1cd",
+  "repair_script": {
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/scripts/repair_round2_signatures.py",
+    "sha256": "d902abc00393355e6a084bb544ae678bfa19b6a68672836fd316a6094d271018"
+  },
+  "candidate_count": 5,
+  "all_current_signatures_match": true,
+  "all_current_signatures_unique": true,
+  "preserved_declaration_signatures": [
+    "head_rho_p1e-2",
+    "head_rho_p1e-3",
+    "head_rho_p1e-4"
+  ],
+  "candidate_source_references_verified": 50,
+  "repeated_execution": "verified no-op on second invocation",
+  "repair_scope": "Only three candidate signatures, three declaration_signature fields, one amendment receipt, and registry digest; source/spec/reservation/result/cap identity asserted before write."
+}

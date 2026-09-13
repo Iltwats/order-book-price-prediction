@@ -1,0 +1,8 @@
+........................................................................ [ 66%]
+....................................                                     [100%]
+=========================== short test summary info ============================
+SKIPPED [1] ../Users/atulsharma/research/ml/wnn_connectome_starterpack/tests/test_conversion_audit.py:7: optional offline training dependency
+SKIPPED [1] ../Users/atulsharma/research/ml/wnn_connectome_starterpack/tests/test_correlation.py:5: could not import 'torch': No module named 'torch'
+SKIPPED [1] ../Users/atulsharma/research/ml/wnn_connectome_starterpack/tests/test_correlation_integration.py:10: optional offline training dependency
+SKIPPED [1] ../Users/atulsharma/research/ml/wnn_connectome_starterpack/tests/test_training.py:7: optional offline training dependency
+108 passed, 4 skipped in 2.80s
