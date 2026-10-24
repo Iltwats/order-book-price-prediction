@@ -1,0 +1,11 @@
+{
+  "checked_at_utc": "2026-10-24T15:20:00+00:00",
+  "plan_sha256": "3723823f45de3395f4c12962230645515c20fbd4362c438619dfd4e07d0c10c4",
+  "status": "superseded_do_not_run",
+  "superseded_by": "artifacts/gpu/global-wp-v2.1",
+  "superseded_by_plan_sha256": "1c3a926d2a420ec70528b2517039112d05183b52f4087a08d302e08fc396a091",
+  "reason": "Repository cleanup removed unused connectome modules, which changes the frozen code identity. Objective, parameters, seed, reserve and repeat1024 are unchanged; coverage4096 redrew 1,566 of 3,072 added groups because prepare counts this plan's allocations as exposure.",
+  "trained": false,
+  "historical_bundle": "dist/gpu_training_global_wp_v2.tar.gz",
+  "history_tag": "pre-cleanup"
+}

@@ -8,7 +8,7 @@ sequences helps more than repeating the existing subset.
 The scorer pools every selected row across sequences, computes one clipped
 weighted correlation per target, and averages those two correlations. Earlier
 per-sequence scores belong to a different metric. See the
-[metric reference](../METRIC.md) and [documentation audit](METRIC_UPDATE_AUDIT.md).
+[metric reference](../METRIC.md).
 
 ## Starting point from the rescore
 
@@ -84,11 +84,11 @@ Use Python 3.11 and the existing environment:
 .venv/bin/python -m connectome.gpu_training prepare \
   --train datasets/train.parquet \
   --ranking artifacts/global_wp/rescore_v1/ranking.json \
-  --output artifacts/gpu/global-wp-v2
+  --output artifacts/gpu/global-wp-v2.1
 
 .venv/bin/python -m connectome.gpu_training bundle \
-  --plan artifacts/gpu/global-wp-v2 \
-  --output dist/gpu_training_global_wp_v2.tar.gz
+  --plan artifacts/gpu/global-wp-v2.1 \
+  --output dist/gpu_training_global_wp_v2.1.tar.gz
 ```
 
 Preparation freezes the ranking, model hashes, full training-file SHA256,
@@ -103,10 +103,14 @@ excludes datasets, credentials, Git history and prediction caches. Transfer
 `train.parquet` separately to your own machine or private storage. The fitting
 job does not need `valid.parquet`.
 
-The earlier plan remains under `artifacts/gpu/coverage-v1` with a superseded
-receipt. Its archive is preserved as
-`dist/gpu_training_bundle.legacy_block_wp.tar.gz`. The current runner rejects
-that obsolete format. Use the Global-WP v2 plan and archive for this cycle.
+The current plan is `artifacts/gpu/global-wp-v2.1`, plan SHA256
+`1c3a926d2a420ec70528b2517039112d05183b52f4087a08d302e08fc396a091`. It replaced
+`global-wp-v2` after the repository cleanup removed unused modules, which changes
+the frozen source hashes. Settings, reserve and `repeat1024` are identical;
+`coverage4096` keeps the same 1,024 base groups but redrew 1,566 of its 3,072
+added groups, because `prepare` counts the earlier plan's allocations as
+exposure. Neither v2 arm had been trained. The legacy per-sequence plan under
+`artifacts/gpu/coverage-v1` is rejected by the current runner.
 
 ## Launch a single-GPU pilot
 
@@ -118,9 +122,9 @@ before buying a larger machine or committing to a long run.
 
 ```sh
 mkdir -p connectome-training
-tar -xzf gpu_training_global_wp_v2.tar.gz -C connectome-training
+tar -xzf gpu_training_global_wp_v2.1.tar.gz -C connectome-training
 cd connectome-training
-docker build -f cloud/Dockerfile -t connectome-train:global-wp-v2 .
+docker build -f cloud/Dockerfile -t connectome-train:global-wp-v2.1 .
 ```
 
 The image uses Python 3.11, the pinned project requirements, and the official
@@ -138,7 +142,7 @@ docker run --rm --init --gpus all --network none \
   -v "$PWD/plan:/plan:ro" \
   -v /mnt/connectome/data:/data:ro \
   -v /mnt/connectome/runs:/runs \
-  connectome-train:global-wp-v2 qualify \
+  connectome-train:global-wp-v2.1 qualify \
   --plan /plan --train /data/train.parquet \
   --arm coverage4096 --output /runs/qualification
 
@@ -146,7 +150,7 @@ docker run --rm --init --gpus all --network none \
   -v "$PWD/plan:/plan:ro" \
   -v /mnt/connectome/data:/data:ro \
   -v /mnt/connectome/runs:/runs \
-  connectome-train:global-wp-v2 train \
+  connectome-train:global-wp-v2.1 train \
   --plan /plan --train /data/train.parquet \
   --arm coverage4096 --output /runs/coverage4096 --max-updates 1
 ```

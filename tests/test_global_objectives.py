@@ -74,14 +74,18 @@ def test_batch_partition_and_order_do_not_reweight_rows():
 
 
 def test_offsets_and_unequal_weights_differ_from_mean_sequence_objective():
-    from connectome.recurrent_objectives import correlation_objective as old_objective
     prediction, teacher, targets = _arrays(rows=21, batch=2)
     prediction = prediction.clamp(-.2, .2)
     targets = targets.clamp(-.2, .2)
     prediction[:, 1] += 1.
     targets[:, 1] -= 1.
     pooled_loss, coefficient, report = correlation_objective(prediction, teacher, targets, warmup=2, teacher_weight=0.)
-    old_loss, old_coefficient, _ = old_objective(prediction, teacher, targets, warmup=2, teacher_weight=0.)
+    # The removed per-sequence objective equals the mean of one-sequence pooled
+    # losses; its coefficients also divide by the batch size.
+    per_sequence = [correlation_objective(*(value[:, [b]] for value in (prediction, teacher, targets)),
+                                          warmup=2, teacher_weight=0.) for b in range(2)]
+    old_loss = np.mean([result[0] for result in per_sequence])
+    old_coefficient = torch.cat([result[1] for result in per_sequence], dim=1) / 2
     assert abs(pooled_loss-old_loss) > .5
     assert not torch.allclose(coefficient, old_coefficient)
     assert report["target_weight_sum"][0] > targets[2:, 0, 0].abs().sum()*5
@@ -149,12 +153,11 @@ def test_weight_floor_uses_pooled_weight_and_zero_targets_give_loss_one():
 
 
 def test_specification_is_independent_and_distinct_from_legacy():
-    from connectome.recurrent_objectives import objective_parameters as old_parameters
     spec = objective_parameters()
     spec["label_clip"][0] = -99
     assert objective_parameters()["label_clip"] == [-2., 2.]
     assert spec["version"] == "batch_pooled_global_correlation.v1"
-    assert spec["version"] != old_parameters()["version"]
+    assert spec["version"] != "full_sequence_clipped_correlation.v1"
     assert "surrogate" in spec["surrogate_scope"]
 
 

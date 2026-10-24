@@ -34,11 +34,11 @@ These values were read from the signed-in [submission page](https://wundernn.io/
 | submission_round2_affine_rho.zip | 0.65146 |
 | submission.zip | 0.65095 |
 
-The original local baseline scores 0.610331386 on this development subset. The organizer documents 0.617052 on complete validation; the domains differ, and confirmation was not reopened to reproduce that full-validation number.
+The original local baseline scores 0.610331386 on this development subset. Pooling its existing development and confirmation prediction caches reproduces the organizer's complete-validation 0.617052 (0.617052289); only baseline predictions were read, so no candidate touched confirmation.
 
 ## Training decision
 
-Plan `3723823f45de3395f4c12962230645515c20fbd4362c438619dfd4e07d0c10c4` starts from `correlation1024_seed20260912` and uses the same model as the unchanged teacher. Deployment postprocessing is preserved. It uses the new batch-pooled Global-WP surrogate, rather than averaging sequence losses.
+Plan `1c3a926d2a420ec70528b2517039112d05183b52f4087a08d302e08fc396a091` (`global-wp-v2.1`) starts from `correlation1024_seed20260912` and uses the same model as the unchanged teacher. Deployment postprocessing is preserved. It uses the new batch-pooled Global-WP surrogate, rather than averaging sequence losses.
 
 The two fixed arms compare four passes over the original 1,024 groups with one pass over 4,096 groups: 512 optimizer updates each, batch size 8, backward window 256, learning rate 1e-5, teacher weight 0.1. The reduced learning rate is a conservative starting hypothesis, not an optimum established by this rescore. The original 512 reserved TRAIN groups stay excluded. No new validation rows become independent merely because the metric changed.
 
@@ -50,7 +50,7 @@ A real eight-sequence CPU pilot completed one update with the new objective. Syn
 - [Complete ranking and clustered comparisons](../artifacts/global_wp/rescore_v1/ranking.json)
 - [Post-run cache hashes, runtime and official-reference receipt](../artifacts/global_wp/rescore_v1/evidence.json)
 - [Winner callback/bulk byte parity on 32 full development sequences](../artifacts/global_wp/rescore_v1/winner_parity32.json)
-- [Frozen Global-WP training plan](../artifacts/gpu/global-wp-v2/plan.json)
+- [Frozen Global-WP training plan](../artifacts/gpu/global-wp-v2.1/plan.json)
 - [GPU training guide](GPU_TRAINING.md)
 
 Cache array hashes were recorded after scoring, not prospectively in the policy. They identify the observed files for reproduction. Cache metadata and model/data identities were checked before scoring.

@@ -1,6 +1,6 @@
 # Latest validation
 
-The current Global-WP migration, rescore and GPU v2 validation are recorded in [global-wp-v2/VALIDATION.md](global-wp-v2/VALIDATION.md). Earlier per-sequence evidence below is historical.
+The current plan is `global-wp-v2.1`; its checks are recorded in [global-wp-v2.1/VALIDATION.md](global-wp-v2.1/VALIDATION.md). The Global-WP migration, rescore and original v2 checks are in [global-wp-v2/VALIDATION.md](global-wp-v2/VALIDATION.md). Earlier per-sequence evidence below is historical.
 
 # GPU training structure validation — 2026-10-24
 

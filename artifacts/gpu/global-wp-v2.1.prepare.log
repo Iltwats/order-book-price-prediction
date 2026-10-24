@@ -1,0 +1,2 @@
+{"plan_sha256": "1c3a926d2a420ec70528b2517039112d05183b52f4087a08d302e08fc396a091", "arms": ["repeat1024", "coverage4096"]}
+exit 0
