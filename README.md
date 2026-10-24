@@ -1,5 +1,9 @@
 # Sequence Prediction Challenge
 
+> Scoring now uses Global Weighted Pearson. See the [rescored models](docs/GLOBAL_WP_RESULTS.md)
+> and the [rebuilt GPU training plan](docs/GPU_TRAINING.md). Historical block-wise
+> results remain available under their original reports.
+
 The implemented pretrained-model workflow, CPU experiments, training tools and
 release commands are documented in [IMPLEMENTATION.md](IMPLEMENTATION.md).
 
@@ -25,11 +29,12 @@ sequences.
 
 ## Metric
 
-The metric is Weighted Pearson correlation (WP), using weights
+The metric is Global Weighted Pearson correlation (WP), using weights
 `abs(clipped target)`
 on rows selected by `need_prediction AND is_scored`. Compute it separately
-for each target within a sequence, then average the two target scores and
-all eligible sequence scores equally. On the selected rows, both targets and
+for each target over all selected rows pooled across sequences, then average
+the two target correlations. There is no sequence eligibility filter or average
+of sequence scores. On the selected rows, both targets and
 predictions are clipped to `[-2.0, 2.0]`, and weights use the clipped targets.
 Higher is better.
 
@@ -48,8 +53,10 @@ See [METRIC.md](METRIC.md) for the full scoring reference.
 
 ## Baseline
 
-The included vanilla GRU baseline scores **0.589595 WP** on the complete
-validation set. It runs statefully on CPU with one ONNX Runtime compute thread.
+The organizer documents **0.617052 Global WP** for the baseline on the complete
+validation set. Our original local model scores **0.610331386** on the frozen
+1,400-sequence development subset; these are different evaluation domains.
+It runs statefully on CPU with one ONNX Runtime compute thread.
 
 ```bash
 python baseline/solution.py --validation datasets/valid.parquet

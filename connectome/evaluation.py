@@ -1,4 +1,4 @@
-"""Exact block scoring, prediction caches, and complete-callback benchmarks."""
+"""Global scoring, prediction caches, and complete-callback benchmarks."""
 from __future__ import annotations
 
 import hashlib
@@ -13,7 +13,7 @@ import numpy as np
 import onnxruntime as ort
 import pyarrow.parquet as pq
 
-from utils import BlockAccumulator, DataPoint
+from utils import BlockAccumulator, DataPoint, scoring_accumulator, add_scored_sequence, METRIC_ID
 from .runtime import OnnxBackend, StreamingPredictor, apply_affinity, session_options
 
 
@@ -42,7 +42,7 @@ def environment():
 
 
 def evaluate(dataset_path, model_path, groups=None, mode="run", cache_path=None,
-             report_path=None, postprocess=None, bulk_model=None, progress=True):
+             report_path=None, postprocess=None, bulk_model=None, progress=True, *, metric_id=METRIC_ID):
     from .data import read_sequence
     from .calibration import PredictionCache, apply_calibration
     parquet = pq.ParquetFile(dataset_path)
@@ -78,12 +78,11 @@ def evaluate(dataset_path, model_path, groups=None, mode="run", cache_path=None,
     if cache_path:
         ids = [int(parquet.read_row_group(g, columns=["seq_ix"])["seq_ix"][0].as_py()) for g in groups]
         cache = PredictionCache.create(cache_path, groups, ids, provenance)
-    accumulator = BlockAccumulator()
+    accumulator = scoring_accumulator(metric_id)
     rows = 0
     per_sequence = []
     for index, group in enumerate(groups):
         sequence = read_sequence(parquet, group)
-        before = len(accumulator.scores)
         if session is not None:
             outputs = session.run(None, {"features": sequence.features[None, :, :],
                                          "hidden_0": np.zeros((1, 1, widths[0]), np.float32),
@@ -106,19 +105,17 @@ def evaluate(dataset_path, model_path, groups=None, mode="run", cache_path=None,
                     raise ValueError("warm-up must return None")
         if sequence.mask is None:
             raise ValueError("official evaluation requires validation scoring mask")
-        accumulator.add(sequence.targets, predicted, sequence.mask & sequence.need)
-        eligible = len(accumulator.scores) > before
-        values = accumulator.scores[-1] if eligible else [None, None]
-        per_sequence.append({"row_group": group, "seq_ix": sequence.seq_ix, "eligible": eligible,
-                             "t0": values[0], "t1": values[1],
-                             "weighted_pearson": float(np.mean(values)) if eligible else None})
+        per_sequence.append(add_scored_sequence(accumulator, sequence.targets, predicted, sequence.mask & sequence.need,
+                                                row_group=group, seq_ix=sequence.seq_ix))
         rows += 20_000
         if cache:
             cache.write(index, raw)
         if progress and ((index + 1) % 32 == 0 or index == len(groups)-1):
             elapsed = time.perf_counter() - start
-            score = (f"{accumulator.result()['weighted_pearson']:.6f}"
-                     if accumulator.scores else "pending eligible sequence")
+            has_rows = accumulator.selected_rows > 0
+            if hasattr(accumulator, 'scores'):
+                has_rows = bool(accumulator.scores)
+            score = f"{accumulator.result()['weighted_pearson']:.6f}" if has_rows else "pending scoring rows"
             print(f"evaluate {index+1}/{len(groups)} sequences; {rows/elapsed:.0f} rows/s; "
                   f"WP={score}", flush=True)
     if cache:

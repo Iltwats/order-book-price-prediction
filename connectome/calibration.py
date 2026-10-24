@@ -11,7 +11,9 @@ import shutil
 import numpy as np
 
 from connectome.data import iter_labels
-from utils import BlockAccumulator, SEQUENCE_LENGTH, WARMUP
+from utils import (BlockAccumulator, SEQUENCE_LENGTH, WARMUP, METRIC_ID, LEGACY_METRIC_ID,
+                   scoring_accumulator, add_scored_sequence)
+from .global_metric import paired_global_bootstrap
 
 
 def _atomic_json(path: Path, value: dict) -> None:
@@ -234,14 +236,14 @@ def fit_affine_ridge(pairs, *, source_split: str, ridge: float = 0.01,
 
 
 def evaluate_cache(dataset_path: str | Path, cache: PredictionCache, groups=None,
-                   transform=None, *, postprocess: dict | None = None) -> dict:
-    """Reference block scorer over a caller-selected split; no implicit confirmation reads."""
+                   transform=None, *, postprocess: dict | None = None, metric_id=METRIC_ID) -> dict:
+    """Global scorer over an explicit split; no implicit confirmation reads."""
     selected_groups = cache.groups if groups is None else [int(g) for g in groups]
     if len(set(selected_groups)) != len(selected_groups):
         raise ValueError("duplicate groups in evaluation")
     if transform is not None and postprocess is not None:
         raise ValueError("provide either a tracked postprocess config or a custom transform")
-    accumulator, per_sequence = BlockAccumulator(), []
+    accumulator, per_sequence = scoring_accumulator(metric_id), []
     for sequence in iter_labels(dataset_path, selected_groups):
         if sequence.mask is None:
             raise ValueError("evaluation requires a labeled validation scoring mask")
@@ -253,16 +255,9 @@ def evaluate_cache(dataset_path: str | Path, cache: PredictionCache, groups=None
             predictions = transform(predictions)
         elif postprocess:
             predictions = apply_calibration(predictions, **postprocess)
-        before = len(accumulator.scores)
         mask = sequence.mask & sequence.need
-        accumulator.add(sequence.targets, predictions, mask)
-        eligible = len(accumulator.scores) > before
-        score = accumulator.scores[-1] if eligible else None
-        per_sequence.append({"row_group": sequence.row_group, "seq_ix": sequence.seq_ix,
-                             "eligible": eligible, "selected_rows": int(mask.sum()),
-                             "t0": score[0] if eligible else None,
-                             "t1": score[1] if eligible else None,
-                             "weighted_pearson": float(np.mean(score)) if eligible else None})
+        per_sequence.append(add_scored_sequence(accumulator, sequence.targets, predictions, mask,
+                                                row_group=sequence.row_group, seq_ix=sequence.seq_ix))
     return {**accumulator.result(), "rows_seen": len(selected_groups) * SEQUENCE_LENGTH,
             "predictions_required": len(selected_groups) * (SEQUENCE_LENGTH - WARMUP),
             "provenance": {**cache.metadata["provenance"], "evaluation_source": "prediction_cache",
@@ -300,7 +295,14 @@ def _paired_scores(candidate, baseline) -> tuple[np.ndarray, np.ndarray]:
 def paired_bootstrap(candidate, baseline, *, n_resamples: int = 10000,
                      seed: int = 20260912, batch_size: int = 256,
                      confidence: float = 0.95) -> dict:
-    """Percentile CI of mean paired sequence deltas, with bounded resampling memory."""
+    """Dispatch by metric; global reports resample clusters and recompute WP."""
+    if isinstance(candidate, dict) and isinstance(baseline, dict):
+        metrics = [value.get('metric_id', LEGACY_METRIC_ID) for value in (candidate, baseline)]
+        if metrics[0] != metrics[1]:
+            raise ValueError('cannot compare different scoring metric versions')
+        if metrics[0] == METRIC_ID:
+            return paired_global_bootstrap(candidate, baseline, n_resamples=n_resamples, seed=seed,
+                                           batch_size=batch_size, confidence=confidence)
     a, b = _paired_scores(candidate, baseline)
     if n_resamples <= 0 or batch_size <= 0 or not 0 < confidence < 1:
         raise ValueError("invalid bootstrap parameters")
@@ -336,7 +338,7 @@ def search_calibration(dataset_path: str | Path, cache: PredictionCache, groups,
                        output_path: str | Path, *,
                        scale_values=(0.5, 0.75, 1.0, 1.25, 1.5, 2.0),
                        half_lives=(2.0, 8.0, 32.0), blends=(0.0, 0.1, 0.25),
-                       bootstrap_resamples: int = 10000, seed: int = 20260912) -> dict:
+                       bootstrap_resamples: int = 10000, seed: int = 20260912, metric_id=METRIC_ID) -> dict:
     """One labels pass for a predeclared independent scale/EMA screening grid.
 
     The default is 42 unique candidates: identity, 35 other per-target scales,
@@ -364,7 +366,7 @@ def search_calibration(dataset_path: str | Path, cache: PredictionCache, groups,
     names = [name for name, _ in configurations]
     if len(set(names)) != len(names):
         raise ValueError("search grid contains duplicate candidates")
-    accumulators = [BlockAccumulator() for _ in configurations]
+    accumulators = [scoring_accumulator(metric_id) for _ in configurations]
     per_sequence = [[] for _ in configurations]
     half_index = {half: index for index, half in enumerate(halves)}
     for sequence in iter_labels(dataset_path, groups):
@@ -387,15 +389,8 @@ def search_calibration(dataset_path: str | Path, cache: PredictionCache, groups,
             else:
                 predictions = raw
             accumulator = accumulators[index]
-            before = len(accumulator.scores)
-            accumulator.add(sequence.targets, predictions, mask)
-            eligible = len(accumulator.scores) > before
-            score = accumulator.scores[-1] if eligible else None
-            per_sequence[index].append({"row_group": sequence.row_group, "seq_ix": sequence.seq_ix,
-                                        "eligible": eligible, "selected_rows": int(mask.sum()),
-                                        "t0": score[0] if eligible else None,
-                                        "t1": score[1] if eligible else None,
-                                        "weighted_pearson": float(np.mean(score)) if eligible else None})
+            per_sequence[index].append(add_scored_sequence(accumulator, sequence.targets, predictions, mask,
+                                                           row_group=sequence.row_group, seq_ix=sequence.seq_ix))
     reports = [{**acc.result(), "rows_seen": len(groups) * SEQUENCE_LENGTH,
                 "predictions_required": len(groups) * (SEQUENCE_LENGTH - WARMUP),
                 "provenance": {**cache.metadata["provenance"], "evaluation_source": "prediction_cache",

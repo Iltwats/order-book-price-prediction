@@ -68,7 +68,7 @@ This script will load the validation data and the pre-trained `baseline.onnx` mo
 
 > **Fun facts:**
 > * This baseline is a stateful vanilla GRU.
-> * It scores **0.589595 WP** on the complete validation set.
+> * Current official documentation reports **0.617052 Global WP** on the complete validation set.
 > * The ONNX Runtime session uses one CPU compute thread.
 
 ## 5. Submit

@@ -1,0 +1,53 @@
+/Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l1dcachesize'. Detail: [errno 1] Operation not permitted
+/Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l2cachesize'. Detail: [errno 1] Operation not permitted
+/Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.l3cachesize'. Detail: [errno 1] Operation not permitted
+/Users/runner/work/crossbow/crossbow/arrow/cpp/src/arrow/util/cpu_info.cc:239: IOError: sysctlbyname failed for 'hw.optional.neon'. Detail: [errno 1] Operation not permitted
+byte parity sequence 1562: callback all states and bulk outputs/final states passed
+byte parity sequence 1562: callback all states and bulk outputs/final states passed
+byte parity sequence 1562: callback all states and bulk outputs/final states passed
+byte parity sequence 1562: callback all states and bulk outputs/final states passed
+{"sequences": 32, "total": 1400, "elapsed_seconds": 7.692653500009328, "input_rows_per_second": 83196.25991203477}
+{"sequences": 64, "total": 1400, "elapsed_seconds": 14.966409957967699, "input_rows_per_second": 85524.85222540384}
+{"sequences": 96, "total": 1400, "elapsed_seconds": 22.26526395790279, "input_rows_per_second": 86232.97723441177}
+{"sequences": 128, "total": 1400, "elapsed_seconds": 29.92083204095252, "input_rows_per_second": 85559.1180250649}
+{"sequences": 160, "total": 1400, "elapsed_seconds": 37.4705856658984, "input_rows_per_second": 85400.3198277279}
+{"sequences": 192, "total": 1400, "elapsed_seconds": 44.97935845796019, "input_rows_per_second": 85372.4937759849}
+{"sequences": 224, "total": 1400, "elapsed_seconds": 52.653551457915455, "input_rows_per_second": 85084.47912731474}
+{"sequences": 256, "total": 1400, "elapsed_seconds": 59.90149737498723, "input_rows_per_second": 85473.65632529135}
+{"sequences": 288, "total": 1400, "elapsed_seconds": 67.32139108283445, "input_rows_per_second": 85559.72934238252}
+{"sequences": 320, "total": 1400, "elapsed_seconds": 75.34250424988568, "input_rows_per_second": 84945.4111423395}
+{"sequences": 352, "total": 1400, "elapsed_seconds": 82.94960233289748, "input_rows_per_second": 84870.81073332601}
+{"sequences": 384, "total": 1400, "elapsed_seconds": 90.31763849989511, "input_rows_per_second": 85033.22415819053}
+{"sequences": 416, "total": 1400, "elapsed_seconds": 97.88431541598402, "input_rows_per_second": 84998.29584180129}
+{"sequences": 448, "total": 1400, "elapsed_seconds": 105.11140908300877, "input_rows_per_second": 85242.88731515428}
+{"sequences": 480, "total": 1400, "elapsed_seconds": 112.5416145408526, "input_rows_per_second": 85301.77960540276}
+{"sequences": 512, "total": 1400, "elapsed_seconds": 119.88891474995762, "input_rows_per_second": 85412.40048220237}
+{"sequences": 544, "total": 1400, "elapsed_seconds": 127.3871210408397, "input_rows_per_second": 85408.94802475302}
+{"sequences": 576, "total": 1400, "elapsed_seconds": 134.74623641581275, "input_rows_per_second": 85494.03906503547}
+{"sequences": 608, "total": 1400, "elapsed_seconds": 142.55285454099067, "input_rows_per_second": 85301.69416217075}
+{"sequences": 640, "total": 1400, "elapsed_seconds": 150.41377683286555, "input_rows_per_second": 85098.58783895112}
+{"sequences": 672, "total": 1400, "elapsed_seconds": 158.3155439158436, "input_rows_per_second": 84893.74869687055}
+{"sequences": 704, "total": 1400, "elapsed_seconds": 165.81248724996112, "input_rows_per_second": 84915.19688004258}
+{"sequences": 736, "total": 1400, "elapsed_seconds": 173.0116072499659, "input_rows_per_second": 85080.99678383228}
+{"sequences": 768, "total": 1400, "elapsed_seconds": 180.30072966590524, "input_rows_per_second": 85191.00298962665}
+{"sequences": 800, "total": 1400, "elapsed_seconds": 187.86679074983113, "input_rows_per_second": 85166.72870249892}
+{"sequences": 832, "total": 1400, "elapsed_seconds": 195.24871379090473, "input_rows_per_second": 85224.63312009352}
+{"sequences": 864, "total": 1400, "elapsed_seconds": 202.77258774987422, "input_rows_per_second": 85218.61949759883}
+{"sequences": 896, "total": 1400, "elapsed_seconds": 209.8774949158542, "input_rows_per_second": 85383.14223344735}
+{"sequences": 928, "total": 1400, "elapsed_seconds": 217.35555049986579, "input_rows_per_second": 85390.04390417653}
+{"sequences": 960, "total": 1400, "elapsed_seconds": 224.82716166600585, "input_rows_per_second": 85398.93426454738}
+{"sequences": 992, "total": 1400, "elapsed_seconds": 232.4958035829477, "input_rows_per_second": 85334.87355147753}
+{"sequences": 1024, "total": 1400, "elapsed_seconds": 239.68405387480743, "input_rows_per_second": 85445.81781271599}
+{"sequences": 1056, "total": 1400, "elapsed_seconds": 246.8577015409246, "input_rows_per_second": 85555.36192780553}
+{"sequences": 1088, "total": 1400, "elapsed_seconds": 254.1951382078696, "input_rows_per_second": 85603.5255174929}
+{"sequences": 1120, "total": 1400, "elapsed_seconds": 261.5995296249166, "input_rows_per_second": 85627.06527843261}
+{"sequences": 1152, "total": 1400, "elapsed_seconds": 268.87826958298683, "input_rows_per_second": 85689.33456665569}
+{"sequences": 1184, "total": 1400, "elapsed_seconds": 276.7508387498092, "input_rows_per_second": 85564.32965830108}
+{"sequences": 1216, "total": 1400, "elapsed_seconds": 283.80110116582364, "input_rows_per_second": 85693.81831182515}
+{"sequences": 1248, "total": 1400, "elapsed_seconds": 291.1199399998877, "input_rows_per_second": 85737.85773660721}
+{"sequences": 1280, "total": 1400, "elapsed_seconds": 298.5651299159508, "input_rows_per_second": 85743.43563565734}
+{"sequences": 1312, "total": 1400, "elapsed_seconds": 305.9413276249543, "input_rows_per_second": 85768.07914021655}
+{"sequences": 1344, "total": 1400, "elapsed_seconds": 313.5397591658402, "input_rows_per_second": 85730.75412034872}
+{"sequences": 1376, "total": 1400, "elapsed_seconds": 320.7278029997833, "input_rows_per_second": 85804.84679720328}
+{"sequences": 1400, "total": 1400, "elapsed_seconds": 326.6577238328755, "input_rows_per_second": 85716.63229468087}
+{"selected": "correlation1024_seed20260912", "global_wp": 0.6720919452834274}

@@ -1,0 +1,24 @@
+{
+  "checked_at_utc": "2026-10-24T14:11:38.270439+00:00",
+  "plan_sha256": "944bb8f5b8ed7597ffc8ae801eec52fef38ac7fb325ecce713a5ed3eb1387503",
+  "status": "superseded_do_not_run",
+  "reason": "Official metric now pools selected moments globally; frozen plan uses per-sequence correlation objective.",
+  "current_public_wp_user_reported": 0.651,
+  "current_public_wp_independently_verified": false,
+  "official_metric_url": "https://wundernn.io/connectome/docs/data_overview",
+  "audit": "docs/METRIC_UPDATE_AUDIT.md",
+  "historical_bundle": "dist/gpu_training_bundle.legacy_block_wp.tar.gz",
+  "historical_bundle_sha256": "070fcdf67502440433affb5c7a422f54e29bb1d4c6198e0352a220d30de45fdd",
+  "validation_or_training_performed_in_this_audit": false,
+  "audit_tests": {
+    "command": "python -m pytest tests/test_gpu_training.py -q",
+    "passed": 15,
+    "skipped": 1,
+    "scope": "historical CPU plumbing and four early-stop CLI regression cases; no current global scorer implemented"
+  },
+  "starter_pack_header_check": {
+    "url": "https://files.wundernn.io/wnn_connectome_starterpack.zip",
+    "http_status": 403,
+    "downloaded": false
+  }
+}

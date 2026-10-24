@@ -131,6 +131,7 @@ def _groups(args):
 def main(argv=None):
     args = parser().parse_args(argv)
     from .evaluation import file_hash, save_json
+    from .global_metric import METRIC_ID
     if args.command == "audit":
         from .data import build_manifest, save_manifest
         result = build_manifest(args.train, args.valid, args.mask)
@@ -174,7 +175,7 @@ def main(argv=None):
                 from .selection import claim_confirmation
                 claim_confirmation(args.frozen_config, model_path=args.model, groups=groups,
                                    report_path=args.output, postprocess=postprocess, mode=args.mode,
-                                   bulk_model=args.bulk_model, parity_report=args.parity_report)
+                                   bulk_model=args.bulk_model, parity_report=args.parity_report, metric_id=METRIC_ID)
             result = evaluate(args.dataset, args.model, groups, args.mode, args.cache, args.output,
                               postprocess, args.bulk_model)
         elif args.command == "benchmark":

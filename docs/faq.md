@@ -7,8 +7,8 @@ Here are answers to some common questions. This list will be updated during the 
 Your goal is to predict `t0` and `t1`, two indicators of future price movements of a trading instrument.
 
 **What is the evaluation metric?**  
-Weighted Pearson correlation (WP), averaged across the two targets and then
-equally across eligible sequences. On the supplied scoring mask, targets and
+Global Weighted Pearson correlation (WP), pooled over all selected rows for each
+target and averaged across the two targets. On the supplied scoring mask, targets and
 predictions are clipped to `[-2.0, 2.0]` before WP. See
 [Data overview](data_overview.md) for the formula. A higher score is better.
 

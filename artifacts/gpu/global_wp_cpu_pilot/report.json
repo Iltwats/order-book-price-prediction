@@ -1,0 +1,316 @@
+{
+  "format": "connectome.gpu-training.global-wp.v2",
+  "metric_id": "global_wp_clip2_v1",
+  "objective": {
+    "version": "batch_pooled_global_correlation.v1",
+    "label_clip": [
+      -2.0,
+      2.0
+    ],
+    "prediction_clip": [
+      -2.0,
+      2.0
+    ],
+    "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+    "rho_bound": [
+      -1.0,
+      1.0
+    ],
+    "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+    "weight": "absolute clipped target; one denominator per target over time and batch",
+    "weight_sum_floor": 1e-08,
+    "std_floor": 1e-08,
+    "degenerate_policy": "rho0 and zero correlation gradient when pooled weight<floor or either pooled std<=floor; target retained with correlation loss1",
+    "aggregation": "pool time and batch rows per target; equal mean over two global target losses",
+    "domain": "all TRAIN post-warmup rows; no validation mask or per-sequence sign eligibility",
+    "surrogate_scope": "batch-pooled correlation is a surrogate for complete-corpus Global WP; batches do not yield additive correlation losses",
+    "teacher": "raw selected-ORT predictions; unclipped weighted MSE with the same pooled label weights and one denominator per target",
+    "teacher_denominator_floor": 1e-12,
+    "accumulation": "FP64; current ORT FP32 values preserved; FP64 inputs accepted for derivative audits",
+    "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), includes teacher weight and two-target mean only",
+    "chunk_rule": "compute once over the complete sequence batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+    "gradient_scale": "correlation contains inverse pooled prediction standard deviation; legacy per-sequence learning rates require reassessment",
+    "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+  },
+  "postprocess": {},
+  "plan_sha256": "3723823f45de3395f4c12962230645515c20fbd4362c438619dfd4e07d0c10c4",
+  "arm": "coverage4096",
+  "complete": false,
+  "cursor": {
+    "epoch": 0,
+    "position": 8,
+    "updates": 1,
+    "sequences_seen": 8
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "update": 1,
+      "groups": [
+        8415,
+        6011,
+        8568,
+        4931,
+        8533,
+        8537,
+        8327,
+        7397
+      ],
+      "objective_loss": 0.5584931542458895,
+      "objective_components": {
+        "objective": {
+          "version": "batch_pooled_global_correlation.v1",
+          "label_clip": [
+            -2.0,
+            2.0
+          ],
+          "prediction_clip": [
+            -2.0,
+            2.0
+          ],
+          "prediction_clip_derivative": "one strictly inside (-2,2); zero at endpoints and outside",
+          "rho_bound": [
+            -1.0,
+            1.0
+          ],
+          "rho_bound_derivative": "zero strictly outside [-1,1] for numerical roundoff safeguard",
+          "weight": "absolute clipped target; one denominator per target over time and batch",
+          "weight_sum_floor": 1e-08,
+          "std_floor": 1e-08,
+          "degenerate_policy": "rho0 and zero correlation gradient when pooled weight<floor or either pooled std<=floor; target retained with correlation loss1",
+          "aggregation": "pool time and batch rows per target; equal mean over two global target losses",
+          "domain": "all TRAIN post-warmup rows; no validation mask or per-sequence sign eligibility",
+          "surrogate_scope": "batch-pooled correlation is a surrogate for complete-corpus Global WP; batches do not yield additive correlation losses",
+          "teacher": "raw selected-ORT predictions; unclipped weighted MSE with the same pooled label weights and one denominator per target",
+          "teacher_denominator_floor": 1e-12,
+          "accumulation": "FP64; current ORT FP32 values preserved; FP64 inputs accepted for derivative audits",
+          "coefficient": "detached FP32 d(total mean loss)/d(raw prediction), includes teacher weight and two-target mean only",
+          "chunk_rule": "compute once over the complete sequence batch; sum(proxy_prediction*coefficient_slice), no extra mean or scaling",
+          "gradient_scale": "correlation contains inverse pooled prediction standard deviation; legacy per-sequence learning rates require reassessment",
+          "state_scope": "future labels used only in training loss; no feature/state/callback mutation"
+        },
+        "loss": 0.5584931542458895,
+        "correlation_loss": 0.5584931542458895,
+        "teacher_loss": 0.0,
+        "teacher_loss_per_target": [
+          0.0,
+          0.0
+        ],
+        "teacher_weight": 0.1,
+        "mean_rho": 0.4415068457541104,
+        "rho_per_target": [
+          0.4186830880980172,
+          0.46433060341020366
+        ],
+        "target_weight_sum": [
+          111921.77412775159,
+          109540.0354334265
+        ],
+        "normalized_weight_sum": [
+          0.9999999999999999,
+          1.0
+        ],
+        "target_std_after_clip": [
+          1.1899038101908093,
+          1.3034438221737772
+        ],
+        "prediction_std_after_clip": [
+          0.5315281246866376,
+          0.6686462878764455
+        ],
+        "correlation_active": [
+          true,
+          true
+        ],
+        "degenerate_targets": 0,
+        "degenerate_reasons": {
+          "low_weight": [
+            false,
+            false
+          ],
+          "target_std": [
+            false,
+            false
+          ],
+          "prediction_std": [
+            false,
+            false
+          ]
+        },
+        "prediction_at_or_outside_clip_fraction": [
+          0.0004333953067685041,
+          0.002053916888598563
+        ],
+        "warmup": 99,
+        "rows_per_sequence": 20000,
+        "batch_size": 8,
+        "pooled_post_warmup_rows": 159208,
+        "target_denominator": 2,
+        "coefficient_sha256": "dd26b8460b83b51070208592d6210bf55965883426c8b1c72aa19d2d62ca2e1c",
+        "gradient_scale": {
+          "correlation": {
+            "max_absolute": 5.001214846258275e-05,
+            "l2": 0.004071126069135517,
+            "per_target_l1": [
+              0.6949433234793573,
+              0.5341294231414476
+            ]
+          },
+          "teacher": {
+            "max_absolute": 0.0,
+            "l2": 0.0,
+            "per_target_l1": [
+              0.0,
+              0.0
+            ]
+          },
+          "total": {
+            "max_absolute": 5.001214846258275e-05,
+            "l2": 0.004071126069135517,
+            "per_target_l1": [
+              0.6949433234793573,
+              0.5341294231414476
+            ]
+          }
+        }
+      },
+      "gradient_norm": 0.2803197205066681,
+      "local_diagnostics": [
+        {
+          "sequence_id": 1722004669,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 7.450580596923828e-06,
+            "normalized_rms": 1.0686686742899772e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.3113021850585938e-06,
+            "normalized_rms": 2.6856729538027217e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1238249035,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 3.941357135772705e-06,
+            "normalized_rms": 8.931477886744411e-07,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.9073486328125e-06,
+            "normalized_rms": 2.650369976599708e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1752384217,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 8.612871170043945e-06,
+            "normalized_rms": 1.0507219794434153e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.430511474609375e-06,
+            "normalized_rms": 2.244322651291068e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1012977439,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 1.2099742889404297e-05,
+            "normalized_rms": 1.8275074243237168e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.2516975402832031e-06,
+            "normalized_rms": 2.38055086206883e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1744284694,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 1.3113021850585938e-05,
+            "normalized_rms": 1.6614742209475516e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.430511474609375e-06,
+            "normalized_rms": 2.0272502698235437e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1745939544,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 6.087124347686768e-06,
+            "normalized_rms": 1.24210252105744e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.1339891708999996e-06,
+            "normalized_rms": 2.423615851814756e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1702011254,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 1.1563301086425781e-05,
+            "normalized_rms": 2.024660896131332e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.5497207641601562e-06,
+            "normalized_rms": 2.7126261451778993e-07,
+            "passed": true
+          }
+        },
+        {
+          "sequence_id": 1517682455,
+          "rows": 20000,
+          "upper": {
+            "normalized_max": 7.163733243942261e-06,
+            "normalized_rms": 1.0542124344686987e-06,
+            "passed": true
+          },
+          "prediction": {
+            "normalized_max": 1.3113021850585938e-06,
+            "normalized_rms": 2.558122752125112e-07,
+            "passed": true
+          }
+        }
+      ],
+      "raw_coefficients_sha256": "dd26b8460b83b51070208592d6210bf55965883426c8b1c72aa19d2d62ca2e1c",
+      "batch_seconds": 8.5586292501539
+    }
+  ],
+  "sessions": [
+    {
+      "device": "cpu",
+      "gpu": null,
+      "torch": "2.5.1",
+      "cuda": null,
+      "cudnn": null,
+      "onnxruntime": "1.23.2",
+      "numpy": "2.2.6",
+      "precision": "FP32; no AMP or TF32"
+    }
+  ],
+  "model_sha256": "d394352cbfc8d6e2518e9420c21845f57043caf8f3a6b376f48e8d165c2b8660",
+  "checkpoint_sha256": "96a0d04e4fd3dc393ec96f4a66c7688430906661a3f58d8f3005654c0886e5d8",
+  "elapsed_seconds": 29.259183041984215,
+  "session_updates": 1,
+  "session_rows_per_second": 5468.368674901648,
+  "session_rows": 160000,
+  "peak_cuda_allocated_bytes": null,
+  "deployment_status": "experimental; CPU callback/bulk parity, new declared validation and callback feasibility pending"
+}

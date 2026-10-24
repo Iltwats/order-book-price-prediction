@@ -249,7 +249,8 @@ def test_evaluation_progress_can_precede_first_eligible_block(tmp_path, monkeypa
             return [np.zeros((1, 20000, 2), np.float32), *[np.zeros((1, 1, 128), np.float32) for _ in range(2)]]
     monkeypatch.setattr(evaluation.ort, "InferenceSession", lambda *args, **kwargs: BulkSession())
     result = evaluation.evaluate(dataset, BASELINE, groups=range(33), bulk_model=BASELINE, progress=True)
-    assert result["eligible_blocks"] == 1 and result["excluded_blocks"] == 32
+    assert result["blocks"] == 33 and result["blocks_with_selected_rows"] == 33
+    assert result['metric_id'] == 'global_wp_clip2_v1'
     assert result["weighted_pearson"] == 0
 
 

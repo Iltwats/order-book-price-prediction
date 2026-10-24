@@ -1,0 +1,29 @@
+{
+  "checked_at_utc": "2026-10-24T14:39:31.763693+00:00",
+  "source": "https://wundernn.io/connectome/submit",
+  "method": "read-only rendered Chrome account submission history",
+  "submissions": [
+    {
+      "archive": "submission_correlation1024.zip",
+      "submission_id": "2PDB5UK5",
+      "public_wp": 0.65151
+    },
+    {
+      "archive": "submission_correlation256.zip",
+      "submission_id": "1CX5NB1C",
+      "public_wp": 0.6511
+    },
+    {
+      "archive": "submission_round2_affine_rho.zip",
+      "submission_id": "1OATLN0E",
+      "public_wp": 0.65146
+    },
+    {
+      "archive": "submission.zip",
+      "submission_id": "0748K25E",
+      "public_wp": 0.65095
+    }
+  ],
+  "uploaded_archive_checksums_verified": false,
+  "new_submission_uploaded": false
+}

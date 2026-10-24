@@ -1,10 +1,11 @@
-"""Competition callback and clipped block-wise Weighted Pearson scorer."""
+"""Competition callbacks and current Global WP; historical block scorer retained."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
+from connectome.global_metric import GlobalAccumulator, METRIC_ID, score_statistics
 
 SEQUENCE_LENGTH = 20_000
 WARMUP = 99
@@ -14,6 +15,7 @@ FEATURE_COLUMNS = [f'i{i}_{g}{j}' for i in range(2)
 FEATURE_COLUMNS += [f'a{i}' for i in range(8)]
 TARGET_COLUMNS = ('t0', 't1')
 METRIC_CLIP = 2.0
+LEGACY_METRIC_ID = 'legacy_block_wp_clip2_v1'
 
 
 @dataclass(frozen=True)
@@ -52,6 +54,7 @@ def weighted_pearson(target, prediction):
 
 
 class BlockAccumulator:
+    """Historical sequence-averaged metric, for reproducibility only."""
     def __init__(self):
         self.scores = []
         self.blocks_seen = 0
@@ -84,12 +87,47 @@ class BlockAccumulator:
         if not self.scores:
             raise ValueError('no eligible blocks')
         per_side = np.mean(np.asarray(self.scores, dtype=np.float64), axis=0)
-        return {'t0': float(per_side[0]), 't1': float(per_side[1]),
+        return {'metric_id': LEGACY_METRIC_ID, 't0': float(per_side[0]), 't1': float(per_side[1]),
                 'weighted_pearson': float(per_side.mean()), 'blocks': self.blocks_seen,
                 'eligible_blocks': len(self.scores), 'excluded_blocks': self.blocks_seen-len(self.scores),
                 'selected_rows': self.selected_rows, 'effective_scored_rows': self.effective_rows,
                 'metric_clip': [-METRIC_CLIP, METRIC_CLIP],
                 'aggregation': 'equal mean of eligible block-wise two-target clipped Weighted Pearson'}
+
+
+def scoring_accumulator(metric_id=METRIC_ID):
+    if metric_id == METRIC_ID:
+        return GlobalAccumulator()
+    if metric_id == LEGACY_METRIC_ID:
+        return BlockAccumulator()
+    raise ValueError('unsupported scoring metric identifier')
+
+
+def add_scored_sequence(accumulator, targets, predictions, mask, *, row_group, seq_ix):
+    """Enforce the full callback contract before adding selected scoring rows."""
+    targets, predictions = (np.asarray(value, dtype=np.float32) for value in (targets, predictions))
+    mask = np.asarray(mask, dtype=bool)
+    if targets.shape != (SEQUENCE_LENGTH, 2) or predictions.shape != targets.shape or mask.shape != (SEQUENCE_LENGTH,):
+        raise ValueError('one scoring call must contain one complete 20k sequence')
+    if mask[:WARMUP].any():
+        raise ValueError('warm-up rows cannot be scored')
+    if not np.isfinite(targets).all() or not np.isfinite(predictions[WARMUP:]).all():
+        raise ValueError('nonfinite labels or required predictions, including unscored rows')
+    row = {'row_group': int(row_group), 'seq_ix': int(seq_ix), 'selected_rows': int(mask.sum())}
+    if isinstance(accumulator, GlobalAccumulator):
+        row.update(accumulator.add(targets, predictions, mask))
+        # Diagnostic only: per-sequence correlations never define the global score.
+        diagnostic = score_statistics(row['sufficient_statistics'])
+        row.update(t0=float(diagnostic[0]), t1=float(diagnostic[1]),
+                   weighted_pearson=float(diagnostic.mean()), contributes=bool(mask.any()))
+    else:
+        before = len(accumulator.scores)
+        accumulator.add(targets, predictions, mask)
+        eligible = len(accumulator.scores) > before
+        values = accumulator.scores[-1] if eligible else [None, None]
+        row.update(eligible=eligible, t0=values[0], t1=values[1],
+                   weighted_pearson=float(np.mean(values)) if eligible else None)
+    return row
 
 
 def validate_sequence(table):
@@ -114,7 +152,7 @@ class ScorerStepByStep:
             raise ValueError('local scoring requires the labeled validation schema')
 
     def score(self, model):
-        accumulator = BlockAccumulator()
+        accumulator = GlobalAccumulator()
         seen = set()
         for group in range(self.parquet.num_row_groups):
             table = self.parquet.read_row_group(group, use_threads=False)
@@ -136,7 +174,8 @@ class ScorerStepByStep:
                     if value.shape != (2,) or not np.isfinite(value).all():
                         raise ValueError('return two finite scores on every required row')
                     predictions[step] = value
-            accumulator.add(targets, predictions, table['is_scored'].to_numpy().astype(bool) & need)
+            add_scored_sequence(accumulator, targets, predictions, table['is_scored'].to_numpy().astype(bool) & need,
+                                row_group=group, seq_ix=seq)
         result = accumulator.result()
         result['rows_seen'] = len(seen)*SEQUENCE_LENGTH
         result['predictions_required'] = len(seen)*(SEQUENCE_LENGTH-WARMUP)

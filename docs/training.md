@@ -1,5 +1,11 @@
 # Offline training and model reuse
 
+For the current Global-WP objective and cloud workflow, use the
+[Global-WP GPU handoff](GPU_TRAINING.md). It starts from the development rescore
+winner and pools time and batch for each target. The earlier methods below
+remain available for historical reproduction; their sequence-normalized losses
+are distinct surrogates, and their old numerical receipts do not qualify new code.
+
 Use Python 3.11 and the pinned `requirements-train.txt`. Training is separate
 from the inference-only submission. The default seed is `20260912`; every
 training function is bounded by an explicit sequence limit and writes a model,

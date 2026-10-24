@@ -1,5 +1,17 @@
 # Implemented pretrained GRU workflow
 
+**Current status:** Global WP scoring, metric-aware selection and the pooled GPU
+training loss are implemented. The [12-model rescore](docs/GLOBAL_WP_RESULTS.md)
+selects correlation-1024 at development WP **0.672091945**. The rebuilt
+[GPU plan](docs/GPU_TRAINING.md) uses that model as initialization and teacher.
+CUDA qualification and cloud execution remain pending. Unless identified as
+Global WP, the earlier results below use the historical per-sequence metric.
+
+The next portable GPU training cycle is documented in [GPU training handoff](docs/GPU_TRAINING.md).
+It adds frozen training plans, CPU ONNX forward/CUDA backward qualification,
+portable checkpoints, matched-update coverage experiments and a private Docker
+handoff bundle. GPU and cloud measurements remain pending.
+
 The implementation starts from the supplied **112 → GRU-128 → GRU-128 → linear-2** model. `baseline/` remains unchanged. The production callback is `solution.PredictionModel()`; research, training and packaging are available through `python -m connectome`. See [the measured results](artifacts/IMPLEMENTATION_REPORT.md) for the selected model, accuracy, performance, and release limitations.
 
 ## Environment and reproducibility

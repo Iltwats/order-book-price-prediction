@@ -10,7 +10,7 @@ import pyarrow.parquet as pq
 from connectome.calibration import (PredictionCache, apply_calibration, ema_grid, evaluate_cache,
                                     fit_affine_ridge, paired_bootstrap, scale_grid, search_calibration)
 from connectome.data import iter_labels
-from utils import BlockAccumulator, FEATURE_COLUMNS, SEQUENCE_LENGTH, WARMUP
+from utils import BlockAccumulator, GlobalAccumulator, LEGACY_METRIC_ID, FEATURE_COLUMNS, SEQUENCE_LENGTH, WARMUP
 
 
 class CalibrationTests(unittest.TestCase):
@@ -90,19 +90,19 @@ class CalibrationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "eligibility"):
             paired_bootstrap(candidate, baseline)
 
-    def test_exact_evaluation_uses_equal_block_weight_and_eligibility(self):
+    def test_exact_evaluation_pools_rows_and_keeps_one_sign_sequences(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             path = root / "valid.parquet"
             rng = np.random.default_rng(23)
             cache = PredictionCache.create(root / "cache", [0, 1, 2], [40, 41, 42], {})
-            reference = BlockAccumulator()
+            reference = GlobalAccumulator()
             writer = None
             try:
                 for group in range(3):
                     targets = rng.uniform(-3, 3, size=(SEQUENCE_LENGTH, 2)).astype(np.float32)
                     if group == 2:
-                        targets[:, 1] = 1  # Whole block excluded despite t0 variation.
+                        targets[:, 1] = 1  # Still contributes under the global metric.
                     predictions = (targets + rng.normal(size=targets.shape) * (group + 1)).astype(np.float32)
                     mask = (np.arange(SEQUENCE_LENGTH) >= WARMUP) & (np.arange(SEQUENCE_LENGTH) % (group * 7 + 1) == 0)
                     arrays = {"seq_ix": np.full(SEQUENCE_LENGTH, 40 + group, np.int32),
@@ -125,8 +125,11 @@ class CalibrationTests(unittest.TestCase):
             self.assertTrue(result["postprocess_tracked"])
             for key, value in reference.result().items():
                 self.assertEqual(result[key], value)
-            self.assertEqual(result["eligible_blocks"], 2)
-            self.assertFalse(result["per_sequence"][2]["eligible"])
+            self.assertEqual(result["blocks_with_selected_rows"], 3)
+            self.assertTrue(result["per_sequence"][2]["contributes"])
+            legacy = evaluate_cache(path, cache, metric_id=LEGACY_METRIC_ID)
+            self.assertEqual(legacy['eligible_blocks'], 2)
+            self.assertFalse(legacy['per_sequence'][2]['eligible'])
             self.assertEqual(result["rows_seen"], 3 * SEQUENCE_LENGTH)
             tracked = evaluate_cache(path, cache, postprocess={"scales": [0.5, 0.75]})
             opaque = evaluate_cache(path, cache,

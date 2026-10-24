@@ -10,7 +10,8 @@ from connectome import __main__ as cli
 from connectome.data import file_fingerprint
 from connectome.evaluation import file_hash
 from connectome.selection import (claim_confirmation, compare_confirmation_once, freeze_candidate,
-                                  select_development_candidate, validate_frozen)
+                                  select_development_candidate, validate_frozen, _validate_report)
+from connectome.global_metric import GlobalAccumulator, METRIC_ID
 
 BASELINE = Path(__file__).resolve().parents[1] / "baseline" / "baseline.onnx"
 
@@ -196,7 +197,9 @@ def test_cli_invalid_bulk_hash_preflight_does_not_burn_confirmation(setup):
 def test_cli_candidate_confirmation_is_claimed_after_valid_preflight(setup, monkeypatch):
     from connectome import evaluation
     s = setup
-    freeze(s)
+    development = global_report(s, s.root / "global-dev.json")
+    freeze_candidate(s.config, s.frozen, manifest_path=s.manifest,
+                     development_report=development, inference_paths=[s.inference])
     seen = []
     def evaluate(*args, **kwargs):
         assert s.ledger.exists()
@@ -207,6 +210,16 @@ def test_cli_candidate_confirmation_is_claimed_after_valid_preflight(setup, monk
               "--split", "confirmation", "--model", str(s.model), "--postprocess", str(s.postprocess),
               "--frozen-config", str(s.frozen), "--output", str(s.root / "result.json")])
     assert seen[0][2] == [2, 3]
+
+
+def test_cli_global_confirmation_cannot_use_a_historical_legacy_freeze(setup):
+    s = setup
+    freeze(s)
+    with pytest.raises(ValueError, match="metric differs"):
+        cli.main(["evaluate", "--dataset", str(s.dataset), "--manifest", str(s.manifest),
+                  "--split", "confirmation", "--model", str(s.model), "--postprocess", str(s.postprocess),
+                  "--frozen-config", str(s.frozen), "--output", str(s.root / "result.json")])
+    assert not s.ledger.exists()
 
 
 def test_cli_calibration_cannot_use_confirmation_even_with_a_freeze(setup):
@@ -250,3 +263,139 @@ def test_bulk_execution_and_prediction_cache_record_actual_bulk_hash(tmp_path, m
     assert result["provenance"]["bulk_model_sha256"] == file_hash(bulk_model)
     assert result["provenance"]["model_sha256"] == file_hash(BASELINE)
     assert PredictionCache.open(tmp_path / "cache").metadata["provenance"]["bulk_model_sha256"] == file_hash(bulk_model)
+
+
+def global_report(s, path, groups=(0, 1), *, target_shift=0., drop_row=False):
+    """Synthetic centered-statistics report; it never opens fixture Parquet."""
+    accumulator, entries = GlobalAccumulator(), []
+    for group in groups:
+        targets = np.array([[-.8, -.5], [-.2, .6], [.3, -.3], [.9, .8]], np.float32)
+        targets += target_shift if group == groups[0] else 0.
+        prediction = targets * np.array([.7, .6], np.float32) + .2 * group
+        mask = np.ones(len(targets), bool)
+        if drop_row and group == groups[0]:
+            mask[0] = False
+        row = accumulator.add(targets, prediction, mask)
+        entries.append({"row_group": group, "seq_ix": 11 + group, **row})
+    result = {**accumulator.result(), "per_sequence": entries,
+              "provenance": {"model_sha256": file_hash(s.model), "dataset_path": str(s.dataset),
+                             "dataset_size": s.dataset.stat().st_size},
+              "postprocess": json.loads(s.config.read_text())["postprocess"]}
+    return write_json(path, result)
+
+
+def global_candidates(s, paths):
+    return [{"name": str(index), "config_path": str(s.config), "dev_report_path": str(path),
+             "feasible": True, "feasibility_reason": "local engineering assessment"}
+            for index, path in enumerate(paths)]
+
+
+def test_global_selection_recomputes_pooled_statistics_without_sequence_eligibility(setup):
+    s = setup
+    path = global_report(s, s.root / "global-dev.json")
+    evidence = json.loads(path.read_text())
+    # Sequence correlations/eligibility have no role in the pooled estimand.
+    for entry in evidence["per_sequence"]:
+        entry.update(eligible=False, weighted_pearson=-1.)
+    write_json(path, evidence)
+    result = select_development_candidate(global_candidates(s, [path]), manifest_path=s.manifest)
+    assert result["metric_id"] == METRIC_ID
+    assert result["selected"]["weighted_pearson"] == pytest.approx(evidence["weighted_pearson"], abs=1e-12)
+    frozen = freeze_candidate(s.config, s.frozen, manifest_path=s.manifest,
+                              development_report=path, inference_paths=[s.inference])
+    assert frozen["metric_id"] == METRIC_ID
+
+
+@pytest.mark.parametrize("change,error", [("pooled", "pooled statistics"), ("score", "Global WP"),
+                                         ("count", "selected-row count"), ("id", "identifier differs"),
+                                         ("target", "target correlation")])
+def test_global_report_tampering_rejected(setup, change, error):
+    s = setup
+    path = global_report(s, s.root / "global-dev.json")
+    evidence = json.loads(path.read_text())
+    if change == "pooled":
+        evidence["sufficient_statistics"][0][2] += .1
+    elif change == "score":
+        evidence["weighted_pearson"] -= .1
+    elif change == "count":
+        evidence["selected_rows"] += 1
+    elif change == "id":
+        evidence["per_sequence"][0]["seq_ix"] += 100
+    else:
+        evidence["t0"] -= .1
+    with pytest.raises(ValueError, match=error):
+        _validate_report(evidence, json.loads(s.manifest.read_text()), "dev")
+
+
+@pytest.mark.parametrize("column,value", [(1, 2.1), (3, -1.), (4, 1e5), (5, 1e5)])
+def test_global_selection_rejects_impossible_centered_moments(setup, column, value):
+    s = setup
+    path = global_report(s, s.root / "global-dev.json")
+    evidence = json.loads(path.read_text())
+    evidence["per_sequence"][0]["sufficient_statistics"][0][column] = value
+    with pytest.raises(ValueError, match="moment invariants"):
+        _validate_report(evidence, json.loads(s.manifest.read_text()), "dev")
+
+
+def test_selection_rejects_mixed_legacy_and_global_reports(setup):
+    s = setup
+    paths = [global_report(s, s.root / "global-dev.json"),
+             report(s, s.root / "legacy-dev.json", [.3, .4], groups=[0, 1])]
+    with pytest.raises(ValueError, match="mix legacy and global"):
+        select_development_candidate(global_candidates(s, paths), manifest_path=s.manifest)
+
+
+@pytest.mark.parametrize("changed", ["rows", "labels", "dataset"])
+def test_global_selection_rejects_changed_scoring_domain(setup, changed):
+    s = setup
+    first = global_report(s, s.root / "first.json")
+    second = global_report(s, s.root / "second.json", target_shift=.1 if changed == "labels" else 0.,
+                           drop_row=changed == "rows")
+    if changed == "dataset":
+        evidence = json.loads(second.read_text())
+        evidence["provenance"]["dataset_size"] += 1
+        write_json(second, evidence)
+    with pytest.raises(ValueError, match="scoring domains|dataset provenance"):
+        select_development_candidate(global_candidates(s, [first, second]), manifest_path=s.manifest)
+
+
+def test_confirmation_claim_metric_mismatch_does_not_consume_ledger(setup):
+    from utils import LEGACY_METRIC_ID
+    s = setup
+    development = global_report(s, s.root / "global-dev.json")
+    freeze_candidate(s.config, s.frozen, manifest_path=s.manifest,
+                     development_report=development, inference_paths=[s.inference])
+    with pytest.raises(ValueError, match="metric differs"):
+        claim(s, metric_id=LEGACY_METRIC_ID)
+    assert not s.ledger.exists()
+    receipt = claim(s, metric_id=METRIC_ID)
+    assert receipt["metric_id"] == METRIC_ID
+
+
+def test_confirmation_comparison_rejects_metric_mismatch_before_scoring(setup):
+    s = setup
+    freeze(s)
+    candidate = global_report(s, s.root / "candidate_confirmation.json", groups=(2, 3))
+    baseline = report(s, s.root / "baseline_confirmation.json", [.2, .3])
+    claim(s, candidate)
+    with pytest.raises(ValueError, match="frozen metric"):
+        compare_confirmation_once(s.frozen, candidate, baseline, s.root / "decision.json")
+    assert not (s.root / "manifest.confirmation-access.decision.json").exists()
+
+
+def test_global_confirmation_uses_pooled_cluster_bootstrap(setup):
+    s = setup
+    development = global_report(s, s.root / "global-dev.json")
+    freeze_candidate(s.config, s.frozen, manifest_path=s.manifest,
+                     development_report=development, inference_paths=[s.inference])
+    candidate = global_report(s, s.root / "candidate_confirmation.json", groups=(2, 3))
+    baseline = global_report(s, s.root / "baseline_confirmation.json", groups=(2, 3))
+    control = json.loads(baseline.read_text())
+    control["postprocess"] = {}
+    write_json(baseline, control)
+    claim(s, candidate, metric_id=METRIC_ID)
+    result = compare_confirmation_once(s.frozen, candidate, baseline, s.root / "decision.json", n_resamples=50)
+    assert result["metric_id"] == METRIC_ID
+    assert result["selected"] == "baseline"
+    assert result["bootstrap"]["delta"] == pytest.approx(0.)
+    assert "pooled global" in result["bootstrap"]["method"]

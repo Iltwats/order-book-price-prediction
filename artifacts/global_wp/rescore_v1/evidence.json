@@ -1,0 +1,39 @@
+{
+  "scope": "post-run evidence; hashes identify bytes observed after scoring, not a prospective seal of cached arrays",
+  "policy_sha256": "7deeccaccb7f17dcc6e5a89889a9d5453945eb1ee3a39ec4bd49907e1ef44511",
+  "environment": {
+    "python": "3.11.16",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 62439424
+  },
+  "cache_files": {
+    "artifacts/cache/baseline_dev/metadata.json": "66056a393ea106ef6de4d075e408d2ea63b83b918d8ca980986682146cc6875d",
+    "artifacts/cache/baseline_dev/predictions.npy": "f8a9816d0dac0b3f8834f44a56fb169d1d7f24499f550a3c1bb4ef2195814a05",
+    "artifacts/global_wp/rescore_v1/correlation1024_seed20260912.cache/metadata.json": "efca04d51a9f55bd9dab9b5cbcd22f12b48102a6b271a2a1ad4586ce57fb8f17",
+    "artifacts/global_wp/rescore_v1/correlation1024_seed20260912.cache/predictions.npy": "ff45888f77b2886bd5788a3db4da55ae40b7c46580fa14bc85b6c5af38bc1a8a",
+    "artifacts/global_wp/rescore_v1/correlation1024_seed20260913.cache/metadata.json": "d8891382c67240ffdccee62e9fe0530fe38beb498b130a57a8a6972fb62959db",
+    "artifacts/global_wp/rescore_v1/correlation1024_seed20260913.cache/predictions.npy": "ae4fac2a269b6379238dd5f9b6b0982da952d069f578dc87aa74e5abe58e42fb",
+    "artifacts/global_wp/rescore_v1/correlation256.cache/metadata.json": "9ad54d5b534a6bee074cf4380282eb8d57fbe2ab3e01ed047afb6ae0018ca103",
+    "artifacts/global_wp/rescore_v1/correlation256.cache/predictions.npy": "133e7c7696c6ded3457379c60d21a44d8c3fc1919c25b7b8b77c7922b231043b",
+    "artifacts/global_wp/rescore_v1/round2_affine_rho.cache/metadata.json": "b3242d79158f5579b9f78f09c8e949df828cfa0a2f0d8baee463bb4cc5aff59d",
+    "artifacts/global_wp/rescore_v1/round2_affine_rho.cache/predictions.npy": "31de3dd3ef7ef726411c636e3dc50624c0730fe8b9bfda47812e3e0a61604958",
+    "artifacts/selected/dev_cache/metadata.json": "09f97c7cb714cd90185ec277cd92ddc0de784b82e60e4e83e6cc688712618f9a",
+    "artifacts/selected/dev_cache/predictions.npy": "31d00a8227a09320590468e2b3149a544dec7ef7bb06d0f288516c36988f8fbd",
+    "artifacts/training_pilot1024/affine_p1e-2/dev_cache/metadata.json": "4a00e597bc437aac0a10eab3398369550a327789e8cf06d77c385205aeb934ed",
+    "artifacts/training_pilot1024/affine_p1e-2/dev_cache/predictions.npy": "e59d114a9e5ae77ed5479fc2f59ea3c6ee68a8ccb5669a2b4cd4d89293665225",
+    "artifacts/training_pilot256/affine_p1e-2/dev_cache/metadata.json": "ae80c82f4df2392d2169e0ea2c5d349870215f440af56d19e66b61680033c75c",
+    "artifacts/training_pilot256/affine_p1e-2/dev_cache/predictions.npy": "8c6f354c3892a46ebb3d435eac0a0d352e52e42fb834142372cd473abe202f2a"
+  },
+  "official_reference": {
+    "source": "https://files.wundernn.io/wnn_connectome_starterpack.zip",
+    "method": "read only first 2097152 bytes of HTTP response; extract complete METRIC.md member before datasets/train.parquet",
+    "bytes_read": 2097152,
+    "reference_sha256": "3773b9726a5fd36d5ec695104bd92763a451e9a2d3f0f3fdc0b388f8db1d6c80",
+    "floors_verified": true,
+    "baseline_weights_or_dataset_update_verified": false
+  },
+  "confirmation_used": false
+}

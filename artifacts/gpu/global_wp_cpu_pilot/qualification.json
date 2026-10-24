@@ -1,0 +1,181 @@
+{
+  "passed": true,
+  "gradient_tolerance": {
+    "atol": 1e-06,
+    "rtol": 0.0001
+  },
+  "local_limits": {
+    "normalized_max": 6.103515625e-05,
+    "normalized_rms": 3.814697265625e-06
+  },
+  "gradients": {
+    "gru1.weight_ih_l0": {
+      "max_abs": 0.0,
+      "max_tolerance_ratio": 0.0,
+      "passed": true
+    },
+    "gru1.weight_hh_l0": {
+      "max_abs": 0.0,
+      "max_tolerance_ratio": 0.0,
+      "passed": true
+    },
+    "gru1.bias_ih_l0": {
+      "max_abs": 0.0,
+      "max_tolerance_ratio": 0.0,
+      "passed": true
+    },
+    "gru1.bias_hh_l0": {
+      "max_abs": 0.0,
+      "max_tolerance_ratio": 0.0,
+      "passed": true
+    },
+    "head.weight": {
+      "max_abs": 0.0,
+      "max_tolerance_ratio": 0.0,
+      "passed": true
+    },
+    "head.bias": {
+      "max_abs": 0.0,
+      "max_tolerance_ratio": 0.0,
+      "passed": true
+    }
+  },
+  "local_diagnostics": [
+    {
+      "sequence_id": 1722004669,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 7.450580596923828e-06,
+        "normalized_rms": 1.0686686742899772e-06,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.3113021850585938e-06,
+        "normalized_rms": 2.6856729538027217e-07,
+        "passed": true
+      }
+    },
+    {
+      "sequence_id": 1238249035,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 3.941357135772705e-06,
+        "normalized_rms": 8.931477886744411e-07,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.9073486328125e-06,
+        "normalized_rms": 2.650369976599708e-07,
+        "passed": true
+      }
+    },
+    {
+      "sequence_id": 1752384217,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 8.612871170043945e-06,
+        "normalized_rms": 1.0507219794434153e-06,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.430511474609375e-06,
+        "normalized_rms": 2.244322651291068e-07,
+        "passed": true
+      }
+    },
+    {
+      "sequence_id": 1012977439,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 1.2099742889404297e-05,
+        "normalized_rms": 1.8275074243237168e-06,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.2516975402832031e-06,
+        "normalized_rms": 2.38055086206883e-07,
+        "passed": true
+      }
+    },
+    {
+      "sequence_id": 1744284694,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 1.3113021850585938e-05,
+        "normalized_rms": 1.6614742209475516e-06,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.430511474609375e-06,
+        "normalized_rms": 2.0272502698235437e-07,
+        "passed": true
+      }
+    },
+    {
+      "sequence_id": 1745939544,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 6.087124347686768e-06,
+        "normalized_rms": 1.24210252105744e-06,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.1339891708999996e-06,
+        "normalized_rms": 2.423615851814756e-07,
+        "passed": true
+      }
+    },
+    {
+      "sequence_id": 1702011254,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 1.1563301086425781e-05,
+        "normalized_rms": 2.024660896131332e-06,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.5497207641601562e-06,
+        "normalized_rms": 2.7126261451778993e-07,
+        "passed": true
+      }
+    },
+    {
+      "sequence_id": 1517682455,
+      "rows": 20000,
+      "upper": {
+        "normalized_max": 7.163733243942261e-06,
+        "normalized_rms": 1.0542124344686987e-06,
+        "passed": true
+      },
+      "prediction": {
+        "normalized_max": 1.3113021850585938e-06,
+        "normalized_rms": 2.558122752125112e-07,
+        "passed": true
+      }
+    }
+  ],
+  "scope": "this runtime, current weights, batch and backward window; not full carried-Torch parity",
+  "runtime": {
+    "device": "cpu",
+    "gpu": null,
+    "torch": "2.5.1",
+    "cuda": null,
+    "cudnn": null,
+    "onnxruntime": "1.23.2",
+    "numpy": "2.2.6",
+    "precision": "FP32; no AMP or TF32"
+  },
+  "plan_sha256": "3723823f45de3395f4c12962230645515c20fbd4362c438619dfd4e07d0c10c4",
+  "arm": "coverage4096",
+  "current_model_sha256": "15c3dad6c0f9964df7489c5dc8c3b5d5774907d6dc33ac80d8fe5533a61f6cde",
+  "groups": [
+    8415,
+    6011,
+    8568,
+    4931,
+    8533,
+    8537,
+    8327,
+    7397
+  ]
+}

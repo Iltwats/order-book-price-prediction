@@ -1,149 +1,98 @@
-# Scoring reference: Weighted Pearson correlation
+# Scoring reference: Global Weighted Pearson correlation
 
-Specification ID: `v2_wp_block_clip2_v1`. The score is the equal mean of block-wise,
-two-target Weighted Pearson correlations on the supplied scoring mask.
-Both targets refer to instrument `i0`.
+The metric is Global Weighted Pearson correlation (WP).
+Compute one weighted correlation for each target over all
+scoring rows in the evaluated dataset, then average the two correlations.
+Both targets refer to instrument `i0`. Higher is better.
 
 ## Evaluation domain
 
-Each sequence contains exactly 20,000 rows. Steps 0 through 98 are warm-up;
-every later step requires two finite, float32-compatible predictions. Model
-state must be updated on every row and reset between sequences. Scoring uses
-only `need_prediction AND is_scored`, without filtering the inference stream.
-The `is_scored` column marks the rows used for evaluation.
+Each sequence contains 20,000 rows. Steps 0 through 98 are warm-up;
+every later step requires two finite, float32-compatible predictions.
+Update model state on every row and reset it between sequences.
+Scoring uses only rows where `need_prediction AND is_scored` is true.
+The validation mask is provided; the test mask is hidden from submissions.
 
-For this challenge, a block is eligible only if, on its selected rows, each
-target has at least one strictly positive and one strictly negative value.
-Otherwise the whole block is excluded. Eligibility depends on the targets and
-mask. A block with an empty mask is excluded.
-If no blocks are eligible, evaluation fails instead of returning a score.
+All selected rows from all sequences enter the global calculation. There
+is no additional sequence eligibility condition. Sequence boundaries control
+model-state resets, not metric averaging. Targets are scored separately,
+not concatenated with each other.
 
-All required predictions must still be valid, even in excluded blocks or on
-unscored rows. Missing outputs, incorrect shapes, or nonfinite values are
-submission errors, not additional reasons to exclude data.
+Required predictions must be valid even on unscored rows. Missing outputs,
+incorrect shapes and nonfinite values are submission errors. An evaluated
+dataset with no selected rows is an evaluation error.
 
-## Per-target WP
+## Formula
 
-For sequence `b`, let `M_b` contain only rows where
-`need_prediction AND is_scored` is true. For target `k`, clip both the target
-and prediction on those selected rows:
+Let `M` be the set of all rows in the evaluated dataset selected by
+`need_prediction AND is_scored`. For target `k`, define
 
 $$
-y_{bki}=\operatorname{clip}(t_{bki},-2,2),\qquad
-\hat y_{bki}=\operatorname{clip}(p_{bki},-2,2),\qquad i\in M_b.
+y_{ki}=\operatorname{clip}(t_{ki},-2,2),\qquad
+\hat y_{ki}=\operatorname{clip}(p_{ki},-2,2),\qquad
+w_{ki}=|y_{ki}|,\qquad i\in M.
 $$
 
-With $w_{bki}=|y_{bki}|$ and $W_{bk}=\sum_{i\in M_b}w_{bki}$, define
+With $W_k=\sum_{i\in M}w_{ki}$, the weighted means are
 
 $$
-\bar y_{bk,w}=\frac{\sum_{i\in M_b}w_{bki}y_{bki}}{W_{bk}},\qquad
-\bar{\hat y}_{bk,w}=\frac{\sum_{i\in M_b}w_{bki}\hat y_{bki}}{W_{bk}},
+\bar y_{k,w}=\frac{\sum_{i\in M}w_{ki}y_{ki}}{W_k},\qquad
+\bar{\hat y}_{k,w}=\frac{\sum_{i\in M}w_{ki}\hat y_{ki}}{W_k}.
 $$
 
-$$
-\operatorname{cov}_{bk,w}=
-\frac{\sum_{i\in M_b}w_{bki}(y_{bki}-\bar y_{bk,w})
-(\hat y_{bki}-\bar{\hat y}_{bk,w})}{W_{bk}},
-$$
+The per-target correlation and final score are
 
 $$
-\operatorname{var}_{bk,w}(y)=
-\frac{\sum_{i\in M_b}w_{bki}(y_{bki}-\bar y_{bk,w})^2}{W_{bk}},\qquad
-\operatorname{var}_{bk,w}(\hat y)=
-\frac{\sum_{i\in M_b}w_{bki}(\hat y_{bki}-\bar{\hat y}_{bk,w})^2}{W_{bk}},
+\rho_{k,w}=
+\frac{\sum_{i\in M}w_{ki}(y_{ki}-\bar y_{k,w})
+(\hat y_{ki}-\bar{\hat y}_{k,w})}
+{\sqrt{\left[\sum_{i\in M}w_{ki}(y_{ki}-\bar y_{k,w})^2\right]
+\left[\sum_{i\in M}w_{ki}(\hat y_{ki}-\bar{\hat y}_{k,w})^2\right]}},
+\qquad S=\frac{\rho_{0,w}+\rho_{1,w}}{2}.
 $$
 
-$$
-\rho_{bk,w}=
-\frac{\operatorname{cov}_{bk,w}}
-{\sqrt{\operatorname{var}_{bk,w}(y)\operatorname{var}_{bk,w}(\hat y)}}.
-$$
+Both targets and predictions are clipped to the same fixed range `[-2, 2]`.
+Weights are the absolute values of the clipped targets; zero targets have
+zero weight. Values are not rounded. Clipping is part of scoring only and
+does not modify the stored dataset or submitted predictions.
 
-Each target uses the absolute value of its clipped target as weight. Zero
-targets have zero weight. Clipping is part of scoring only: stored targets
-and submitted predictions are not changed.
+Use float32-compatible inputs and float64 metric arithmetic. If a target's
+total weight is less than `1e-8`, or either weighted standard deviation is
+at most `1e-8`, its correlation is `0`. Constant predictions therefore
+contribute `0`. The final score remains the mean of both target scores.
+Correlation is bounded to `[-1, 1]` to remove numerical round-off.
 
-Use float32-compatible inputs and float64 metric accumulation. If `W < 1e-8`,
-or either weighted standard deviation is at most `1e-8`, the side contributes
-`0`. Constant predictions also contribute `0`; the block remains included.
-The returned correlation is bounded to `[-1, 1]` only to remove numerical
-round-off outside the mathematical range.
+## Reference calculation
 
-## Aggregation
-
-$$
-s_b=\frac{\rho_{b,0,w}+\rho_{b,1,w}}{2},\qquad
-S=\frac{1}{|B|}\sum_{b\in B}s_b,
-$$
-
-where `B` is the set of eligible 20,000-row sequences.
-
-Both targets and all eligible sequences have equal weight in the final score.
-The result lies in `[-1, 1]`; higher is better.
-
-## Standalone reference calculation
-
-`block_wp` accepts a complete 20,000-row block and returns `None` for an
-ineligible block. The callback contract is described in
-[Submission guide](docs/submission_guide.md).
+This in-memory reference takes all rows of an evaluated dataset in matching
+order. `weighted_pearson` is provided in `utils.py` and applies the clipping,
+weights and numerical conventions above.
 
 ```python
 import numpy as np
-
-METRIC_CLIP = 2.0
-
-
-def weighted_pearson(target, prediction):
-    y = np.asarray(target, dtype=np.float32)
-    p = np.asarray(prediction, dtype=np.float32)
-    if y.ndim != 1 or p.shape != y.shape:
-        raise ValueError("expected equal one-dimensional arrays")
-    if not np.isfinite(y).all() or not np.isfinite(p).all():
-        raise ValueError("nonfinite target or prediction")
-    y = np.clip(y, -METRIC_CLIP, METRIC_CLIP).astype(np.float64)
-    p = np.clip(p, -METRIC_CLIP, METRIC_CLIP).astype(np.float64)
-    w = np.abs(y)
-    total = w.sum()
-    if total < 1e-8:
-        return 0.0
-    mean_y = np.sum(w * y) / total
-    mean_p = np.sum(w * p) / total
-    yc, pc = y - mean_y, p - mean_p
-    cov = np.sum(w * yc * pc) / total
-    sy = np.sqrt(np.sum(w * yc * yc) / total)
-    sp = np.sqrt(np.sum(w * pc * pc) / total)
-    if sy <= 1e-8 or sp <= 1e-8:
-        return 0.0
-    return float(np.clip(cov / (sy * sp), -1.0, 1.0))
+from utils import weighted_pearson
 
 
-def block_wp(targets, predictions, is_scored):
+def global_wp(targets, predictions, need_prediction, is_scored):
     y = np.asarray(targets, dtype=np.float32)
     p = np.asarray(predictions, dtype=np.float32)
-    mask = np.asarray(is_scored, dtype=bool)
-    if y.shape != (20_000, 2) or p.shape != y.shape:
-        raise ValueError("expected targets and predictions of shape (20000, 2)")
-    if mask.shape != (20_000,) or mask[:99].any():
-        raise ValueError("invalid mask or selected warm-up rows")
-    if not np.isfinite(y).all() or not np.isfinite(p[99:]).all():
+    need = np.asarray(need_prediction, dtype=bool)
+    scored = np.asarray(is_scored, dtype=bool)
+    if y.ndim != 2 or y.shape[1] != 2 or p.shape != y.shape:
+        raise ValueError("expected targets and predictions of shape (N, 2)")
+    if need.shape != (len(y),) or scored.shape != need.shape:
+        raise ValueError("incorrect mask shape")
+    if not np.isfinite(y).all() or not np.isfinite(p[need]).all():
         raise ValueError("nonfinite target or required prediction")
-    selected = mask & (np.arange(20_000) >= 99)
-    if not all(np.any(y[selected, j] > 0) and np.any(y[selected, j] < 0)
-               for j in range(2)):
-        return None
-    return float(np.mean([weighted_pearson(y[selected, j], p[selected, j])
-                          for j in range(2)]))
-
-
-def aggregate_wp(block_scores):
-    scores = [s for s in block_scores if s is not None]
-    if not scores:
-        raise ValueError("no eligible blocks")
-    if not np.isfinite(scores).all():
-        raise ValueError("nonfinite block score")
-    return float(np.mean(scores, dtype=np.float64))
+    mask = need & scored
+    if not mask.any():
+        raise ValueError("no rows selected by the scoring mask")
+    return float(np.mean([
+        weighted_pearson(y[mask, k], p[mask, k]) for k in range(2)
+    ]))
 ```
 
-The evaluation report should include per-target WP, final WP, total/eligible/
-excluded block counts, selected rows and rows in eligible blocks. These counts
-make the evaluation domain auditable; they do not change the weighting.
+`GlobalAccumulator` in `utils.py` computes the same result with bounded
+memory by merging centered weighted moments as sequences are read.
+`ScorerStepByStep` uses this accumulator for local validation. Its report
+includes `t0`, `t1`, `weighted_pearson`, sequence counts and selected-row counts.

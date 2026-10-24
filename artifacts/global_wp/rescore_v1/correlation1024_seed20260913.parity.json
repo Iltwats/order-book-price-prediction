@@ -1,0 +1,68 @@
+{
+  "format": "connectome.recurrent-parity.v1",
+  "passed": true,
+  "bitwise_equal": true,
+  "bulk_bitwise_equal": true,
+  "mode": "iobinding",
+  "groups": [
+    1562
+  ],
+  "groups_sha256": "59f2ad7f8c8a84fbd2e9c070969c69adcd0cb97232e2d71c29fe4df903ee16c4",
+  "per_sequence": [
+    {
+      "row_group": 1562,
+      "seq_ix": 1788254407,
+      "rows": 20000,
+      "features_sha256": "fb80600033d9583cbc6b7f91484007d1404918fcf65a4a5c0362f27346d9e07c",
+      "reference_predictions_sha256": "89bb5c328aa649514f3201af282d227b00e64f3a65f7e6f49eae2a1796ab7975",
+      "reference_hidden_sha256": [
+        "b0137d947b3b0396887b5218373587b631706ff22da6988466e97d856e3ec1d4",
+        "2cd6faf1065a3589edeba8046dd297113bbcbbf642028d0f742095def6d3c36c"
+      ],
+      "checks": {
+        "callback_predictions": true,
+        "callback_all_hidden_states": true,
+        "bulk_all_predictions": true,
+        "bulk_final_hidden_states": true
+      }
+    }
+  ],
+  "dataset": {
+    "path": "/Users/atulsharma/research/ml/wnn_connectome_starterpack/datasets/valid.parquet",
+    "fingerprint": {
+      "size_bytes": 5615509128,
+      "mtime_ns": 1577826000000000000,
+      "sample_sha256": "6f85b66f5271bd2eeb9765e330fe73dfc2362a8026e99280dbe835de64a7d7e8",
+      "sample_bytes_per_edge": 65536,
+      "method": "size+mtime_ns+sha256(first_and_last_bytes); not a full-file hash"
+    },
+    "selected_features_sha256": "a210a91e94b2235591bd8b27f202517f44ec5776b5115ca08750df7ad062d2dc"
+  },
+  "original_sha256": "c019dea283df63e69f27711b8fe8b839fe2c6f0a7f8156b8d12415b7f06eabb8",
+  "candidate_sha256": "c019dea283df63e69f27711b8fe8b839fe2c6f0a7f8156b8d12415b7f06eabb8",
+  "bulk_model_sha256": "88b6ee9213468d1da715f96368199ab15814711393c2a78874c38278c31a01f4",
+  "implementation": {
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/recurrent_parity.py": "9a01cc8fb4446edbc137173e48a719252546cf5477a5765d04dcdcfd6e9dd826",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/data.py": "2df8e76f5c445b8509fb1486a309c3008f3e725f44b8d5f6bff06d3b2ad766d7",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/evaluation.py": "7e91d6010b0561550387ec25b8e8e9d37b99c1077c2dc439b1a463769c16dbf3",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/connectome/runtime.py": "3ea32e973161cc0049024feb2e39d76223674318d587008608eee1194b861f19",
+    "/Users/atulsharma/research/ml/wnn_connectome_starterpack/utils.py": "dfb3aafc385505a92536efb4c11c88fa72ee75b2fd34ee318a7b66b219017af2"
+  },
+  "checks": {
+    "callback_predictions": true,
+    "callback_all_hidden_states": true,
+    "bulk_all_predictions": true,
+    "bulk_final_hidden_states": true
+  },
+  "comparison": "finite FP32 shape/dtype and exact C-order bytes; signed zeros differ",
+  "score_computed": false,
+  "seconds": 1.3845601670909673,
+  "environment": {
+    "python": "3.11.16",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "architecture": "arm64",
+    "numpy": "2.2.6",
+    "onnxruntime": "1.23.2",
+    "peak_rss_bytes": 696188928
+  }
+}

@@ -9,13 +9,24 @@ pytest.importorskip("torch")
 from connectome import correlation_training_bridge as bridge
 
 
-def test_new_protocol_records_correlation_objective_without_touching_data_or_old_evidence(tmp_path, monkeypatch):
+@pytest.fixture
+def accepted_forward_gate(monkeypatch):
+    # Test protocol authoring independently of obsolete, source-bound historical
+    # evidence. Production still verifies that gate; a separate test below checks
+    # that a metric migration cannot silently reuse the old receipt.
+    calls = []
+    monkeypatch.setattr(bridge.forward, 'require_bridge_acceptance', lambda *args: calls.append(args))
+    return calls
+
+
+def test_new_protocol_records_correlation_objective_without_touching_data_or_old_evidence(tmp_path, monkeypatch, accepted_forward_gate):
     from connectome import data
     evidence = bridge.ROOT / "artifacts/round2/ort_training_bridge/report.json"
     before = evidence.read_bytes()
     monkeypatch.setattr(data, "iter_sequences", lambda *a, **k: pytest.fail("no dataset rows before registration"))
     monkeypatch.setattr(data, "file_fingerprint", lambda *a, **k: pytest.fail("prepare must not open dataset"))
     path = bridge.prepare_protocol(tmp_path)
+    assert accepted_forward_gate
     protocol = bridge._verify_protocol(path)
     assert protocol["groups"] == [2309, 9078, 4507, 3165, 3508, 2523, 1866, 5932]
     assert protocol["stages"] == [2, 8]
@@ -30,7 +41,7 @@ def test_new_protocol_records_correlation_objective_without_touching_data_or_old
         bridge._verify_protocol(path)
 
 
-def test_candidate_acceptance_cannot_reuse_mse_gradient_identity(tmp_path, monkeypatch):
+def test_candidate_acceptance_cannot_reuse_mse_gradient_identity(tmp_path, monkeypatch, accepted_forward_gate):
     initial = Path(bridge.prepare_protocol(tmp_path / "initial"))
     initial_report = initial.parent / "report.json"
     initial_report.write_text(json.dumps({"protocol_path": str(initial)}))
@@ -71,3 +82,10 @@ def test_candidate_acceptance_cannot_reuse_mse_gradient_identity(tmp_path, monke
     model.write_bytes(model.read_bytes() + b"changed")
     with pytest.raises(ValueError, match="artifact changed"):
         bridge.require_candidate_acceptance(report_path, model)
+
+
+def test_historical_forward_receipt_rejects_changed_metric_sources():
+    with pytest.raises(ValueError, match='preregistered artifact changed'):
+        bridge.forward.require_bridge_acceptance(
+            bridge.ROOT / 'artifacts/round2/ort_training_bridge/report.json',
+            bridge.ROOT / 'artifacts/selected/model.onnx')
