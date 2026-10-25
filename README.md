@@ -67,7 +67,7 @@ TRAIN target check. These findings shape the next experiments.
   rows and within-class WP 0.41. The other classes score 0.72–0.79. A
   prediction that only knows the class level already scores 0.33 pooled.
 - **TRAIN and validation differ in class mix.** The small-tick classes
-  (0.1254 and 0.2413) make up 24% of TRAIN but 40% of validation. Reweighting dev
+  (0.1254 and 0.2413) make up 24% of TRAIN but 40% of dev. Reweighting dev
   to TRAIN's mix drops the same model from 0.672 to 0.626, so the score is
   sensitive to the unknown test mix.
 - **The mask follows slow state, not events.** Book and trade changes around a
@@ -103,6 +103,7 @@ Every experiment run, with commands, numbers and decisions, is recorded in
 | Add a small temporal correction and compare capacity control, fast-only, slow-only and combined summaries | Deprioritized: on cached outputs, fast/slow summaries added nothing over an outputs-only control ([log](docs/EXPERIMENT_LOG.md)) |
 | Train new GRUs from scratch on all 10,607 train sequences with pooled \|y\|-weighted MSE on clipped targets (the loss whose minimizer maximizes Global WP) | Proposed |
 | Check our assumptions against the official data overview: tick classes, class mix, mask, feature representation | Done ([log](docs/EXPERIMENT_LOG.md)): loss and calibration are sound; training ignores the class mix and the mask |
+| Frozen-state head probe: does the GRU state lack current book/trade information? Heads on the frozen state or the two outputs, with and without current `i0` price/trade features | Done ([log](docs/EXPERIMENT_LOG.md)): a head alone adds nothing; current `i0` features add about +0.0025 over raw and +0.0007 over the shipped calibrator, not through the large-tick class |
 | Class- and mask-aware training: weight TRAIN sequences to validation's class mix and rows by a mask-propensity model (`a2`–`a6`); report WP per tick class | Next; CPU pilot first |
 | Ensemble seeds/variants within the runtime budget; refit the final models on train + validation | Proposed |
 
@@ -122,7 +123,7 @@ public scores.
 | `connectome/gpu_training.py` (+ `partial_gru.py`, `conversion_audit.py`, `recurrent_parity.py`) | Frozen-plan GPU runner for upper-GRU training with ONNX parity checks |
 | `connectome/training.py`, `model_io.py` | Torch GRU import/export, head and affine fitting, ONNX inspection |
 | `scripts/` | `rescore_global.py`, Linux single-CPU checks, callback benchmarks |
-| `experiments/` | CPU experiments on cached development predictions: context probe, output calibration, calibrated ONNX export, latency breakdown, data-semantics checks ([log](docs/EXPERIMENT_LOG.md)) |
+| `experiments/` | CPU experiments on cached development predictions: context probe, output calibration, calibrated ONNX export, latency breakdown, data-semantics checks, frozen-state head probe ([log](docs/EXPERIMENT_LOG.md)) |
 | `cloud/Dockerfile`, `scripts/Dockerfile` | GPU training image; offline inference-check image |
 | `configs/` | Postprocessing configurations used by the rescore |
 | `baseline/` | Official baseline, unchanged |

@@ -13,7 +13,7 @@ identifiers rather than depth levels. This script measures:
   4. how the current model (correlation1024, cached development predictions)
      and the shipped clip2 calibrator score inside each tick class, and how
      much the pooled score moves when one class improves;
-  5. the class mix of every TRAIN and validation sequence, and the dev score
+  5. the class mix of every TRAIN and dev sequence, and the dev score
      after reweighting sequences to TRAIN's mix;
   6. whether the class can be inferred from features without targets;
   7. whether zeroing predictions that break `never both positive` helps.
@@ -126,12 +126,13 @@ def mask_predictors(parquet, groups):
 
 
 def label_classes(path):
+    """Tick class of every sequence in a file. Use only on files with no reserved sequences (TRAIN)."""
     parquet = pq.ParquetFile(path)
     return np.array([round(spacing(np.c_[t["t0"].to_numpy(), t["t1"].to_numpy()]), 4) for t in
                      (parquet.read_row_group(g, columns=["t0", "t1"]) for g in range(parquet.metadata.num_row_groups))])
 
 
-def class_mix(train, valid, dev_classes, raw_stats, oof_stats):
+def class_mix(train, dev_classes, raw_stats, oof_stats):
     """Class shares per split, and dev WP after reweighting sequences to another split's class mix."""
     classes = np.unique(dev_classes)
 
@@ -144,8 +145,8 @@ def class_mix(train, valid, dev_classes, raw_stats, oof_stats):
         stats[..., [0, 3, 4, 5]] *= ratio[:, None, None]  # weight sums and centred moments scale; means do not
         return global_wp(stats)
 
-    shares = {"train": share(train), "valid": share(valid), "dev": share(dev_classes)}
-    return {"classes": classes.tolist(), "sequences": {"train": len(train), "valid": len(valid)},
+    shares = {"train": share(train), "dev": share(dev_classes)}
+    return {"classes": classes.tolist(), "sequences": {"train": len(train), "dev": len(dev_classes)},
             "share": {k: v.round(4).tolist() for k, v in shares.items()},
             "dev_wp_at_mix": {k: {"raw": reweighted(raw_stats, v), "calibrated_out_of_fold": reweighted(oof_stats, v)}
                               for k, v in shares.items()}}
@@ -278,9 +279,10 @@ def main():
     log(f"loaded {len(groups)} development sequences; classes {report['classes']}")
     report["target_structure"] = target_structure(targets, scored, classes)
     log(f"target structure {json.dumps(report['target_structure'])}")
-    labels = {"train": label_classes(args.train), "valid": label_classes(args.valid)}
+    # Validation targets are read for dev sequences only; the 473 confirmation sequences stay closed.
+    labels = {"train": label_classes(args.train), "dev": classes}
     np.savez(output / "class_labels.npz", **labels)
-    report["class_mix"] = class_mix(labels["train"], labels["valid"], classes,
+    report["class_mix"] = class_mix(labels["train"], classes,
                                     sequence_statistics(targets, predictions, scored),
                                     oof["mlp64_scored_30epochs_clip2__scored"])
     log(f"class mix {json.dumps(report['class_mix'], indent=1)}")

@@ -273,9 +273,22 @@ training) fit that?
 
 **Method.** `experiments/data_semantics.py`: dev targets with cached
 `correlation1024` predictions; random dev samples of 12, 40 and 300 sequences
-for the feature checks; the tick class of every TRAIN and validation sequence.
+for the feature checks; the tick class of every TRAIN sequence.
 Output: `artifacts/experiments/data_semantics/{report.json,class_labels.npz,run.log}`.
 Runtime about one minute.
+
+**Protocol exposure (recorded 2026-10-25).** The first version of this script
+read `t0`/`t1` for all 1,873 validation sequences to label tick classes. That
+included the 473 closed confirmation sequences. An inline follow-up also printed
+their class shares (21.8 / 18.8 / 22.0 / 37.4%).
+- Nothing was fitted on them, no model output on them was inspected, and no
+  decision used them.
+- Their per-sequence target spacing and aggregate class mix are no longer
+  untouched. Do not describe the confirmation split as entirely unseen.
+- The script now reads validation targets for dev sequences only, and the numbers
+  below come from that version.
+- An earlier suggestion to fit a mask-propensity model on the confirmation
+  sequences is withdrawn: it would open the split.
 
 ### What the features are
 
@@ -339,7 +352,6 @@ sequences sharing one spacing. On 2.6M required dev rows:
 | Tick class | 0.1254 | 0.2413 | 0.4685 | 0.6569 |
 | --- | ---: | ---: | ---: | ---: |
 | TRAIN (10,607 seqs) | 12.3% | 11.9% | 32.9% | 43.0% |
-| Validation (1,873) | 21.3% | 18.5% | 23.0% | 37.2% |
 | Dev (1,400) | 21.1% | 18.4% | 23.4% | 37.1% |
 
 Reweighting dev sequences to TRAIN's class mix lowers the same model from
@@ -349,6 +361,8 @@ Reweighting dev sequences to TRAIN's class mix lowers the same model from
    published. A test mix between TRAIN's and validation's would explain the
    0.02 gap between dev and public scores. That is a hypothesis, not a
    measurement.
+   The validation split's class mix was taken from dev, and dev's mix
+   is our only estimate of the test mix.
 2. Training samples sequences uniformly from TRAIN, so it underweights the
    small-tick classes by about 1.7× relative to validation-like data. Those
    classes carry the most leverage per point.
@@ -388,8 +402,117 @@ post-processing can get from it.
 - Report WP by tick class in every future experiment.
 - The next modeling experiment should change what the base model trains on:
   - weight TRAIN sequences to the validation class mix;
-  - weight rows by a mask-propensity model fitted on validation (`a2`–`a6`);
-  - consider validation sequences outside dev as extra training data.
+  - weight rows by a mask-propensity model fitted on dev (`a2`–`a6`), with
+    folds kept separate from evaluation;
+  - the confirmation split stays closed.
 - Post-processing has little left to give.
 - Run a CPU pilot before any GPU run, so the GPU decision rests on measured
   evidence.
+
+---
+
+## 2026-10-25 — Is current book/trade information missing from the GRU state?
+
+**Question.** An outside analysis, shared by Atul, reported three things:
+- In TRAIN snapshot regressions, current `i0` price-like and trade features
+  predict the shared component `C = (t0 + t1)/2` well: median within-sequence
+  correlation about 0.46.
+- They predict the difference `D = (t0 − t1)/2` poorly.
+- The GRU's own C is weak in the large-tick class.
+
+It proposed this hypothesis: *the GRU does not keep enough current book/trade
+information to predict the shared adjustment, especially in the weakest
+regime.* The test separates three cases:
+1. a better head on the frozen state is enough;
+2. useful current-row information is missing from the state;
+3. the recurrent representation itself has to change.
+
+This entry tests the first two.
+
+**Method.** `experiments/state_head_probe.py`.
+- **Stage `features`:** runs the frozen `correlation1024` GRU (Torch import,
+  max |Torch − cached ONNX| = 2.7e-5) over all 1,400 dev sequences and keeps
+  each scored row's upper-layer state (128), the 112 current features and the
+  targets.
+- **Stage `fit`:** cross-fits a residual head `q + MLP(z)`, `q = clip(p, ±2)`,
+  with 64 GELU units, |y|-weighted MSE on clipped targets and the dev
+  fold seed.
+- **Early stopping:** WP on 20% held-out training sequences, checked every
+  32 steps, patience 8, at most 3 epochs. Step 0 (the unchanged model) is
+  always a candidate.
+- **Arms:** `z` = state, or the two clipped outputs, each alone or plus the
+  current `i0` price-like and trade columns (30) or all 112 columns.
+- **Output:** `artifacts/experiments/state_head_probe/`.
+
+**Two corrections before the numbers counted.**
+1. *Heads on the state overfit sequences.* The first run trained 10 epochs
+   without stopping and scored 0.638. In one fold, training WP rose from 0.678
+   to 0.728 while held-out WP fell from 0.648 to 0.629, even though held-out
+   weighted MSE still beat the raw model. Rows within a sequence are nearly
+   duplicates (lag-1 autocorrelation about 0.97), and the 128-dimensional state
+   identifies its sequence. That is why sequence-held-out early stopping was
+   added. Log: `run_fit_seed0_unstopped.log`.
+2. *The residual base must be clipped.* With an unclipped base `p`, the ~0.3%
+   of rows with |p| > 2 dominated the loss, even though the metric clips them,
+   and the outputs-only head fell below raw. Log and results with `_unclipped_base`.
+
+**Results** (dev scored rows, out of fold; CI = paired sequence bootstrap):
+
+| Arm | Seed 0 | Seed 1 | vs raw (seed 0 / seed 1) |
+| --- | ---: | ---: | --- |
+| raw GRU | 0.67209 | 0.67209 | |
+| state → head | 0.67218 | 0.66919 | +0.0001 / −0.0029 [−0.0043, −0.0016] |
+| outputs → head | 0.67311 | 0.66914 | +0.0010 / −0.0030 [−0.0038, −0.0021] |
+| state + `i0` price/trade | 0.67316 | 0.67395 | +0.0011 / +0.0019 [+0.0002, +0.0035] |
+| state + all 112 features | 0.67248 | — | +0.0004 |
+| **outputs + `i0` price/trade** | **0.67448** | **0.67471** | **+0.0024 [+0.0011, +0.0034] / +0.0026 [+0.0018, +0.0035]** |
+| outputs + all 112 features | 0.67200 | — | −0.0001 |
+| *shipped calibrator (2 outputs, 30 epochs, no stopping)* | *0.67392* | | *+0.0018* |
+
+Outputs + `i0` price/trade against the shipped calibrator, paired:
+- seed 0: +0.0006 [−0.0013, +0.0017];
+- seed 1: +0.0008 [+0.0001, +0.0014].
+
+Components: median within-sequence correlation, clipped. The raw model's
+values match the outside analysis exactly.
+
+| | D, class 0.6569 | C, class 0.6569 | C, class 0.1254 |
+| --- | ---: | ---: | ---: |
+| raw GRU | 0.479 | 0.139 | 0.342 |
+| state → head (seed 0) | 0.473 | 0.108 | 0.365 |
+| state + `i0` (seed 0 / 1) | 0.478 / — | 0.109 / 0.108 | 0.382 / 0.379 |
+| outputs + `i0` (seed 0 / 1) | 0.479 / — | 0.095 / 0.096 | 0.403 / 0.395 |
+
+Within-class WP in the 0.6569 class stays 0.399–0.408 in every arm (raw 0.407).
+
+**Findings.**
+- **A better head alone is not enough.** On the frozen state or on the outputs,
+  a head without current features is unstable across seeds: +0.0001 to
+  −0.0029, and +0.0010 to −0.0030. Its early-stopping choice is noisy.
+- **Current `i0` book and trade features add a small, stable amount**: +0.0024 to
+  +0.0026 over raw on both seeds, and +0.0006 to +0.0008 over the shipped
+  calibrator. Adding all 112 columns removes the gain, probably because the
+  extra columns let the head identify sequences.
+- **The proposed mechanism is not supported.** C in the large-tick class does
+  not improve in any arm (0.095–0.124 against raw 0.139). That class's
+  within-class WP does not move either. The gain sits mainly in the 0.1254 class
+  (C 0.342 → 0.40, WP 0.787 → 0.791) and in cross-sequence calibration.
+- **A possible reason C predictability doesn't pay.** In the large-tick class,
+  the C difference between cells (−1, −1) and (0, −1) / (−1, 0) changes the
+  zero-weight target or leaves the weighted one at −1. Per-target |y|-weighted
+  WP mostly rewards telling −3, −1 and +1 apart, and that is direction. This is
+  an argument, not a measurement.
+
+**Decision.**
+- Case 1 (head alone) is rejected. Case 2 holds only weakly, at about +0.001 over
+  the existing calibrator, and not through C in the weakest class.
+- Fine-tuning the upper GRU with a feature path (case 3) is not justified by
+  this evidence alone. The current-row signal a head can use is worth about
+  +0.0025 over raw, and the shipped calibrator already captures most of it.
+- A calibrator that also reads the 30 current `i0` columns could replace the
+  shipped one for roughly +0.0007. That is too small for a submission on its own.
+  Keep it as a candidate to bundle with a larger change.
+- Method lessons for every future head or fine-tune on this data:
+  - stop early on held-out *sequences*;
+  - clip the residual base;
+  - do not trust single-seed results from early-stopped heads.
