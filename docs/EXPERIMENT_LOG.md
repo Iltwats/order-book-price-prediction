@@ -740,7 +740,18 @@ Systematic ablations on the 2.61M dev scored rows revealed three critical mechan
   Python/PyTorch/ONNX reference is **7.58e-6**, state resets bit-identically
   across interleaved sequences (`A, B, A`), and all 188 pytest tests pass.
 
-| Submission Archive | Models | Dev OOF WP | vs Raw (`0.67209`) | vs Shipped (`0.67392` / pub `0.65288`) | Est. Judge Time |
-| --- | --- | ---: | ---: | ---: | ---: |
-| `dist/submission_corr1024_snap40_fast.zip` | `correlation1024` + 5-seed `snap40` MLP128 | **0.67688** | `+0.00479` `[+0.00337, +0.00624]` | **+0.00296** `[+0.00181, +0.00407]` | **~19.1 min** |
-| `dist/submission_ensemble_sorted_gru_snap40.zip` | `0.85 correlation1024 + 0.15 ScratchSortedGRU_v3` + 5-seed `snap40` MLP128 | **0.67756** | `+0.00547` `[+0.00388, +0.00716]` | **+0.00365** `[+0.00238, +0.00489]` | **~35.2 min** |
+| Submission Archive | Models | Dev OOF WP | vs Raw (`0.67209`) | vs Shipped (`0.67392` / pub `0.65288`) | Live Public WP | Live Judge Runtime / RAM |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `dist/submission_corr1024_snap40_fast.zip` (`14WQUJIK`) | `correlation1024` + 5-seed `snap40` MLP128 | **0.67688** | `+0.00479` `[+0.00337, +0.00624]` | **+0.00296** `[+0.00181, +0.00407]` | **0.65456** (`+0.00168`) | **20m52s** / 615 MB |
+| `dist/submission_ensemble_sorted_gru_snap40.zip` (`22Z98Z0W`) | `0.85 correlation1024 + 0.15 ScratchSortedGRU_v3` + 5-seed `snap40` MLP128 | **0.67756** | `+0.00547` `[+0.00388, +0.00716]` | **+0.00365** `[+0.00238, +0.00489]` | **0.65533** (`+0.00245`) | **41m42s** / 618 MB |
+
+### Live Public Leaderboard Confirmation (2026-11-12 09:59 UTC)
+Both archives completed cleanly on the live scoring host (`2/5` daily submissions used):
+1. **Every single component transferred cleanly to the hidden test set:**
+   - `0.65151 → 0.65288` (`+0.00137` public vs `+0.00183` dev, `74.9%` transfer): output-only scored-row calibrator.
+   - `0.65288 → 0.65456` (`+0.00168` public vs `+0.00296` dev, `56.8%` transfer): `snap40` price-sorted LOB calibrator.
+   - `0.65456 → 0.65533` (`+0.00077` public vs `+0.00068` dev, **`113.2%` transfer!**): adding the 100% scratch `ScratchSortedGRU_v3` model. Because `ScratchSortedGRU_v3` was trained strictly on `train.parquet` with zero fitting on `dev`, its out-of-sample gain transferred **1:1+ without shrinkage**!
+   - Overall cumulative progression: **`0.65151 → 0.65288 → 0.65456 → 0.65533` (`+0.00382` public WP)**.
+2. **Exact AMD EPYC 9224 Judge Timing Profile:**
+   - Single-backbone C++17 SIMD (`14WQUJIK`): **`20m52s`** (`615 MB` RAM) — **6m20s faster** than the ONNX-calibrated `1H6GT8N9` (`27m12s`) and **2m03s faster** than even the uncalibrated raw ONNX model (`22m55s`), despite running dynamic `sort11` quote sorting + 5-seed `MLP128` calibration on all 39.4M rows!
+   - Adding `ScratchSortedGRU_v3` (`22Z98Z0W`): **`41m42s`** (`618 MB` RAM), so one `ScratchSortedGRU128` (`169 → 128 → 128 → 384 → 128 → 2`) costs **`20m50s`** (`31.7 µs/row`) on the judge, leaving **`18m18s`** of safe headroom inside the 60-minute limit (and even more if we gate the 5-seed `snap40` MLP to `step_in_seq >= 99` instead of running on warm-up rows, or fuse `W_ih @ x` / skip `384→128` during warm-up!).

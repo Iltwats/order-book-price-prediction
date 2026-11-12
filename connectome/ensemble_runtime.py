@@ -52,10 +52,11 @@ class CompiledEnsembleBackend:
             os.replace(tmp_lib, lib_path)
 
         lib = ctypes.CDLL(str(lib_path))
-        lib.ens_create.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int]
-        lib.ens_create.restype = ctypes.c_void_p
+        lib.ens_create_v2.argtypes = [ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+        lib.ens_create_v2.restype = ctypes.c_void_p
         lib.ens_load_onnx_gru.argtypes = [ctypes.c_void_p, ctypes.c_int] + [ctypes.c_void_p] * 8 + [ctypes.c_float]
-        lib.ens_load_sorted_gru.argtypes = [ctypes.c_void_p] + [ctypes.c_void_p] * 16 + [ctypes.c_float]
+        lib.ens_load_sorted_gru_v2.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int] + [ctypes.c_void_p] * 16 + [ctypes.c_float]
+        lib.ens_load_sorted_lstm.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int] + [ctypes.c_void_p] * 16 + [ctypes.c_float]
         lib.ens_load_tcn80.argtypes = [ctypes.c_void_p] + [ctypes.c_void_p] * 12 + [ctypes.c_float]
         lib.ens_load_calibrator.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_int] + [ctypes.c_void_p] * 6
         lib.ens_reset.argtypes = [ctypes.c_void_p]
@@ -66,9 +67,10 @@ class CompiledEnsembleBackend:
 
         data = np.load(weights_npz, allow_pickle=False)
         n_onnx = int(data["n_onnx_gru"])
-        has_sgru = int(data["has_sorted_gru"])
+        n_sgru = int(data["n_sorted_gru"]) if "n_sorted_gru" in data else (1 if int(data["has_sorted_gru"]) else 0)
+        n_slstm = int(data["n_sorted_lstm"]) if "n_sorted_lstm" in data else 0
         has_tcn = int(data["has_tcn80"])
-        ctx = lib.ens_create(n_onnx, has_sgru, has_tcn)
+        ctx = lib.ens_create_v2(n_onnx, n_sgru, n_slstm, has_tcn)
         if not ctx:
             raise RuntimeError("failed to allocate C++ ensemble context")
         self._ctx = ctx
@@ -81,13 +83,22 @@ class CompiledEnsembleBackend:
             bw = float(data[f"onnx_{idx}_blend"])
             lib.ens_load_onnx_gru(ctx, idx, *[a.ctypes.data for a in arrs], bw)
 
-        if has_sgru:
-            keys = ("in_mu", "in_sd", "stem_w", "stem_b",
+        rnn_keys = ("in_mu", "in_sd", "stem_w", "stem_b",
                     "w0", "r0", "bi0", "bh0", "w1", "r1", "bi1", "bh1",
                     "h1_w", "h1_b", "h2_w", "h2_b")
-            arrs = [c_arr(f"sgru_{k}") for k in keys]
-            bw = float(data["sgru_blend"])
-            lib.ens_load_sorted_gru(ctx, *[a.ctypes.data for a in arrs], bw)
+        for idx in range(n_sgru):
+            prefix = f"sgru_{idx}_" if f"sgru_{idx}_stem_w" in data else "sgru_"
+            arrs = [c_arr(f"{prefix}{k}") for k in rnn_keys]
+            hid = int(arrs[2].shape[0])
+            bw = float(data[f"{prefix}blend"])
+            lib.ens_load_sorted_gru_v2(ctx, idx, hid, *[a.ctypes.data for a in arrs], bw)
+
+        for idx in range(n_slstm):
+            prefix = f"slstm_{idx}_"
+            arrs = [c_arr(f"{prefix}{k}") for k in rnn_keys]
+            hid = int(arrs[2].shape[0])
+            bw = float(data[f"{prefix}blend"])
+            lib.ens_load_sorted_lstm(ctx, idx, hid, *[a.ctypes.data for a in arrs], bw)
 
         if has_tcn:
             keys = ("in_mu", "in_sd", "stem_w", "stem_b",
@@ -153,16 +164,26 @@ class FallbackPythonEnsembleBackend:
     def __init__(self, weights_npz: str | Path):
         d = np.load(weights_npz, allow_pickle=False)
         self.n_onnx = int(d["n_onnx_gru"])
-        self.has_sgru = bool(int(d["has_sorted_gru"]))
+        self.n_sgru = int(d["n_sorted_gru"]) if "n_sorted_gru" in d else (1 if int(d["has_sorted_gru"]) else 0)
+        self.n_slstm = int(d["n_sorted_lstm"]) if "n_sorted_lstm" in d else 0
         self.onnx_models = [
             {k: d[f"onnx_{i}_{k}"].astype(np.float32) for k in ("w0", "r0", "b0", "w1", "r1", "b1", "hw", "hb", "blend")}
             for i in range(self.n_onnx)
         ]
-        if self.has_sgru:
-            self.sgru = {k: d[f"sgru_{k}"].astype(np.float32) for k in (
-                "in_mu", "in_sd", "stem_w", "stem_b", "w0", "r0", "bi0", "bh0",
-                "w1", "r1", "bi1", "bh1", "h1_w", "h1_b", "h2_w", "h2_b", "blend"
-            )}
+        rnn_keys = ("in_mu", "in_sd", "stem_w", "stem_b", "w0", "r0", "bi0", "bh0",
+                    "w1", "r1", "bi1", "bh1", "h1_w", "h1_b", "h2_w", "h2_b", "blend")
+        self.sgru_models = []
+        for idx in range(self.n_sgru):
+            prefix = f"sgru_{idx}_" if f"sgru_{idx}_stem_w" in d else "sgru_"
+            m = {k: d[f"{prefix}{k}"].astype(np.float32) for k in rnn_keys}
+            m["hidden"] = int(m["stem_w"].shape[0])
+            self.sgru_models.append(m)
+        self.slstm_models = []
+        for idx in range(self.n_slstm):
+            prefix = f"slstm_{idx}_"
+            m = {k: d[f"{prefix}{k}"].astype(np.float32) for k in rnn_keys}
+            m["hidden"] = int(m["stem_w"].shape[0])
+            self.slstm_models.append(m)
         self.cal_seeds = int(d["cal_seeds"])
         if self.cal_seeds > 0:
             self.cal = {k: d[f"cal_{k}"].astype(np.float32) for k in ("mu", "sd", "w1", "b1", "w2", "b2")}
@@ -175,7 +196,9 @@ class FallbackPythonEnsembleBackend:
         self.dyn_ring = np.zeros((32, 16), dtype=np.float32)
         self.f_step = 0
         self.onnx_h = [[np.zeros(128, np.float32), np.zeros(128, np.float32)] for _ in range(self.n_onnx)]
-        self.sgru_h = [np.zeros(128, np.float32), np.zeros(128, np.float32)]
+        self.sgru_h = [[np.zeros(m["hidden"], np.float32), np.zeros(m["hidden"], np.float32)] for m in self.sgru_models]
+        self.slstm_hc = [[np.zeros(m["hidden"], np.float32), np.zeros(m["hidden"], np.float32),
+                          np.zeros(m["hidden"], np.float32), np.zeros(m["hidden"], np.float32)] for m in self.slstm_models]
 
     @staticmethod
     def _sig(x):
@@ -247,29 +270,56 @@ class FallbackPythonEnsembleBackend:
             preds.append((h1 @ m["hw"] + m["hb"]).astype(np.float32))
             weights.append(float(m["blend"]))
 
-        if self.has_sgru:
+        if self.n_sgru > 0 or self.n_slstm > 0:
             f169 = np.concatenate([bp0, ap0, bv0, av0, x[44:52], bp1, ap1, bv1, av1, x[96:104], x[104:112],
                                    [mid0, wmid0, spr0, imb0, imb0_3, mid1, spr1, imb1, imb1_3],
                                    cur_dyn - l1, cur_dyn - l4, cur_dyn - l16]).astype(np.float32)
-            g = self.sgru
+
+        for idx, g in enumerate(self.sgru_models):
+            H = g["hidden"]
             st_out = self._gelu_safe(((f169 - g["in_mu"]) / g["in_sd"]) @ g["stem_w"].T + g["stem_b"])
-            h0, h1 = self.sgru_h
+            h0, h1 = self.sgru_h[idx]
             for li, (w, r, bi, bh, inp, h) in enumerate([
                 (g["w0"], g["r0"], g["bi0"], g["bh0"], st_out, h0),
                 (g["w1"], g["r1"], g["bi1"], g["bh1"], None, h1),
             ]):
                 if li == 1: inp = h0 + st_out
                 xp, rp = w @ inp + bi, r @ h + bh
-                rg = self._sig(xp[:128] + rp[:128])
-                zg = self._sig(xp[128:256] + rp[128:256])
-                ng = np.tanh(xp[256:] + rg * rp[256:])
+                rg = self._sig(xp[:H] + rp[:H])
+                zg = self._sig(xp[H:2*H] + rp[H:2*H])
+                ng = np.tanh(xp[2*H:] + rg * rp[2*H:])
                 nh = (1.0 - zg) * ng + zg * h
                 if li == 0: h0 = nh
                 else: h1 = nh
-            self.sgru_h = [h0, h1]
-            mid = self._gelu_safe(np.concatenate([st_out, h0, h1]) @ g["h1_w"].T + g["h1_b"])
-            preds.append((mid @ g["h2_w"].T + g["h2_b"]).astype(np.float32))
-            weights.append(float(g["blend"]))
+            self.sgru_h[idx] = [h0, h1]
+            if need:
+                mid = self._gelu_safe(np.concatenate([st_out, h0, h1]) @ g["h1_w"].T + g["h1_b"])
+                preds.append((mid @ g["h2_w"].T + g["h2_b"]).astype(np.float32))
+                weights.append(float(g["blend"]))
+
+        for idx, g in enumerate(self.slstm_models):
+            H = g["hidden"]
+            st_out = self._gelu_safe(((f169 - g["in_mu"]) / g["in_sd"]) @ g["stem_w"].T + g["stem_b"])
+            h0, c0, h1, c1 = self.slstm_hc[idx]
+            for li, (w, r, bi, bh, inp, h, c) in enumerate([
+                (g["w0"], g["r0"], g["bi0"], g["bh0"], st_out, h0, c0),
+                (g["w1"], g["r1"], g["bi1"], g["bh1"], None, h1, c1),
+            ]):
+                if li == 1: inp = h0 + st_out
+                gates = w @ inp + bi + r @ h + bh
+                ig = self._sig(gates[:H])
+                fg = self._sig(gates[H:2*H])
+                gg = np.tanh(gates[2*H:3*H])
+                og = self._sig(gates[3*H:])
+                nc = fg * c + ig * gg
+                nh = og * np.tanh(nc)
+                if li == 0: h0, c0 = nh, nc
+                else: h1, c1 = nh, nc
+            self.slstm_hc[idx] = [h0, c0, h1, c1]
+            if need:
+                mid = self._gelu_safe(np.concatenate([st_out, h0, h1]) @ g["h1_w"].T + g["h1_b"])
+                preds.append((mid @ g["h2_w"].T + g["h2_b"]).astype(np.float32))
+                weights.append(float(g["blend"]))
 
         self.previous_step = step
         if not need:

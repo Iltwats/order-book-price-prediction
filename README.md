@@ -11,11 +11,14 @@ test set; the private leaderboard uses a separate dataset.
 
 | | Global WP |
 | --- | ---: |
-| Our best public: `submission_correlation1024_mlp64_clip2.zip` (`1H6GT8N9`) | 0.65288 |
+| Our best public: `submission_ensemble_sorted_gru_snap40.zip` (`22Z98Z0W`) | **0.65533** |
+| Single-backbone `snap40` public: `submission_corr1024_snap40_fast.zip` (`14WQUJIK`) | 0.65456 |
+| Prior ONNX-calibrated public: `submission_correlation1024_mlp64_clip2.zip` (`1H6GT8N9`) | 0.65288 |
 | Previous public: `submission_correlation1024.zip` (rank 635) | 0.65151 |
 | Public rank 300 / 100 / 50 | 0.6572 / 0.6628 / 0.6653 |
 | Public rank ~8 (last paid place) / rank 1 | ~0.670 / 0.6739 |
-| Same model, our 1,400-sequence development split | 0.67209 |
+| `correlation1024` raw, our 1,400-sequence development split | 0.67209 |
+| `submission_ensemble_sorted_gru_snap40.zip` OOF, 1,400-sequence dev split | **0.67756** |
 
 Development scores run about 0.02 above public scores, so compare
 improvements, not levels. Each +0.001 currently moves dozens of places. Full
@@ -106,7 +109,7 @@ Every experiment run, with commands, numbers and decisions, is recorded in
 | Train new GRUs from scratch on all 10,607 train sequences with pooled \|y\|-weighted MSE + Global WP + mask-propensity & class-mix weighting | Done ([log](docs/EXPERIMENT_LOG.md)): `ScratchSortedGRU` (169 price-sorted L11 depth, aligned volume & multi-lag order-flow features) reaches **0.66076** standalone dev WP from random init and lifts raw blend with `correlation1024` from **0.67209 → 0.67331** |
 | Check our assumptions against the official data overview: tick classes, class mix, mask, feature representation | Done ([log](docs/EXPERIMENT_LOG.md)): loss and calibration are sound; training ignores the class mix and the mask |
 | Frozen-state head probe: does the GRU state lack current book/trade information? Heads on the frozen state or the two outputs, with and without current `i0` price/trade features | Done ([log](docs/EXPERIMENT_LOG.md)): a head alone adds nothing; current `i0` features add about +0.0025 over raw and +0.0007 over the shipped calibrator, not through the large-tick class |
-| Price-sorted LOB snapshot calibrator (`snap40`, no `LayerNorm`) + C++17 SIMD ensemble runtime | Done ([log](docs/EXPERIMENT_LOG.md)): single-backbone reaches **0.67688** OOF dev WP (**+0.00296** over shipped `0.65288`, ~19 min judge runtime) in `dist/submission_corr1024_snap40_fast.zip`; 2-model diverse ensemble reaches **0.67756** OOF dev WP (**+0.00365** over shipped, CI `[+0.00238, +0.00489]`, ~35 min judge runtime) in `dist/submission_ensemble_sorted_gru_snap40.zip` |
+| Price-sorted LOB snapshot calibrator (`snap40`, no `LayerNorm`) + C++17 SIMD ensemble runtime | Done ([log](docs/EXPERIMENT_LOG.md)): single-backbone reaches **0.67688** OOF dev WP and **0.65456** public (`14WQUJIK`, **20m52s**, 615 MB); 2-model diverse ensemble reaches **0.67756** OOF dev WP and **0.65533** public (`22Z98Z0W`, **+0.00245** over `0.65288` and **+0.00382** over `0.65151`, **41m42s**, 618 MB) |
 
 The FAQ warns against overfitting the visible validation mask, and the private
 test uses different data, so judge changes on held-out sequences, not only on

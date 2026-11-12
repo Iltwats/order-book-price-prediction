@@ -316,6 +316,7 @@ struct OnnxGRU128 {
     void step(const float* x112, float* out2) {
         step_layer(w0_t, r0_t, b0, x112, 112, h0);
         step_layer(w1_t, r1_t, b1, h0, 128, h1);
+        if (!out2) return;
         float s0 = hb[0], s1 = hb[1];
         for (int j = 0; j < 128; ++j) {
             s0 += h1[j] * hw[2 * j];
@@ -326,54 +327,165 @@ struct OnnxGRU128 {
 };
 
 // ============================================================================
-// Model 2: PyTorch ScratchSortedGRU (hidden=128, PyTorch [r, z, n] gate order!)
+// Variable-width PyTorch ScratchSortedGRU (supports hidden H in 32..384, e.g. 128, 160, 192, 256!)
 // ============================================================================
-struct TorchSortedGRU128 {
+struct TorchSortedGRU {
+    int H = 128;
     alignas(64) float in_mu[169], in_sd[169];
-    alignas(64) float stem_w_t[169 * 128], stem_b[128];
-    alignas(64) float w0_t[128 * 384], r0_t[128 * 384], bi0[384], bh0[384];
-    alignas(64) float w1_t[128 * 384], r1_t[128 * 384], bi1[384], bh1[384];
-    alignas(64) float h1_w_t[384 * 128], h1_b[128];
-    alignas(64) float h2_w_t[128 * 2], h2_b[2];
-    alignas(64) float h0[128], h1[128];
+    std::unique_ptr<float[]> stem_w_t, stem_b;
+    std::unique_ptr<float[]> w0_t, r0_t, bi0, bh0;
+    std::unique_ptr<float[]> w1_t, r1_t, bi1, bh1;
+    std::unique_ptr<float[]> h1_w_t, h1_b;
+    std::unique_ptr<float[]> h2_w_t;
+    float h2_b[2]{};
+    std::unique_ptr<float[]> h0, h1;
+
+    void init_dims(int hidden) {
+        H = hidden;
+        stem_w_t = std::make_unique<float[]>(169 * H);
+        stem_b   = std::make_unique<float[]>(H);
+        w0_t     = std::make_unique<float[]>(H * 3 * H);
+        r0_t     = std::make_unique<float[]>(H * 3 * H);
+        bi0      = std::make_unique<float[]>(3 * H);
+        bh0      = std::make_unique<float[]>(3 * H);
+        w1_t     = std::make_unique<float[]>(H * 3 * H);
+        r1_t     = std::make_unique<float[]>(H * 3 * H);
+        bi1      = std::make_unique<float[]>(3 * H);
+        bh1      = std::make_unique<float[]>(3 * H);
+        h1_w_t   = std::make_unique<float[]>(3 * H * H);
+        h1_b     = std::make_unique<float[]>(H);
+        h2_w_t   = std::make_unique<float[]>(H * 2);
+        h0       = std::make_unique<float[]>(H);
+        h1       = std::make_unique<float[]>(H);
+        reset();
+    }
 
     void reset() {
-        std::memset(h0, 0, sizeof(h0));
-        std::memset(h1, 0, sizeof(h1));
+        if (h0) std::memset(h0.get(), 0, H * sizeof(float));
+        if (h1) std::memset(h1.get(), 0, H * sizeof(float));
     }
 
     static inline void step_torch_gru(const float* W_t, const float* R_t,
                                       const float* bi, const float* bh,
-                                      const float* inp, float* h) {
-        alignas(64) float xp[384], rp[384];
-        gemv_set(W_t, inp, 128, 384, bi, xp);
-        gemv_set(R_t, h,   128, 384, bh, rp);
+                                      const float* inp, int H, float* h) {
+        alignas(64) float xp[1152], rp[1152]; // supports H up to 384
+        gemv_set(W_t, inp, H, 3 * H, bi, xp);
+        gemv_set(R_t, h,   H, 3 * H, bh, rp);
         // PyTorch gate order is [r, z, n]: h' = (1 - z) * n + z * h
-        for (int j = 0; j < 128; ++j) {
+        for (int j = 0; j < H; ++j) {
             float r = fast_sigmoid(xp[j] + rp[j]);
-            float z = fast_sigmoid(xp[128 + j] + rp[128 + j]);
-            float n = std::tanh(xp[256 + j] + r * rp[256 + j]);
+            float z = fast_sigmoid(xp[H + j] + rp[H + j]);
+            float n = std::tanh(xp[2 * H + j] + r * rp[2 * H + j]);
             h[j] = (1.0f - z) * n + z * h[j];
         }
     }
 
     void step(const float* feat169, float* out2) {
-        alignas(64) float z[169], s[128], g1_in[128], cat384[384], mid[128];
+        alignas(64) float z[169], s[384], g1_in[384], cat[1152], mid[384];
         for (int i = 0; i < 169; ++i) z[i] = (feat169[i] - in_mu[i]) / in_sd[i];
-        gemv_set(stem_w_t, z, 169, 128, stem_b, s);
-        for (int j = 0; j < 128; ++j) s[j] = exact_gelu(s[j]);
-        step_torch_gru(w0_t, r0_t, bi0, bh0, s, h0);
-        for (int j = 0; j < 128; ++j) g1_in[j] = h0[j] + s[j];
-        step_torch_gru(w1_t, r1_t, bi1, bh1, g1_in, h1);
-        std::memcpy(cat384 + 0,   s,  128 * sizeof(float));
-        std::memcpy(cat384 + 128, h0, 128 * sizeof(float));
-        std::memcpy(cat384 + 256, h1, 128 * sizeof(float));
-        gemv_set(h1_w_t, cat384, 384, 128, h1_b, mid);
-        for (int j = 0; j < 128; ++j) mid[j] = exact_gelu(mid[j]);
+        gemv_set(stem_w_t.get(), z, 169, H, stem_b.get(), s);
+        for (int j = 0; j < H; ++j) s[j] = exact_gelu(s[j]);
+        step_torch_gru(w0_t.get(), r0_t.get(), bi0.get(), bh0.get(), s, H, h0.get());
+        for (int j = 0; j < H; ++j) g1_in[j] = h0[j] + s[j];
+        step_torch_gru(w1_t.get(), r1_t.get(), bi1.get(), bh1.get(), g1_in, H, h1.get());
+        // Warm-up optimization: final readout [3*H -> H -> 2] has zero feedback into h0/h1!
+        if (!out2) return;
+        std::memcpy(cat + 0,     s,        H * sizeof(float));
+        std::memcpy(cat + H,     h0.get(), H * sizeof(float));
+        std::memcpy(cat + 2 * H, h1.get(), H * sizeof(float));
+        gemv_set(h1_w_t.get(), cat, 3 * H, H, h1_b.get(), mid);
+        for (int j = 0; j < H; ++j) mid[j] = exact_gelu(mid[j]);
         float o0 = h2_b[0], o1 = h2_b[1];
-        for (int j = 0; j < 128; ++j) {
-            o0 += mid[j] * h2_w_t[2 * j];
-            o1 += mid[j] * h2_w_t[2 * j + 1];
+        const float* hw = h2_w_t.get();
+        for (int j = 0; j < H; ++j) {
+            o0 += mid[j] * hw[2 * j];
+            o1 += mid[j] * hw[2 * j + 1];
+        }
+        out2[0] = o0; out2[1] = o1;
+    }
+};
+
+// ============================================================================
+// Variable-width PyTorch ScratchSortedLSTM (orthogonal cell-state highway [i, f, g, o]!)
+// ============================================================================
+struct TorchSortedLSTM {
+    int H = 128;
+    alignas(64) float in_mu[169], in_sd[169];
+    std::unique_ptr<float[]> stem_w_t, stem_b;
+    std::unique_ptr<float[]> w0_t, r0_t, bi0, bh0;
+    std::unique_ptr<float[]> w1_t, r1_t, bi1, bh1;
+    std::unique_ptr<float[]> h1_w_t, h1_b;
+    std::unique_ptr<float[]> h2_w_t;
+    float h2_b[2]{};
+    std::unique_ptr<float[]> h0, c0, h1, c1;
+
+    void init_dims(int hidden) {
+        H = hidden;
+        stem_w_t = std::make_unique<float[]>(169 * H);
+        stem_b   = std::make_unique<float[]>(H);
+        w0_t     = std::make_unique<float[]>(H * 4 * H);
+        r0_t     = std::make_unique<float[]>(H * 4 * H);
+        bi0      = std::make_unique<float[]>(4 * H);
+        bh0      = std::make_unique<float[]>(4 * H);
+        w1_t     = std::make_unique<float[]>(H * 4 * H);
+        r1_t     = std::make_unique<float[]>(H * 4 * H);
+        bi1      = std::make_unique<float[]>(4 * H);
+        bh1      = std::make_unique<float[]>(4 * H);
+        h1_w_t   = std::make_unique<float[]>(3 * H * H);
+        h1_b     = std::make_unique<float[]>(H);
+        h2_w_t   = std::make_unique<float[]>(H * 2);
+        h0       = std::make_unique<float[]>(H);
+        c0       = std::make_unique<float[]>(H);
+        h1       = std::make_unique<float[]>(H);
+        c1       = std::make_unique<float[]>(H);
+        reset();
+    }
+
+    void reset() {
+        if (h0) std::memset(h0.get(), 0, H * sizeof(float));
+        if (c0) std::memset(c0.get(), 0, H * sizeof(float));
+        if (h1) std::memset(h1.get(), 0, H * sizeof(float));
+        if (c1) std::memset(c1.get(), 0, H * sizeof(float));
+    }
+
+    static inline void step_torch_lstm(const float* W_t, const float* R_t,
+                                       const float* bi, const float* bh,
+                                       const float* inp, int H, float* h, float* c) {
+        alignas(64) float gates[1536]; // 4 * H (supports H up to 384)
+        for (int j = 0; j < 4 * H; ++j) gates[j] = bi[j] + bh[j];
+        gemv_tiled_add(W_t, inp, H, 4 * H, gates);
+        gemv_tiled_add(R_t, h,   H, 4 * H, gates);
+        // PyTorch LSTM gate order is [i, f, g, o]: c' = f * c + i * g, h' = o * tanh(c')
+        for (int j = 0; j < H; ++j) {
+            float ig = fast_sigmoid(gates[j]);
+            float fg = fast_sigmoid(gates[H + j]);
+            float gg = std::tanh(gates[2 * H + j]);
+            float og = fast_sigmoid(gates[3 * H + j]);
+            float nc = fg * c[j] + ig * gg;
+            c[j] = nc;
+            h[j] = og * std::tanh(nc);
+        }
+    }
+
+    void step(const float* feat169, float* out2) {
+        alignas(64) float z[169], s[384], l1_in[384], cat[1152], mid[384];
+        for (int i = 0; i < 169; ++i) z[i] = (feat169[i] - in_mu[i]) / in_sd[i];
+        gemv_set(stem_w_t.get(), z, 169, H, stem_b.get(), s);
+        for (int j = 0; j < H; ++j) s[j] = exact_gelu(s[j]);
+        step_torch_lstm(w0_t.get(), r0_t.get(), bi0.get(), bh0.get(), s, H, h0.get(), c0.get());
+        for (int j = 0; j < H; ++j) l1_in[j] = h0[j] + s[j];
+        step_torch_lstm(w1_t.get(), r1_t.get(), bi1.get(), bh1.get(), l1_in, H, h1.get(), c1.get());
+        if (!out2) return;
+        std::memcpy(cat + 0,     s,        H * sizeof(float));
+        std::memcpy(cat + H,     h0.get(), H * sizeof(float));
+        std::memcpy(cat + 2 * H, h1.get(), H * sizeof(float));
+        gemv_set(h1_w_t.get(), cat, 3 * H, H, h1_b.get(), mid);
+        for (int j = 0; j < H; ++j) mid[j] = exact_gelu(mid[j]);
+        float o0 = h2_b[0], o1 = h2_b[1];
+        const float* hw = h2_w_t.get();
+        for (int j = 0; j < H; ++j) {
+            o0 += mid[j] * hw[2 * j];
+            o1 += mid[j] * hw[2 * j + 1];
         }
         out2[0] = o0; out2[1] = o1;
     }
@@ -458,13 +570,15 @@ struct EnsembleContext {
     FeatureState feat_state;
     int n_onnx_gru = 0;
     std::unique_ptr<OnnxGRU128[]> onnx_grus;
-    bool has_sorted_gru = false;
-    std::unique_ptr<TorchSortedGRU128> sorted_gru;
+    int n_sorted_gru = 0;
+    std::unique_ptr<TorchSortedGRU[]> sorted_grus;
+    int n_sorted_lstm = 0;
+    std::unique_ptr<TorchSortedLSTM[]> sorted_lstms;
     bool has_tcn80 = false;
     std::unique_ptr<StreamingTCN80> tcn80;
 
     // Meta-calibrator: takes [q_models..., derived_q_feats..., snap34] -> residual MLP -> final 2 outputs!
-    float blend_weights[8]{};  // per-model blend weights for base q
+    float blend_weights[16]{};  // per-model blend weights for base q
     int cal_in_dim = 0;
     int cal_hidden = 0;
     int cal_seeds = 0;
@@ -476,15 +590,21 @@ struct EnsembleContext {
     std::unique_ptr<float[]> cal_b2;   // [cal_seeds, 2]
 };
 
-void* ens_create(int n_onnx_gru, int has_sorted_gru, int has_tcn80) {
+void* ens_create_v2(int n_onnx_gru, int n_sorted_gru, int n_sorted_lstm, int has_tcn80) {
     auto* ctx = new EnsembleContext();
     ctx->n_onnx_gru = n_onnx_gru;
     if (n_onnx_gru > 0) ctx->onnx_grus = std::make_unique<OnnxGRU128[]>(n_onnx_gru);
-    ctx->has_sorted_gru = (has_sorted_gru != 0);
-    if (ctx->has_sorted_gru) ctx->sorted_gru = std::make_unique<TorchSortedGRU128>();
+    ctx->n_sorted_gru = n_sorted_gru;
+    if (n_sorted_gru > 0) ctx->sorted_grus = std::make_unique<TorchSortedGRU[]>(n_sorted_gru);
+    ctx->n_sorted_lstm = n_sorted_lstm;
+    if (n_sorted_lstm > 0) ctx->sorted_lstms = std::make_unique<TorchSortedLSTM[]>(n_sorted_lstm);
     ctx->has_tcn80 = (has_tcn80 != 0);
     if (ctx->has_tcn80) ctx->tcn80 = std::make_unique<StreamingTCN80>();
     return ctx;
+}
+
+void* ens_create(int n_onnx_gru, int has_sorted_gru, int has_tcn80) {
+    return ens_create_v2(n_onnx_gru, has_sorted_gru ? 1 : 0, 0, has_tcn80);
 }
 
 void ens_load_onnx_gru(void* p, int idx, const float* w0, const float* r0, const float* b0,
@@ -504,32 +624,77 @@ void ens_load_onnx_gru(void* p, int idx, const float* w0, const float* r0, const
     ctx->blend_weights[idx] = blend_w;
 }
 
+void ens_load_sorted_gru_v2(void* p, int idx, int hidden,
+                            const float* in_mu, const float* in_sd,
+                            const float* stem_w, const float* stem_b,
+                            const float* w0, const float* r0, const float* bi0, const float* bh0,
+                            const float* w1, const float* r1, const float* bi1, const float* bh1,
+                            const float* h1_w, const float* h1_b, const float* h2_w, const float* h2_b,
+                            float blend_w) {
+    auto* ctx = static_cast<EnsembleContext*>(p);
+    auto& g = ctx->sorted_grus[idx];
+    const int H = hidden;
+    g.init_dims(H);
+    std::memcpy(g.in_mu, in_mu, 169 * sizeof(float));
+    std::memcpy(g.in_sd, in_sd, 169 * sizeof(float));
+    for (int i = 0; i < 169; ++i) for (int j = 0; j < H; ++j) g.stem_w_t[i * H + j] = stem_w[j * 169 + i];
+    std::memcpy(g.stem_b.get(), stem_b, H * sizeof(float));
+    for (int i = 0; i < H; ++i) for (int j = 0; j < 3 * H; ++j) {
+        g.w0_t[i * (3 * H) + j] = w0[j * H + i];
+        g.r0_t[i * (3 * H) + j] = r0[j * H + i];
+        g.w1_t[i * (3 * H) + j] = w1[j * H + i];
+        g.r1_t[i * (3 * H) + j] = r1[j * H + i];
+    }
+    std::memcpy(g.bi0.get(), bi0, 3 * H * sizeof(float)); std::memcpy(g.bh0.get(), bh0, 3 * H * sizeof(float));
+    std::memcpy(g.bi1.get(), bi1, 3 * H * sizeof(float)); std::memcpy(g.bh1.get(), bh1, 3 * H * sizeof(float));
+    for (int i = 0; i < 3 * H; ++i) for (int j = 0; j < H; ++j) g.h1_w_t[i * H + j] = h1_w[j * (3 * H) + i];
+    std::memcpy(g.h1_b.get(), h1_b, H * sizeof(float));
+    for (int i = 0; i < H; ++i) for (int j = 0; j < 2; ++j) g.h2_w_t[i * 2 + j] = h2_w[j * H + i];
+    std::memcpy(g.h2_b, h2_b, 2 * sizeof(float));
+    g.reset();
+    ctx->blend_weights[ctx->n_onnx_gru + idx] = blend_w;
+}
+
 void ens_load_sorted_gru(void* p, const float* in_mu, const float* in_sd,
                          const float* stem_w, const float* stem_b,
                          const float* w0, const float* r0, const float* bi0, const float* bh0,
                          const float* w1, const float* r1, const float* bi1, const float* bh1,
                          const float* h1_w, const float* h1_b, const float* h2_w, const float* h2_b,
                          float blend_w) {
+    ens_load_sorted_gru_v2(p, 0, 128, in_mu, in_sd, stem_w, stem_b,
+                           w0, r0, bi0, bh0, w1, r1, bi1, bh1,
+                           h1_w, h1_b, h2_w, h2_b, blend_w);
+}
+
+void ens_load_sorted_lstm(void* p, int idx, int hidden,
+                          const float* in_mu, const float* in_sd,
+                          const float* stem_w, const float* stem_b,
+                          const float* w0, const float* r0, const float* bi0, const float* bh0,
+                          const float* w1, const float* r1, const float* bi1, const float* bh1,
+                          const float* h1_w, const float* h1_b, const float* h2_w, const float* h2_b,
+                          float blend_w) {
     auto* ctx = static_cast<EnsembleContext*>(p);
-    auto& g = *ctx->sorted_gru;
+    auto& g = ctx->sorted_lstms[idx];
+    const int H = hidden;
+    g.init_dims(H);
     std::memcpy(g.in_mu, in_mu, 169 * sizeof(float));
     std::memcpy(g.in_sd, in_sd, 169 * sizeof(float));
-    for (int i = 0; i < 169; ++i) for (int j = 0; j < 128; ++j) g.stem_w_t[i * 128 + j] = stem_w[j * 169 + i];
-    std::memcpy(g.stem_b, stem_b, 128 * sizeof(float));
-    for (int i = 0; i < 128; ++i) for (int j = 0; j < 384; ++j) {
-        g.w0_t[i * 384 + j] = w0[j * 128 + i];
-        g.r0_t[i * 384 + j] = r0[j * 128 + i];
-        g.w1_t[i * 384 + j] = w1[j * 128 + i];
-        g.r1_t[i * 384 + j] = r1[j * 128 + i];
+    for (int i = 0; i < 169; ++i) for (int j = 0; j < H; ++j) g.stem_w_t[i * H + j] = stem_w[j * 169 + i];
+    std::memcpy(g.stem_b.get(), stem_b, H * sizeof(float));
+    for (int i = 0; i < H; ++i) for (int j = 0; j < 4 * H; ++j) {
+        g.w0_t[i * (4 * H) + j] = w0[j * H + i];
+        g.r0_t[i * (4 * H) + j] = r0[j * H + i];
+        g.w1_t[i * (4 * H) + j] = w1[j * H + i];
+        g.r1_t[i * (4 * H) + j] = r1[j * H + i];
     }
-    std::memcpy(g.bi0, bi0, 384 * sizeof(float)); std::memcpy(g.bh0, bh0, 384 * sizeof(float));
-    std::memcpy(g.bi1, bi1, 384 * sizeof(float)); std::memcpy(g.bh1, bh1, 384 * sizeof(float));
-    for (int i = 0; i < 384; ++i) for (int j = 0; j < 128; ++j) g.h1_w_t[i * 128 + j] = h1_w[j * 384 + i];
-    std::memcpy(g.h1_b, h1_b, 128 * sizeof(float));
-    for (int i = 0; i < 128; ++i) for (int j = 0; j < 2; ++j) g.h2_w_t[i * 2 + j] = h2_w[j * 128 + i];
+    std::memcpy(g.bi0.get(), bi0, 4 * H * sizeof(float)); std::memcpy(g.bh0.get(), bh0, 4 * H * sizeof(float));
+    std::memcpy(g.bi1.get(), bi1, 4 * H * sizeof(float)); std::memcpy(g.bh1.get(), bh1, 4 * H * sizeof(float));
+    for (int i = 0; i < 3 * H; ++i) for (int j = 0; j < H; ++j) g.h1_w_t[i * H + j] = h1_w[j * (3 * H) + i];
+    std::memcpy(g.h1_b.get(), h1_b, H * sizeof(float));
+    for (int i = 0; i < H; ++i) for (int j = 0; j < 2; ++j) g.h2_w_t[i * 2 + j] = h2_w[j * H + i];
     std::memcpy(g.h2_b, h2_b, 2 * sizeof(float));
     g.reset();
-    ctx->blend_weights[ctx->n_onnx_gru] = blend_w;
+    ctx->blend_weights[ctx->n_onnx_gru + ctx->n_sorted_gru + idx] = blend_w;
 }
 
 void ens_load_tcn80(void* p, const float* in_mu, const float* in_sd,
@@ -563,7 +728,7 @@ void ens_load_tcn80(void* p, const float* in_mu, const float* in_sd,
     for (int i = 0; i < CH; ++i) for (int j = 0; j < 2; ++j) t.h2_w_t[i * 2 + j] = h2_w[j * CH + i];
     std::memcpy(t.h2_b, h2_b, 2 * sizeof(float));
     t.reset();
-    int slot = ctx->n_onnx_gru + (ctx->has_sorted_gru ? 1 : 0);
+    int slot = ctx->n_onnx_gru + ctx->n_sorted_gru + ctx->n_sorted_lstm;
     ctx->blend_weights[slot] = blend_w;
 }
 
@@ -599,7 +764,8 @@ void ens_reset(void* p) {
     auto* ctx = static_cast<EnsembleContext*>(p);
     ctx->feat_state.reset();
     for (int i = 0; i < ctx->n_onnx_gru; ++i) ctx->onnx_grus[i].reset();
-    if (ctx->has_sorted_gru) ctx->sorted_gru->reset();
+    for (int i = 0; i < ctx->n_sorted_gru; ++i) ctx->sorted_grus[i].reset();
+    for (int i = 0; i < ctx->n_sorted_lstm; ++i) ctx->sorted_lstms[i].reset();
     if (ctx->has_tcn80) ctx->tcn80->reset();
 }
 
@@ -610,19 +776,29 @@ int ens_step(void* p, const float* __restrict x112, int need_calibrator, float* 
     }
     alignas(64) float feat169[169];
     alignas(64) float snap34[34];
-    bool need_f169 = ctx->has_sorted_gru || ctx->has_tcn80;
-    ctx->feat_state.update(x112, need_f169 ? feat169 : nullptr, need_calibrator ? snap34 : nullptr);
+    bool need_f169 = (ctx->n_sorted_gru > 0) || (ctx->n_sorted_lstm > 0) || ctx->has_tcn80;
+    // Skip dynamic sort11 + ring-buffer entirely when only OnnxGRU runs during warm-up (steps 0..98)!
+    if (need_f169 || need_calibrator) {
+        ctx->feat_state.update(x112, need_f169 ? feat169 : nullptr, need_calibrator ? snap34 : nullptr);
+    }
 
-    float model_preds[8][2];
+    float model_preds[16][2];
     int m_count = 0;
     for (int i = 0; i < ctx->n_onnx_gru; ++i) {
-        ctx->onnx_grus[i].step(x112, model_preds[m_count++]);
+        ctx->onnx_grus[i].step(x112, need_calibrator ? model_preds[m_count] : nullptr);
+        ++m_count;
     }
-    if (ctx->has_sorted_gru) {
-        ctx->sorted_gru->step(feat169, model_preds[m_count++]);
+    for (int i = 0; i < ctx->n_sorted_gru; ++i) {
+        ctx->sorted_grus[i].step(feat169, need_calibrator ? model_preds[m_count] : nullptr);
+        ++m_count;
+    }
+    for (int i = 0; i < ctx->n_sorted_lstm; ++i) {
+        ctx->sorted_lstms[i].step(feat169, need_calibrator ? model_preds[m_count] : nullptr);
+        ++m_count;
     }
     if (ctx->has_tcn80) {
-        ctx->tcn80->step(feat169, model_preds[m_count++]);
+        ctx->tcn80->step(feat169, need_calibrator ? model_preds[m_count] : nullptr);
+        ++m_count;
     }
 
     if (!need_calibrator) {
@@ -646,7 +822,7 @@ int ens_step(void* p, const float* __restrict x112, int need_calibrator, float* 
     }
 
     // Build calibrator input vector: [blended q_feats (6), individual model clipped preds (2*m_count if >1), snap34 (34)]
-    alignas(64) float z_in[64];
+    alignas(64) float z_in[96];
     int pos = 0;
     z_in[pos++] = base0;
     z_in[pos++] = base1;

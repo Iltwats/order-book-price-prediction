@@ -47,14 +47,14 @@ def build_lob_engineered_features_torch(x: torch.Tensor) -> torch.Tensor:
     100% causal (uses only current row t and exact lags t-1, t-4, t-16 within the same sequence,
     zero-padded at step 0) and 100% deterministic for single-step ring-buffer inference!
     """
-    # x: [B, T, 112]
-    i0_bp, i0_bo = torch.sort(x[..., 0:11], dim=-1)    # [B, T, 11] ascending: [..., 10] is best bid!
-    i0_ap, i0_ao = torch.sort(x[..., 11:22], dim=-1)   # [B, T, 11] ascending: [..., 0] is best ask!
-    i0_bv = torch.gather(x[..., 22:33], -1, i0_bo)     # volumes aligned to sorted quote levels!
+    # x: [B, T, 112] — use stable=True so any equal quotes match C++ insertion sort (`sort11`) bit-for-bit!
+    i0_bp, i0_bo = torch.sort(x[..., 0:11], dim=-1, stable=True)    # [B, T, 11] ascending: [..., 10] is best bid!
+    i0_ap, i0_ao = torch.sort(x[..., 11:22], dim=-1, stable=True)   # [B, T, 11] ascending: [..., 0] is best ask!
+    i0_bv = torch.gather(x[..., 22:33], -1, i0_bo)                  # volumes aligned to sorted quote levels!
     i0_av = torch.gather(x[..., 33:44], -1, i0_ao)
 
-    i1_bp, i1_bo = torch.sort(x[..., 52:63], dim=-1)
-    i1_ap, i1_ao = torch.sort(x[..., 63:74], dim=-1)
+    i1_bp, i1_bo = torch.sort(x[..., 52:63], dim=-1, stable=True)
+    i1_ap, i1_ao = torch.sort(x[..., 63:74], dim=-1, stable=True)
     i1_bv = torch.gather(x[..., 74:85], -1, i1_bo)
     i1_av = torch.gather(x[..., 85:96], -1, i1_ao)
 

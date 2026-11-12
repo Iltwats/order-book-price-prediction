@@ -299,9 +299,51 @@ print(json.dumps({
         return json.loads(res.stdout.strip())
 
 
+def _export_rnn_weights(weights_dict: dict, prefix: str, state: dict, rnn_prefix: str, blend: float):
+    weights_dict[f"{prefix}in_mu"] = state["in_mu"].numpy().ravel().astype(np.float32)
+    weights_dict[f"{prefix}in_sd"] = state["in_sd"].numpy().ravel().astype(np.float32)
+    weights_dict[f"{prefix}stem_w"] = state["stem.0.weight"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}stem_b"] = state["stem.0.bias"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}w0"] = state[f"{rnn_prefix}0.weight_ih_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}r0"] = state[f"{rnn_prefix}0.weight_hh_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}bi0"] = state[f"{rnn_prefix}0.bias_ih_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}bh0"] = state[f"{rnn_prefix}0.bias_hh_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}w1"] = state[f"{rnn_prefix}1.weight_ih_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}r1"] = state[f"{rnn_prefix}1.weight_hh_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}bi1"] = state[f"{rnn_prefix}1.bias_ih_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}bh1"] = state[f"{rnn_prefix}1.bias_hh_l0"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}h1_w"] = state["head.0.weight"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}h1_b"] = state["head.0.bias"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}h2_w"] = state["head.2.weight"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}h2_b"] = state["head.2.bias"].numpy().astype(np.float32)
+    weights_dict[f"{prefix}blend"] = np.float32(blend)
+
+
+def _ensure_dev_predictions(run_dir: Path, dev_groups: list[int], targets: np.ndarray, scored: np.ndarray) -> np.ndarray:
+    """Load `dev_predictions.npy`, or generate & cache it automatically if only `final_checkpoint.pt` was copied back from GPU."""
+    pred_path = run_dir / "dev_predictions.npy"
+    if pred_path.exists():
+        return np.load(pred_path, mmap_mode="r")
+    from experiments.gpu_train_sorted_models import build_model, evaluate_model_gpu
+    ckpt = torch.load(run_dir / "final_checkpoint.pt", map_location="cpu", weights_only=False)
+    state = ckpt["model_state"]
+    arch = ckpt.get("arch", "slstm" if "lstm0.weight_ih_l0" in state else "sgru")
+    hidden = int(state["stem.0.weight"].shape[0])
+    print(f"Generating missing dev_predictions.npy for {run_dir} ({arch}, hidden={hidden})...", flush=True)
+    model = build_model(arch, hidden, torch.device("cpu"))
+    model.load_state_dict(state)
+    ev = evaluate_model_gpu(model, dev_groups, targets, scored, DEFAULT_VALID, torch.device("cpu"))
+    np.save(pred_path, ev["preds"])
+    np.save(run_dir / "dev_statistics.npy", ev["stats"])
+    return np.load(pred_path, mmap_mode="r")
+
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--sgru-dir", default="artifacts/experiments/track_c_scratch_sorted_gru_v3")
+    p.add_argument("--sgru-dir", nargs="*", default=["artifacts/experiments/track_c_scratch_sorted_gru_v3"],
+                   help="One or more ScratchSortedGRU run directories (e.g. generalist + large-tick specialist)")
+    p.add_argument("--slstm-dir", nargs="*", default=[],
+                   help="Zero or more ScratchSortedLSTM run directories")
     p.add_argument("--output-dir", default="artifacts/ensemble/corr1024_sgru_v3_snap40")
     p.add_argument("--zip-output", default="dist/submission_ensemble_sorted_gru_snap40.zip")
     p.add_argument("--threads", type=int, default=6)
@@ -309,7 +351,8 @@ def main():
 
     torch.set_num_threads(args.threads)
     t0 = time.time()
-    sgru_dir = Path(args.sgru_dir)
+    sgru_dirs = [Path(d) for d in args.sgru_dir]
+    slstm_dirs = [Path(d) for d in args.slstm_dir]
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -318,9 +361,16 @@ def main():
     p_inc, y, seq, classes = rows["p"], rows["y"], rows["seq"], rows["classes"]
     n_seq = len(classes)
 
+    manifest = json.loads(Path("artifacts/manifest.json").read_text())
+    dev_groups = manifest["splits"]["dev"]
     targets, scored = load_targets(load_predictions(DEFAULT_CACHE)[1], DEFAULT_VALID, store="artifacts/experiments/dev_targets.npz")
-    p_sg_full = np.load(sgru_dir / "dev_predictions.npy", mmap_mode="r")
-    p_sg = np.asarray(p_sg_full[scored], dtype=np.float32)
+
+    extra_full = []
+    for d in sgru_dirs:
+        extra_full.append(_ensure_dev_predictions(d, dev_groups, targets, scored))
+    for d in slstm_dirs:
+        extra_full.append(_ensure_dev_predictions(d, dev_groups, targets, scored))
+    extra_qs = [np.clip(np.asarray(pf[scored], dtype=np.float32), -2.0, 2.0) for pf in extra_full]
 
     x_cur = np.asarray(current, dtype=np.float32)
     snap34 = build_snap34_from_current(x_cur)
@@ -334,21 +384,35 @@ def main():
     ship_st = np.load("artifacts/experiments/output_calibration/sequence_statistics_clip2.npz")["mlp64_scored_30epochs_clip2__scored"]
 
     q_inc = np.clip(p_inc, -2.0, 2.0)
-    q_sg = np.clip(p_sg, -2.0, 2.0)
+    all_qs = [q_inc] + extra_qs
+    n_models = len(all_qs)
     fold = folds(n_seq)
 
-    print("Running 5-fold sequence-grouped OOF evaluation on all 1,400 dev sequences (2,612,518 scored rows)...", flush=True)
+    # Candidate blend weight vectors [w_inc, w_m1, w_m2, ...]
+    if n_models == 1:
+        weight_grid = [[1.0]]
+    elif n_models == 2:
+        weight_grid = [[1.0, 0.0], [0.85, 0.15], [0.80, 0.20], [0.65, 0.35], [0.50, 0.50]]
+    else:
+        weight_grid = [[1.0] + [0.0] * (n_models - 1)]
+        for w_tot in (0.30, 0.45, 0.60, 0.70):
+            each = w_tot / float(n_models - 1)
+            weight_grid.append([round(1.0 - w_tot, 4)] + [round(each, 4)] * (n_models - 1))
+
+    print(f"Running 5-fold sequence-grouped OOF evaluation across {n_models} models on 1,400 dev sequences...", flush=True)
     oof_results = {}
-    best_blend_w = 0.20
+    best_weights = weight_grid[-1]
     best_oof_wp = -1.0
     best_oof_st = None
 
-    for bw in (0.0, 0.15, 0.20):
-        base_q = np.clip((1.0 - bw) * q_inc + bw * q_sg, -2.0, 2.0).astype(np.float32)
+    for wvec in weight_grid:
+        tag = "_".join(f"{w:.2f}" for w in wvec)
+        base_q = np.clip(sum(w * q for w, q in zip(wvec, all_qs)), -2.0, 2.0).astype(np.float32)
         q_feats = np.column_stack([
             base_q, base_q[:, 0:1] - base_q[:, 1:2], base_q[:, 0:1] + base_q[:, 1:2], np.abs(base_q)
         ]).astype(np.float32)
-        z_all = np.hstack([q_feats, q_inc, q_sg, snap34] if bw > 0 else [q_feats, snap34]).astype(np.float32)
+        use_multi = (n_models > 1 and any(w > 0 for w in wvec[1:]))
+        z_all = np.hstack(([q_feats] + all_qs + [snap34]) if use_multi else [q_feats, snap34]).astype(np.float32)
 
         oof_pred = np.empty_like(p_inc)
         for k in range(5):
@@ -364,46 +428,43 @@ def main():
         vs_raw = paired_bootstrap(st, raw_st)
         vs_ship = paired_bootstrap(st, ship_st)
         by_c = {str(c): round(global_wp(st[classes == c]), 5) for c in np.unique(classes)}
-        oof_results[f"blend_{bw:.2f}"] = {
-            "blend_weight_sgru": bw,
+        oof_results[f"weights_{tag}"] = {
+            "blend_weights": wvec,
             "oof_wp": wp,
             "vs_raw": vs_raw,
             "vs_shipped": vs_ship,
             "by_class": by_c,
         }
-        print(f"  blend_w={bw:.2f}: OOF WP={wp:.5f} | vs_raw={vs_raw['delta']:+.5f} | "
+        print(f"  weights={wvec}: OOF WP={wp:.5f} | vs_raw={vs_raw['delta']:+.5f} | "
               f"vs_shipped={vs_ship['delta']:+.5f} [{vs_ship['ci_low']:+.5f}, {vs_ship['ci_high']:+.5f}] | {by_c}", flush=True)
-        if bw > 0 and wp > best_oof_wp:
+        if (n_models == 1 or use_multi) and wp > best_oof_wp:
             best_oof_wp = wp
-            best_blend_w = bw
+            best_weights = wvec
             best_oof_st = st
 
-    print(f"Selected ensemble blend weight: {best_blend_w:.2f} (OOF Dev WP = {best_oof_wp:.5f})", flush=True)
+    print(f"Selected ensemble blend weights: {best_weights} (OOF Dev WP = {best_oof_wp:.5f})", flush=True)
 
-    # Fit final 5-seed calibrator on 100% of the 1,400 dev sequences using the exact validated 10-epoch cosine recipe!
-    base_q_final = np.clip((1.0 - best_blend_w) * q_inc + best_blend_w * q_sg, -2.0, 2.0).astype(np.float32)
+    base_q_final = np.clip(sum(w * q for w, q in zip(best_weights, all_qs)), -2.0, 2.0).astype(np.float32)
     q_feats_final = np.column_stack([
         base_q_final,
         base_q_final[:, 0:1] - base_q_final[:, 1:2],
         base_q_final[:, 0:1] + base_q_final[:, 1:2],
         np.abs(base_q_final),
     ]).astype(np.float32)
-    z_final = np.hstack([q_feats_final, q_inc, q_sg, snap34]).astype(np.float32)
+    z_final = np.hstack(([q_feats_final] + all_qs + [snap34]) if n_models > 1 else [q_feats_final, snap34]).astype(np.float32)
     final_params = fit_meta_calibrator_ensemble(
         z_final, base_q_final, y, np.ones(len(z_final), dtype=bool),
         hidden=128, n_seeds=5, epochs=10, seed_base=9000
     )
-    cal_mu = final_params["mu"]
-    cal_sd = final_params["sd"]
+    cal_mu, cal_sd = final_params["mu"], final_params["sd"]
     w1s, b1s, w2s, b2s = final_params["w1"], final_params["b1"], final_params["w2"], final_params["b2"]
 
-    # Assemble `ensemble_weights.npz` for `CompiledEnsembleBackend`
     w_inc = load_weights("artifacts/round2/correlation_gru1024_seed20260912/model.onnx")
-    sg_ckpt = torch.load(sgru_dir / "final_checkpoint.pt", map_location="cpu", weights_only=False)["model_state"]
-
     weights_dict = {
         "n_onnx_gru": np.int32(1),
-        "has_sorted_gru": np.int32(1),
+        "has_sorted_gru": np.int32(1 if len(sgru_dirs) > 0 else 0),
+        "n_sorted_gru": np.int32(len(sgru_dirs)),
+        "n_sorted_lstm": np.int32(len(slstm_dirs)),
         "has_tcn80": np.int32(0),
         "onnx_0_w0": w_inc["w0"].astype(np.float32),
         "onnx_0_r0": w_inc["r0"].astype(np.float32),
@@ -413,24 +474,7 @@ def main():
         "onnx_0_b1": w_inc["b1"].astype(np.float32),
         "onnx_0_hw": w_inc["head_w"].astype(np.float32),
         "onnx_0_hb": w_inc["head_b"].astype(np.float32),
-        "onnx_0_blend": np.float32(1.0 - best_blend_w),
-        "sgru_in_mu": sg_ckpt["in_mu"].numpy().ravel().astype(np.float32),
-        "sgru_in_sd": sg_ckpt["in_sd"].numpy().ravel().astype(np.float32),
-        "sgru_stem_w": sg_ckpt["stem.0.weight"].numpy().astype(np.float32),
-        "sgru_stem_b": sg_ckpt["stem.0.bias"].numpy().astype(np.float32),
-        "sgru_w0": sg_ckpt["gru0.weight_ih_l0"].numpy().astype(np.float32),
-        "sgru_r0": sg_ckpt["gru0.weight_hh_l0"].numpy().astype(np.float32),
-        "sgru_bi0": sg_ckpt["gru0.bias_ih_l0"].numpy().astype(np.float32),
-        "sgru_bh0": sg_ckpt["gru0.bias_hh_l0"].numpy().astype(np.float32),
-        "sgru_w1": sg_ckpt["gru1.weight_ih_l0"].numpy().astype(np.float32),
-        "sgru_r1": sg_ckpt["gru1.weight_hh_l0"].numpy().astype(np.float32),
-        "sgru_bi1": sg_ckpt["gru1.bias_ih_l0"].numpy().astype(np.float32),
-        "sgru_bh1": sg_ckpt["gru1.bias_hh_l0"].numpy().astype(np.float32),
-        "sgru_h1_w": sg_ckpt["head.0.weight"].numpy().astype(np.float32),
-        "sgru_h1_b": sg_ckpt["head.0.bias"].numpy().astype(np.float32),
-        "sgru_h2_w": sg_ckpt["head.2.weight"].numpy().astype(np.float32),
-        "sgru_h2_b": sg_ckpt["head.2.bias"].numpy().astype(np.float32),
-        "sgru_blend": np.float32(best_blend_w),
+        "onnx_0_blend": np.float32(best_weights[0]),
         "cal_in_dim": np.int32(z_final.shape[1]),
         "cal_hidden": np.int32(128),
         "cal_seeds": np.int32(len(w1s)),
@@ -441,12 +485,21 @@ def main():
         "cal_w2": w2s,
         "cal_b2": b2s,
     }
+    w_cursor = 1
+    for idx, d in enumerate(sgru_dirs):
+        st_d = torch.load(d / "final_checkpoint.pt", map_location="cpu", weights_only=False)["model_state"]
+        _export_rnn_weights(weights_dict, f"sgru_{idx}_", st_d, "gru", best_weights[w_cursor])
+        if idx == 0:
+            _export_rnn_weights(weights_dict, "sgru_", st_d, "gru", best_weights[w_cursor])
+        w_cursor += 1
+    for idx, d in enumerate(slstm_dirs):
+        st_d = torch.load(d / "final_checkpoint.pt", map_location="cpu", weights_only=False)["model_state"]
+        _export_rnn_weights(weights_dict, f"slstm_{idx}_", st_d, "lstm", best_weights[w_cursor])
+        w_cursor += 1
+
     weights_npz = out_dir / "ensemble_weights.npz"
     np.savez_compressed(weights_npz, **weights_dict)
 
-    # Exact parity check on smoke dev sequences: C++ streaming callback vs Python reference!
-    manifest = json.loads(Path("artifacts/manifest.json").read_text())
-    dev_groups = manifest["splits"]["dev"]
     smoke_groups = manifest["splits"]["smoke"][:4]
     pf = pq.ParquetFile(DEFAULT_VALID)
     backend = CompiledEnsembleBackend("native/ensemble_engine.cpp", weights_npz)
@@ -471,12 +524,13 @@ def main():
             if st_idx >= WARMUP:
                 c_preds[st_idx - WARMUP] = r
 
-        qi = np.clip(np.asarray(inc_full[di, WARMUP:], np.float32), -2.0, 2.0)
-        qs = np.clip(np.asarray(p_sg_full[di, WARMUP:], np.float32), -2.0, 2.0)
-        bq = np.clip((1.0 - best_blend_w) * qi + best_blend_w * qs, -2.0, 2.0)
+        seq_qs = [np.clip(np.asarray(inc_full[di, WARMUP:], np.float32), -2.0, 2.0)] + [
+            np.clip(np.asarray(ef[di, WARMUP:], np.float32), -2.0, 2.0) for ef in extra_full
+        ]
+        bq = np.clip(sum(w * q for w, q in zip(best_weights, seq_qs)), -2.0, 2.0).astype(np.float32)
         qf_s = np.column_stack([bq, bq[:, 0:1] - bq[:, 1:2], bq[:, 0:1] + bq[:, 1:2], np.abs(bq)]).astype(np.float32)
         s34_s = build_snap34_from_current(x_seq[WARMUP:])
-        z_s = np.hstack([qf_s, qi, qs, s34_s]).astype(np.float32)
+        z_s = np.hstack(([qf_s] + seq_qs + [s34_s]) if n_models > 1 else [qf_s, s34_s]).astype(np.float32)
         ref_preds = apply_meta_calibrator(cal_params_ref, z_s, bq)
         max_err = max(max_err, float(np.abs(c_preds - ref_preds).max()))
 
@@ -488,7 +542,7 @@ def main():
     iso_check = verify_isolated_zip(Path(args.zip_output))
     pkg_report["isolated_verification"] = iso_check
     pkg_report["parity_max_abs_error_80k_rows"] = max_err
-    pkg_report["selected_blend_weight"] = best_blend_w
+    pkg_report["selected_blend_weights"] = best_weights
     pkg_report["oof_results"] = oof_results
     pkg_report["elapsed_seconds"] = round(time.time() - t0, 1)
 

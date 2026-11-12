@@ -96,6 +96,78 @@ def test_compiled_matches_python_fallback_and_resets_cleanly(dummy_weights):
     assert np.array_equal(np.stack(out_a1_cpp), np.stack(out_a2_cpp))
 
 
+def test_v2_variable_hidden_sgru_and_slstm_match_pytorch_and_fallback(tmp_path):
+    import torch
+    from experiments.gpu_train_sorted_models import ScratchSortedLSTM
+    from experiments.train_scratch_gru import ScratchSortedGRU
+    from experiments.train_scratch_tcn import build_lob_engineered_features_torch
+
+    torch.manual_seed(42)
+    sgru = ScratchSortedGRU(hidden=160).eval()
+    slstm = ScratchSortedLSTM(hidden=144).eval()
+    rng = np.random.default_rng(4242)
+    sgru.in_mu.copy_(torch.from_numpy(rng.normal(0, 0.1, (1, 1, 169)).astype(np.float32)))
+    sgru.in_sd.copy_(torch.from_numpy(rng.uniform(0.6, 1.4, (1, 1, 169)).astype(np.float32)))
+    slstm.in_mu.copy_(torch.from_numpy(rng.normal(0, 0.1, (1, 1, 169)).astype(np.float32)))
+    slstm.in_sd.copy_(torch.from_numpy(rng.uniform(0.6, 1.4, (1, 1, 169)).astype(np.float32)))
+
+    def _pack(d, prefix, state, rnn_name, blend):
+        d[f"{prefix}in_mu"] = state["in_mu"].numpy().ravel().astype(np.float32)
+        d[f"{prefix}in_sd"] = state["in_sd"].numpy().ravel().astype(np.float32)
+        d[f"{prefix}stem_w"] = state["stem.0.weight"].numpy().astype(np.float32)
+        d[f"{prefix}stem_b"] = state["stem.0.bias"].numpy().astype(np.float32)
+        d[f"{prefix}w0"] = state[f"{rnn_name}0.weight_ih_l0"].numpy().astype(np.float32)
+        d[f"{prefix}r0"] = state[f"{rnn_name}0.weight_hh_l0"].numpy().astype(np.float32)
+        d[f"{prefix}bi0"] = state[f"{rnn_name}0.bias_ih_l0"].numpy().astype(np.float32)
+        d[f"{prefix}bh0"] = state[f"{rnn_name}0.bias_hh_l0"].numpy().astype(np.float32)
+        d[f"{prefix}w1"] = state[f"{rnn_name}1.weight_ih_l0"].numpy().astype(np.float32)
+        d[f"{prefix}r1"] = state[f"{rnn_name}1.weight_hh_l0"].numpy().astype(np.float32)
+        d[f"{prefix}bi1"] = state[f"{rnn_name}1.bias_ih_l0"].numpy().astype(np.float32)
+        d[f"{prefix}bh1"] = state[f"{rnn_name}1.bias_hh_l0"].numpy().astype(np.float32)
+        d[f"{prefix}h1_w"] = state["head.0.weight"].numpy().astype(np.float32)
+        d[f"{prefix}h1_b"] = state["head.0.bias"].numpy().astype(np.float32)
+        d[f"{prefix}h2_w"] = state["head.2.weight"].numpy().astype(np.float32)
+        d[f"{prefix}h2_b"] = state["head.2.bias"].numpy().astype(np.float32)
+        d[f"{prefix}blend"] = np.float32(blend)
+
+    payload = {
+        "n_onnx_gru": np.int32(0),
+        "has_sorted_gru": np.int32(1),
+        "n_sorted_gru": np.int32(1),
+        "n_sorted_lstm": np.int32(1),
+        "has_tcn80": np.int32(0),
+        "cal_seeds": np.int32(0),
+    }
+    _pack(payload, "sgru_0_", sgru.state_dict(), "gru", 0.55)
+    _pack(payload, "slstm_0_", slstm.state_dict(), "lstm", 0.45)
+    npz_path = tmp_path / "v2_weights.npz"
+    np.savez_compressed(npz_path, **payload)
+
+    cpp_b = CompiledEnsembleBackend(CPP_SOURCE, npz_path)
+    py_b = FallbackPythonEnsembleBackend(npz_path)
+
+    seq = rng.normal(0, 0.5, (115, 112)).astype(np.float32)
+    with torch.no_grad():
+        feat_btf = build_lob_engineered_features_torch(torch.from_numpy(seq[None])).transpose(1, 2).contiguous()
+        pg, _, _ = sgru.forward_features(feat_btf, *sgru.initial_states(1))
+        pl, _, _ = slstm.forward_features(feat_btf, *slstm.initial_states(1))
+        expected = np.clip(0.55 * np.clip(pg[0, 99:].numpy(), -2, 2) + 0.45 * np.clip(pl[0, 99:].numpy(), -2, 2), -2, 2)
+
+    cpp_outs, py_outs = [], []
+    for st in range(115):
+        dp = SimpleNamespace(seq_ix=1, step_in_seq=st, need_prediction=(st >= 99), state=seq[st])
+        rc = cpp_b.predict(dp)
+        rp = py_b.predict(dp)
+        if st >= 99:
+            cpp_outs.append(rc)
+            py_outs.append(rp)
+
+    cpp_arr = np.stack(cpp_outs)
+    py_arr = np.stack(py_outs)
+    assert np.allclose(cpp_arr, expected, atol=3e-6, rtol=1e-5)
+    assert np.allclose(cpp_arr, py_arr, atol=3e-6, rtol=1e-5)
+
+
 def test_rejects_nonfinite_inputs_and_fallback_works_when_source_missing(dummy_weights, tmp_path):
     pred = load_ensemble_predictor(tmp_path / "nonexistent.cpp", dummy_weights)
     assert isinstance(pred, FallbackPythonEnsembleBackend)
