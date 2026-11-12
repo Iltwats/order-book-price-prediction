@@ -76,7 +76,10 @@ class CompiledEnsembleBackend:
         self._ctx = ctx
 
         def c_arr(key: str) -> np.ndarray:
-            return np.ascontiguousarray(data[key], dtype=np.float32)
+            arr = data[key]
+            if arr.dtype != np.float32:
+                arr = arr.astype(np.float32)
+            return np.ascontiguousarray(arr, dtype=np.float32)
 
         for idx in range(n_onnx):
             arrs = [c_arr(f"onnx_{idx}_{k}") for k in ("w0", "r0", "b0", "w1", "r1", "b1", "hw", "hb")]
@@ -117,6 +120,9 @@ class CompiledEnsembleBackend:
 
         self._step_fn = lib.ens_step
         self._reset_fn = lib.ens_reset
+        self._out_buf = np.empty(2, dtype=np.float32)
+        self._out_ptr = self._out_buf.ctypes.data
+        self._f32_dtype = np.dtype(np.float32)
         self.sequence = None
         self.previous_step = None
 
@@ -139,15 +145,18 @@ class CompiledEnsembleBackend:
             self.previous_step = None
         if self.previous_step is not None and step != self.previous_step + 1:
             raise ValueError("rows must arrive in sequence order")
-        features = np.ascontiguousarray(data_point.state, dtype=np.float32)
-        if features.shape != (112,):
-            raise ValueError("expected 112 input features")
-        out = np.empty(2, dtype=np.float32)
-        rc = self._step_fn(self._ctx, features.ctypes.data, 1 if need else 0, out.ctypes.data)
+        st = data_point.state
+        if type(st) is np.ndarray and st.dtype == self._f32_dtype and st.shape == (112,) and st.flags.c_contiguous:
+            features = st
+        else:
+            features = np.ascontiguousarray(st, dtype=np.float32)
+            if features.shape != (112,):
+                raise ValueError("expected 112 input features")
+        rc = self._step_fn(self._ctx, features.ctypes.data, 1 if need else 0, self._out_ptr)
         if rc != 0:
             raise ValueError(f"nonfinite input or prediction in C++ ensemble engine (code {rc})")
         self.previous_step = step
-        return out if need else None
+        return self._out_buf.copy() if need else None
 
     def close(self):
         if self._ctx is not None and self._lib is not None:

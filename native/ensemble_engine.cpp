@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <memory>
 
@@ -20,14 +21,400 @@
 
 namespace {
 
+struct AlignedDeleter {
+    void operator()(void* p) const noexcept { std::free(p); }
+};
+using AlignedFloats = std::unique_ptr<float[], AlignedDeleter>;
+using AlignedU16    = std::unique_ptr<uint16_t[], AlignedDeleter>;
+
+static inline AlignedFloats alloc_aligned_floats(std::size_t n) {
+    std::size_t bytes = ((n * sizeof(float) + 63) / 64) * 64;
+    if (bytes == 0) bytes = 64;
+    void* ptr = nullptr;
+    if (posix_memalign(&ptr, 64, bytes) != 0 || !ptr) return AlignedFloats(nullptr);
+    std::memset(ptr, 0, bytes);
+    return AlignedFloats(static_cast<float*>(ptr));
+}
+
+static inline AlignedU16 alloc_aligned_u16(std::size_t n) {
+    std::size_t bytes = ((n * sizeof(uint16_t) + 63) / 64) * 64;
+    if (bytes == 0) bytes = 64;
+    void* ptr = nullptr;
+    if (posix_memalign(&ptr, 64, bytes) != 0 || !ptr) return AlignedU16(nullptr);
+    std::memset(ptr, 0, bytes);
+    return AlignedU16(static_cast<uint16_t*>(ptr));
+}
+
+// IEEE-754 FP32 <-> FP16 conversion (exact hardware instructions when F16C/NEON present, portable fallback otherwise)
+static inline uint16_t f32_to_f16_bits(float f) {
+#if defined(__ARM_NEON)
+    __fp16 h = static_cast<__fp16>(f);
+    uint16_t u;
+    std::memcpy(&u, &h, 2);
+    return u;
+#elif defined(__F16C__)
+    return static_cast<uint16_t>(_mm_cvtsi128_si32(_mm_cvtps_ph(_mm_set_ss(f), 0)));
+#else
+    uint32_t x;
+    std::memcpy(&x, &f, 4);
+    uint32_t sign = (x >> 16) & 0x8000u;
+    int32_t exp = static_cast<int32_t>((x >> 23) & 0xffu) - 127 + 15;
+    uint32_t mant = x & 0x7fffffu;
+    if (exp <= 0) return static_cast<uint16_t>(sign);
+    if (exp >= 31) return static_cast<uint16_t>(sign | 0x7c00u);
+    return static_cast<uint16_t>(sign | (static_cast<uint32_t>(exp) << 10) | ((mant + 0x1000u) >> 13));
+#endif
+}
+
+static inline float f16_bits_to_f32(uint16_t u) {
+#if defined(__ARM_NEON)
+    __fp16 h;
+    std::memcpy(&h, &u, 2);
+    return static_cast<float>(h);
+#elif defined(__F16C__)
+    return _mm_cvtss_f32(_mm_cvtph_ps(_mm_cvtsi32_si128(static_cast<int>(u))));
+#else
+    uint32_t sign = static_cast<uint32_t>(u & 0x8000u) << 16;
+    uint32_t exp = (u >> 10) & 0x1fu;
+    uint32_t mant = u & 0x3ffu;
+    uint32_t out = (exp == 0) ? sign : (sign | ((exp + 112u) << 23) | (mant << 13));
+    float f;
+    std::memcpy(&f, &out, 4);
+    return f;
+#endif
+}
+
+static inline void pack_matrix_f16_panels(const float* src_mn, int N, int M, uint16_t* dst_pack) {
+#if defined(__AVX2__) && defined(__FMA__) && defined(__F16C__)
+    int j = 0;
+    uint16_t* out = dst_pack;
+    for (; j + 63 < M; j += 64) {
+        for (int i = 0; i < N; ++i) {
+            for (int k = 0; k < 64; ++k) *out++ = f32_to_f16_bits(src_mn[(j + k) * N + i]);
+        }
+    }
+    for (; j + 31 < M; j += 32) {
+        for (int i = 0; i < N; ++i) {
+            for (int k = 0; k < 32; ++k) *out++ = f32_to_f16_bits(src_mn[(j + k) * N + i]);
+        }
+    }
+    for (; j < M; ++j) {
+        for (int i = 0; i < N; ++i) *out++ = f32_to_f16_bits(src_mn[j * N + i]);
+    }
+#else
+    int j = 0;
+    uint16_t* out = dst_pack;
+    for (; j + 31 < M; j += 32) {
+        for (int i = 0; i < N; ++i) {
+            for (int k = 0; k < 32; ++k) *out++ = f32_to_f16_bits(src_mn[(j + k) * N + i]);
+        }
+    }
+    for (; j < M; ++j) {
+        for (int i = 0; i < N; ++i) *out++ = f32_to_f16_bits(src_mn[j * N + i]);
+    }
+#endif
+}
+
+static inline void gemv_f16_packed_add(const uint16_t* __restrict A_pack, const float* __restrict x,
+                                       int N, int M, float* __restrict y) {
+#if defined(__ARM_NEON)
+    const __fp16* p = reinterpret_cast<const __fp16*>(A_pack);
+    int j = 0;
+    for (; j + 31 < M; j += 32) {
+        float32x4_t a0 = vld1q_f32(y + j + 0),  a1 = vld1q_f32(y + j + 4);
+        float32x4_t a2 = vld1q_f32(y + j + 8),  a3 = vld1q_f32(y + j + 12);
+        float32x4_t a4 = vld1q_f32(y + j + 16), a5 = vld1q_f32(y + j + 20);
+        float32x4_t a6 = vld1q_f32(y + j + 24), a7 = vld1q_f32(y + j + 28);
+        for (int i = 0; i < N; ++i, p += 32) {
+            float32x4_t vx = vdupq_n_f32(x[i]);
+            float16x8_t h01 = vld1q_f16(p + 0);
+            float16x8_t h23 = vld1q_f16(p + 8);
+            float16x8_t h45 = vld1q_f16(p + 16);
+            float16x8_t h67 = vld1q_f16(p + 24);
+            a0 = vfmaq_f32(a0, vcvt_f32_f16(vget_low_f16(h01)),  vx);
+            a1 = vfmaq_f32(a1, vcvt_f32_f16(vget_high_f16(h01)), vx);
+            a2 = vfmaq_f32(a2, vcvt_f32_f16(vget_low_f16(h23)),  vx);
+            a3 = vfmaq_f32(a3, vcvt_f32_f16(vget_high_f16(h23)), vx);
+            a4 = vfmaq_f32(a4, vcvt_f32_f16(vget_low_f16(h45)),  vx);
+            a5 = vfmaq_f32(a5, vcvt_f32_f16(vget_high_f16(h45)), vx);
+            a6 = vfmaq_f32(a6, vcvt_f32_f16(vget_low_f16(h67)),  vx);
+            a7 = vfmaq_f32(a7, vcvt_f32_f16(vget_high_f16(h67)), vx);
+        }
+        vst1q_f32(y + j + 0, a0);  vst1q_f32(y + j + 4, a1);
+        vst1q_f32(y + j + 8, a2);  vst1q_f32(y + j + 12, a3);
+        vst1q_f32(y + j + 16, a4); vst1q_f32(y + j + 20, a5);
+        vst1q_f32(y + j + 24, a6); vst1q_f32(y + j + 28, a7);
+    }
+    const uint16_t* pu = reinterpret_cast<const uint16_t*>(p);
+    for (; j < M; ++j) {
+        float sum = y[j];
+        for (int i = 0; i < N; ++i) sum += f16_bits_to_f32(*pu++) * x[i];
+        y[j] = sum;
+    }
+#elif defined(__AVX2__) && defined(__FMA__) && defined(__F16C__)
+    const uint16_t* p = A_pack;
+    int j = 0;
+    for (; j + 63 < M; j += 64) {
+        __m256 a0 = _mm256_loadu_ps(y + j + 0),  a1 = _mm256_loadu_ps(y + j + 8);
+        __m256 a2 = _mm256_loadu_ps(y + j + 16), a3 = _mm256_loadu_ps(y + j + 24);
+        __m256 a4 = _mm256_loadu_ps(y + j + 32), a5 = _mm256_loadu_ps(y + j + 40);
+        __m256 a6 = _mm256_loadu_ps(y + j + 48), a7 = _mm256_loadu_ps(y + j + 56);
+        for (int i = 0; i < N; ++i, p += 64) {
+            __m256 vx = _mm256_set1_ps(x[i]);
+            a0 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 0))),  vx, a0);
+            a1 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 8))),  vx, a1);
+            a2 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 16))), vx, a2);
+            a3 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 24))), vx, a3);
+            a4 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 32))), vx, a4);
+            a5 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 40))), vx, a5);
+            a6 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 48))), vx, a6);
+            a7 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 56))), vx, a7);
+        }
+        _mm256_storeu_ps(y + j + 0, a0);  _mm256_storeu_ps(y + j + 8, a1);
+        _mm256_storeu_ps(y + j + 16, a2); _mm256_storeu_ps(y + j + 24, a3);
+        _mm256_storeu_ps(y + j + 32, a4); _mm256_storeu_ps(y + j + 40, a5);
+        _mm256_storeu_ps(y + j + 48, a6); _mm256_storeu_ps(y + j + 56, a7);
+    }
+    for (; j + 31 < M; j += 32) {
+        __m256 a0 = _mm256_loadu_ps(y + j + 0),  a1 = _mm256_loadu_ps(y + j + 8);
+        __m256 a2 = _mm256_loadu_ps(y + j + 16), a3 = _mm256_loadu_ps(y + j + 24);
+        for (int i = 0; i < N; ++i, p += 32) {
+            __m256 vx = _mm256_set1_ps(x[i]);
+            a0 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 0))),  vx, a0);
+            a1 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 8))),  vx, a1);
+            a2 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 16))), vx, a2);
+            a3 = _mm256_fmadd_ps(_mm256_cvtph_ps(_mm_loadu_si128(reinterpret_cast<const __m128i*>(p + 24))), vx, a3);
+        }
+        _mm256_storeu_ps(y + j + 0, a0);  _mm256_storeu_ps(y + j + 8, a1);
+        _mm256_storeu_ps(y + j + 16, a2); _mm256_storeu_ps(y + j + 24, a3);
+    }
+    for (; j < M; ++j) {
+        float sum = y[j];
+        for (int i = 0; i < N; ++i) sum += f16_bits_to_f32(*p++) * x[i];
+        y[j] = sum;
+    }
+#else
+    const uint16_t* p = A_pack;
+    int j = 0;
+    for (; j + 31 < M; j += 32) {
+        for (int i = 0; i < N; ++i, p += 32) {
+            float xi = x[i];
+            for (int k = 0; k < 32; ++k) y[j + k] += f16_bits_to_f32(p[k]) * xi;
+        }
+    }
+    for (; j < M; ++j) {
+        float sum = y[j];
+        for (int i = 0; i < N; ++i) sum += f16_bits_to_f32(*p++) * x[i];
+        y[j] = sum;
+    }
+#endif
+}
+
+static inline void gemv_f16_packed_set(const uint16_t* __restrict A_pack, const float* __restrict x,
+                                       int N, int M, const float* __restrict bias, float* __restrict y) {
+    if (bias) std::memcpy(y, bias, M * sizeof(float));
+    else std::memset(y, 0, M * sizeof(float));
+    gemv_f16_packed_add(A_pack, x, N, M, y);
+}
+
+// Branchless Cody-Waite minimax expf (max abs error <= 1.2e-7 on sigmoid/tanh, auto-vectorizes cleanly in AVX2/NEON!)
+static inline float fast_expf(float x) {
+    x = x < -87.3f ? -87.3f : (x > 88.0f ? 88.0f : x);
+    float z = x * 1.4426950408889634f;
+    float bias = z >= 0.0f ? 0.5f : -0.5f;
+    int32_t ni = static_cast<int32_t>(z + bias);
+    float n = static_cast<float>(ni);
+    float r = (x - n * 0.693145751953125f) - n * 1.428606765330187e-6f;
+    float p = (((((1.9875691500e-4f * r + 1.3981999507e-3f) * r + 8.3334519073e-3f) * r
+                 + 4.1665795894e-2f) * r + 1.6666665459e-1f) * r + 5.0000001201e-1f) * (r * r) + r + 1.0f;
+    uint32_t bits = static_cast<uint32_t>(ni + 127) << 23;
+    float scale;
+    std::memcpy(&scale, &bits, sizeof(float));
+    return p * scale;
+}
+
 static inline float fast_sigmoid(float x) {
-    if (x >= 0.0f) return 1.0f / (1.0f + std::exp(-x));
-    float e = std::exp(x);
-    return e / (1.0f + e);
+    return 1.0f / (1.0f + fast_expf(-x));
+}
+
+static inline float fast_tanh(float x) {
+    float ax = x >= 0.0f ? x : -x;
+    float e2 = fast_expf(-2.0f * ax);
+    float t = (1.0f - e2) / (1.0f + e2);
+    return x >= 0.0f ? t : -t;
 }
 
 static inline float exact_gelu(float x) {
-    return 0.5f * x * (1.0f + std::erf(x * 0.7071067811865475f));
+    float z = x * 0.7071067811865475f;
+    float az = z >= 0.0f ? z : -z;
+    float t = 1.0f / (1.0f + 0.3275911f * az);
+    float poly = (((((1.061405429f * t - 1.453152027f) * t) + 1.421413741f) * t - 0.284496736f) * t + 0.254829592f) * t;
+    float y = 1.0f - poly * fast_expf(-az * az);
+    float erf_z = z >= 0.0f ? y : -y;
+    return 0.5f * x * (1.0f + erf_z);
+}
+
+// Panel-packed stride-1 GEMV for M % 32 == 0:
+// Packs A [M, N] (PyTorch row-major [out_features=M, in_features=N]) into sequential
+// panels of width 64 (on AVX2) or 32 (on NEON/portable), so every single load in the
+// inner loop is contiguous stride-1 (`p += 32` / `p += 64`), completely eliminating
+// strided cache-set & TLB thrashing!
+static inline void pack_matrix_panels(const float* src_mn, int N, int M, float* dst_pack) {
+#if defined(__AVX2__) && defined(__FMA__)
+    int j = 0;
+    float* out = dst_pack;
+    for (; j + 63 < M; j += 64) {
+        for (int i = 0; i < N; ++i) {
+            for (int k = 0; k < 64; ++k) *out++ = src_mn[(j + k) * N + i];
+        }
+    }
+    for (; j + 31 < M; j += 32) {
+        for (int i = 0; i < N; ++i) {
+            for (int k = 0; k < 32; ++k) *out++ = src_mn[(j + k) * N + i];
+        }
+    }
+    for (; j < M; ++j) {
+        for (int i = 0; i < N; ++i) *out++ = src_mn[j * N + i];
+    }
+#else
+    int j = 0;
+    float* out = dst_pack;
+    for (; j + 31 < M; j += 32) {
+        for (int i = 0; i < N; ++i) {
+            for (int k = 0; k < 32; ++k) *out++ = src_mn[(j + k) * N + i];
+        }
+    }
+    for (; j < M; ++j) {
+        for (int i = 0; i < N; ++i) *out++ = src_mn[j * N + i];
+    }
+#endif
+}
+
+static inline void gemv_packed_add(const float* __restrict A_pack, const float* __restrict x,
+                                   int N, int M, float* __restrict y) {
+#if defined(__ARM_NEON)
+    const float* p = A_pack;
+    int j = 0;
+    for (; j + 31 < M; j += 32) {
+        float32x4_t a0 = vld1q_f32(y + j + 0),  a1 = vld1q_f32(y + j + 4);
+        float32x4_t a2 = vld1q_f32(y + j + 8),  a3 = vld1q_f32(y + j + 12);
+        float32x4_t a4 = vld1q_f32(y + j + 16), a5 = vld1q_f32(y + j + 20);
+        float32x4_t a6 = vld1q_f32(y + j + 24), a7 = vld1q_f32(y + j + 28);
+        int i = 0;
+        for (; i + 1 < N; i += 2, p += 64) {
+            float32x4_t vx0 = vdupq_n_f32(x[i]);
+            a0 = vfmaq_f32(a0, vld1q_f32(p + 0),  vx0); a1 = vfmaq_f32(a1, vld1q_f32(p + 4),  vx0);
+            a2 = vfmaq_f32(a2, vld1q_f32(p + 8),  vx0); a3 = vfmaq_f32(a3, vld1q_f32(p + 12), vx0);
+            a4 = vfmaq_f32(a4, vld1q_f32(p + 16), vx0); a5 = vfmaq_f32(a5, vld1q_f32(p + 20), vx0);
+            a6 = vfmaq_f32(a6, vld1q_f32(p + 24), vx0); a7 = vfmaq_f32(a7, vld1q_f32(p + 28), vx0);
+            float32x4_t vx1 = vdupq_n_f32(x[i + 1]);
+            a0 = vfmaq_f32(a0, vld1q_f32(p + 32), vx1); a1 = vfmaq_f32(a1, vld1q_f32(p + 36), vx1);
+            a2 = vfmaq_f32(a2, vld1q_f32(p + 40), vx1); a3 = vfmaq_f32(a3, vld1q_f32(p + 44), vx1);
+            a4 = vfmaq_f32(a4, vld1q_f32(p + 48), vx1); a5 = vfmaq_f32(a5, vld1q_f32(p + 52), vx1);
+            a6 = vfmaq_f32(a6, vld1q_f32(p + 56), vx1); a7 = vfmaq_f32(a7, vld1q_f32(p + 60), vx1);
+        }
+        for (; i < N; ++i, p += 32) {
+            float32x4_t vx0 = vdupq_n_f32(x[i]);
+            a0 = vfmaq_f32(a0, vld1q_f32(p + 0),  vx0); a1 = vfmaq_f32(a1, vld1q_f32(p + 4),  vx0);
+            a2 = vfmaq_f32(a2, vld1q_f32(p + 8),  vx0); a3 = vfmaq_f32(a3, vld1q_f32(p + 12), vx0);
+            a4 = vfmaq_f32(a4, vld1q_f32(p + 16), vx0); a5 = vfmaq_f32(a5, vld1q_f32(p + 20), vx0);
+            a6 = vfmaq_f32(a6, vld1q_f32(p + 24), vx0); a7 = vfmaq_f32(a7, vld1q_f32(p + 28), vx0);
+        }
+        vst1q_f32(y + j + 0, a0);  vst1q_f32(y + j + 4, a1);
+        vst1q_f32(y + j + 8, a2);  vst1q_f32(y + j + 12, a3);
+        vst1q_f32(y + j + 16, a4); vst1q_f32(y + j + 20, a5);
+        vst1q_f32(y + j + 24, a6); vst1q_f32(y + j + 28, a7);
+    }
+    for (; j < M; ++j) {
+        float sum = y[j];
+        for (int i = 0; i < N; ++i) sum += (*p++) * x[i];
+        y[j] = sum;
+    }
+#elif defined(__AVX2__) && defined(__FMA__)
+    const float* p = A_pack;
+    int j = 0;
+    for (; j + 63 < M; j += 64) {
+        __m256 a0 = _mm256_loadu_ps(y + j + 0),  a1 = _mm256_loadu_ps(y + j + 8);
+        __m256 a2 = _mm256_loadu_ps(y + j + 16), a3 = _mm256_loadu_ps(y + j + 24);
+        __m256 a4 = _mm256_loadu_ps(y + j + 32), a5 = _mm256_loadu_ps(y + j + 40);
+        __m256 a6 = _mm256_loadu_ps(y + j + 48), a7 = _mm256_loadu_ps(y + j + 56);
+        int i = 0;
+        for (; i + 1 < N; i += 2, p += 128) {
+            __m256 vx0 = _mm256_set1_ps(x[i]);
+            a0 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 0),   vx0, a0);
+            a1 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 8),   vx0, a1);
+            a2 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 16),  vx0, a2);
+            a3 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 24),  vx0, a3);
+            a4 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 32),  vx0, a4);
+            a5 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 40),  vx0, a5);
+            a6 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 48),  vx0, a6);
+            a7 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 56),  vx0, a7);
+            __m256 vx1 = _mm256_set1_ps(x[i + 1]);
+            a0 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 64),  vx1, a0);
+            a1 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 72),  vx1, a1);
+            a2 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 80),  vx1, a2);
+            a3 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 88),  vx1, a3);
+            a4 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 96),  vx1, a4);
+            a5 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 104), vx1, a5);
+            a6 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 112), vx1, a6);
+            a7 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 120), vx1, a7);
+        }
+        for (; i < N; ++i, p += 64) {
+            __m256 vx0 = _mm256_set1_ps(x[i]);
+            a0 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 0),  vx0, a0);
+            a1 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 8),  vx0, a1);
+            a2 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 16), vx0, a2);
+            a3 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 24), vx0, a3);
+            a4 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 32), vx0, a4);
+            a5 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 40), vx0, a5);
+            a6 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 48), vx0, a6);
+            a7 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 56), vx0, a7);
+        }
+        _mm256_storeu_ps(y + j + 0, a0);  _mm256_storeu_ps(y + j + 8, a1);
+        _mm256_storeu_ps(y + j + 16, a2); _mm256_storeu_ps(y + j + 24, a3);
+        _mm256_storeu_ps(y + j + 32, a4); _mm256_storeu_ps(y + j + 40, a5);
+        _mm256_storeu_ps(y + j + 48, a6); _mm256_storeu_ps(y + j + 56, a7);
+    }
+    for (; j + 31 < M; j += 32) {
+        __m256 a0 = _mm256_loadu_ps(y + j + 0),  a1 = _mm256_loadu_ps(y + j + 8);
+        __m256 a2 = _mm256_loadu_ps(y + j + 16), a3 = _mm256_loadu_ps(y + j + 24);
+        for (int i = 0; i < N; ++i, p += 32) {
+            __m256 vx0 = _mm256_set1_ps(x[i]);
+            a0 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 0),  vx0, a0);
+            a1 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 8),  vx0, a1);
+            a2 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 16), vx0, a2);
+            a3 = _mm256_fmadd_ps(_mm256_loadu_ps(p + 24), vx0, a3);
+        }
+        _mm256_storeu_ps(y + j + 0, a0);  _mm256_storeu_ps(y + j + 8, a1);
+        _mm256_storeu_ps(y + j + 16, a2); _mm256_storeu_ps(y + j + 24, a3);
+    }
+    for (; j < M; ++j) {
+        float sum = y[j];
+        for (int i = 0; i < N; ++i) sum += (*p++) * x[i];
+        y[j] = sum;
+    }
+#else
+    const float* p = A_pack;
+    int j = 0;
+    for (; j + 31 < M; j += 32) {
+        for (int i = 0; i < N; ++i, p += 32) {
+            float xi = x[i];
+            for (int k = 0; k < 32; ++k) y[j + k] += p[k] * xi;
+        }
+    }
+    for (; j < M; ++j) {
+        float sum = y[j];
+        for (int i = 0; i < N; ++i) sum += (*p++) * x[i];
+        y[j] = sum;
+    }
+#endif
+}
+
+static inline void gemv_packed_set(const float* __restrict A_pack, const float* __restrict x,
+                                   int N, int M, const float* __restrict bias, float* __restrict y) {
+    if (bias) std::memcpy(y, bias, M * sizeof(float));
+    else std::memset(y, 0, M * sizeof(float));
+    gemv_packed_add(A_pack, x, N, M, y);
 }
 
 // Register-tiled GEMV: y[0..M) = bias[0..M) + sum_{i=0}^{N-1} x[i] * A_t[i * M + j]
@@ -284,11 +671,11 @@ struct FeatureState {
 // Model 1: ONNX-compatible 2-layer GRU128 (e.g., correlation1024, [z, r, h], LBR=1)
 // ============================================================================
 struct OnnxGRU128 {
-    alignas(64) float w0_t[112 * 384];
-    alignas(64) float r0_t[128 * 384];
+    alignas(64) uint16_t w0_p[112 * 384];
+    alignas(64) uint16_t r0_p[128 * 384];
     alignas(64) float b0[768];
-    alignas(64) float w1_t[128 * 384];
-    alignas(64) float r1_t[128 * 384];
+    alignas(64) uint16_t w1_p[128 * 384];
+    alignas(64) uint16_t r1_p[128 * 384];
     alignas(64) float b1[768];
     alignas(64) float hw[128 * 2];
     alignas(64) float hb[2];
@@ -300,22 +687,22 @@ struct OnnxGRU128 {
         std::memset(h1, 0, sizeof(h1));
     }
 
-    static inline void step_layer(const float* W_t, const float* R_t, const float* B,
+    static inline void step_layer(const uint16_t* W_p, const uint16_t* R_p, const float* B,
                                   const float* inp, int nin, float* h) {
         alignas(64) float xp[384], rp[384];
-        gemv_set(W_t, inp, nin, 384, nullptr, xp);
-        gemv_set(R_t, h, 128, 384, nullptr, rp);
+        gemv_f16_packed_set(W_p, inp, nin, 384, nullptr, xp);
+        gemv_f16_packed_set(R_p, h, 128, 384, nullptr, rp);
         for (int j = 0; j < 128; ++j) {
             float z = fast_sigmoid((xp[j] + rp[j]) + (B[j] + B[384 + j]));
             float r = fast_sigmoid((xp[128 + j] + rp[128 + j]) + (B[128 + j] + B[512 + j]));
-            float c = std::tanh((xp[256 + j] + B[256 + j]) + r * (rp[256 + j] + B[640 + j]));
+            float c = fast_tanh((xp[256 + j] + B[256 + j]) + r * (rp[256 + j] + B[640 + j]));
             h[j] = (1.0f - z) * c + z * h[j];
         }
     }
 
     void step(const float* x112, float* out2) {
-        step_layer(w0_t, r0_t, b0, x112, 112, h0);
-        step_layer(w1_t, r1_t, b1, h0, 128, h1);
+        step_layer(w0_p, r0_p, b0, x112, 112, h0);
+        step_layer(w1_p, r1_p, b1, h0, 128, h1);
         if (!out2) return;
         float s0 = hb[0], s1 = hb[1];
         for (int j = 0; j < 128; ++j) {
@@ -332,31 +719,28 @@ struct OnnxGRU128 {
 struct TorchSortedGRU {
     int H = 128;
     alignas(64) float in_mu[169], in_sd[169];
-    std::unique_ptr<float[]> stem_w_t, stem_b;
-    std::unique_ptr<float[]> w0_t, r0_t, bi0, bh0;
-    std::unique_ptr<float[]> w1_t, r1_t, bi1, bh1;
-    std::unique_ptr<float[]> h1_w_t, h1_b;
-    std::unique_ptr<float[]> h2_w_t;
+    AlignedU16 stem_w_p, w0_p, r0_p, w1_p, r1_p, h1_w_p;
+    AlignedFloats stem_b, bi0, bh0, bi1, bh1, h1_b, h2_w_t;
     float h2_b[2]{};
-    std::unique_ptr<float[]> h0, h1;
+    AlignedFloats h0, h1;
 
     void init_dims(int hidden) {
         H = hidden;
-        stem_w_t = std::make_unique<float[]>(169 * H);
-        stem_b   = std::make_unique<float[]>(H);
-        w0_t     = std::make_unique<float[]>(H * 3 * H);
-        r0_t     = std::make_unique<float[]>(H * 3 * H);
-        bi0      = std::make_unique<float[]>(3 * H);
-        bh0      = std::make_unique<float[]>(3 * H);
-        w1_t     = std::make_unique<float[]>(H * 3 * H);
-        r1_t     = std::make_unique<float[]>(H * 3 * H);
-        bi1      = std::make_unique<float[]>(3 * H);
-        bh1      = std::make_unique<float[]>(3 * H);
-        h1_w_t   = std::make_unique<float[]>(3 * H * H);
-        h1_b     = std::make_unique<float[]>(H);
-        h2_w_t   = std::make_unique<float[]>(H * 2);
-        h0       = std::make_unique<float[]>(H);
-        h1       = std::make_unique<float[]>(H);
+        stem_w_p = alloc_aligned_u16(169 * H);
+        stem_b   = alloc_aligned_floats(H);
+        w0_p     = alloc_aligned_u16(H * 3 * H);
+        r0_p     = alloc_aligned_u16(H * 3 * H);
+        bi0      = alloc_aligned_floats(3 * H);
+        bh0      = alloc_aligned_floats(3 * H);
+        w1_p     = alloc_aligned_u16(H * 3 * H);
+        r1_p     = alloc_aligned_u16(H * 3 * H);
+        bi1      = alloc_aligned_floats(3 * H);
+        bh1      = alloc_aligned_floats(3 * H);
+        h1_w_p   = alloc_aligned_u16(3 * H * H);
+        h1_b     = alloc_aligned_floats(H);
+        h2_w_t   = alloc_aligned_floats(H * 2);
+        h0       = alloc_aligned_floats(H);
+        h1       = alloc_aligned_floats(H);
         reset();
     }
 
@@ -365,35 +749,75 @@ struct TorchSortedGRU {
         if (h1) std::memset(h1.get(), 0, H * sizeof(float));
     }
 
-    static inline void step_torch_gru(const float* W_t, const float* R_t,
+    template <int FH>
+    static inline void step_torch_gru_fixed(const uint16_t* __restrict W_p, const uint16_t* __restrict R_p,
+                                            const float* __restrict bi, const float* __restrict bh,
+                                            const float* __restrict inp, float* __restrict h) {
+        alignas(64) float xp[3 * FH], rp[3 * FH];
+        gemv_f16_packed_set(W_p, inp, FH, 3 * FH, bi, xp);
+        gemv_f16_packed_set(R_p, h,   FH, 3 * FH, bh, rp);
+        for (int j = 0; j < FH; ++j) {
+            float r = fast_sigmoid(xp[j] + rp[j]);
+            float z = fast_sigmoid(xp[FH + j] + rp[FH + j]);
+            float n = fast_tanh(xp[2 * FH + j] + r * rp[2 * FH + j]);
+            h[j] = (1.0f - z) * n + z * h[j];
+        }
+    }
+
+    template <int FH>
+    inline void step_fixed(const float* __restrict feat169, float* __restrict out2) {
+        alignas(64) float z[169], s[FH], g1_in[FH], cat[3 * FH], mid[FH];
+        for (int i = 0; i < 169; ++i) z[i] = (feat169[i] - in_mu[i]) / in_sd[i];
+        gemv_f16_packed_set(stem_w_p.get(), z, 169, FH, stem_b.get(), s);
+        for (int j = 0; j < FH; ++j) s[j] = exact_gelu(s[j]);
+        step_torch_gru_fixed<FH>(w0_p.get(), r0_p.get(), bi0.get(), bh0.get(), s, h0.get());
+        for (int j = 0; j < FH; ++j) g1_in[j] = h0[j] + s[j];
+        step_torch_gru_fixed<FH>(w1_p.get(), r1_p.get(), bi1.get(), bh1.get(), g1_in, h1.get());
+        if (!out2) return;
+        std::memcpy(cat + 0,      s,        FH * sizeof(float));
+        std::memcpy(cat + FH,     h0.get(), FH * sizeof(float));
+        std::memcpy(cat + 2 * FH, h1.get(), FH * sizeof(float));
+        gemv_f16_packed_set(h1_w_p.get(), cat, 3 * FH, FH, h1_b.get(), mid);
+        for (int j = 0; j < FH; ++j) mid[j] = exact_gelu(mid[j]);
+        float o0 = h2_b[0], o1 = h2_b[1];
+        const float* hw = h2_w_t.get();
+        for (int j = 0; j < FH; ++j) {
+            o0 += mid[j] * hw[2 * j];
+            o1 += mid[j] * hw[2 * j + 1];
+        }
+        out2[0] = o0; out2[1] = o1;
+    }
+
+    static inline void step_torch_gru(const uint16_t* W_p, const uint16_t* R_p,
                                       const float* bi, const float* bh,
                                       const float* inp, int H, float* h) {
-        alignas(64) float xp[1152], rp[1152]; // supports H up to 384
-        gemv_set(W_t, inp, H, 3 * H, bi, xp);
-        gemv_set(R_t, h,   H, 3 * H, bh, rp);
-        // PyTorch gate order is [r, z, n]: h' = (1 - z) * n + z * h
+        alignas(64) float xp[1152], rp[1152];
+        gemv_f16_packed_set(W_p, inp, H, 3 * H, bi, xp);
+        gemv_f16_packed_set(R_p, h,   H, 3 * H, bh, rp);
         for (int j = 0; j < H; ++j) {
             float r = fast_sigmoid(xp[j] + rp[j]);
             float z = fast_sigmoid(xp[H + j] + rp[H + j]);
-            float n = std::tanh(xp[2 * H + j] + r * rp[2 * H + j]);
+            float n = fast_tanh(xp[2 * H + j] + r * rp[2 * H + j]);
             h[j] = (1.0f - z) * n + z * h[j];
         }
     }
 
     void step(const float* feat169, float* out2) {
+        if (H == 160) { step_fixed<160>(feat169, out2); return; }
+        if (H == 128) { step_fixed<128>(feat169, out2); return; }
+        if (H == 192) { step_fixed<192>(feat169, out2); return; }
         alignas(64) float z[169], s[384], g1_in[384], cat[1152], mid[384];
         for (int i = 0; i < 169; ++i) z[i] = (feat169[i] - in_mu[i]) / in_sd[i];
-        gemv_set(stem_w_t.get(), z, 169, H, stem_b.get(), s);
+        gemv_f16_packed_set(stem_w_p.get(), z, 169, H, stem_b.get(), s);
         for (int j = 0; j < H; ++j) s[j] = exact_gelu(s[j]);
-        step_torch_gru(w0_t.get(), r0_t.get(), bi0.get(), bh0.get(), s, H, h0.get());
+        step_torch_gru(w0_p.get(), r0_p.get(), bi0.get(), bh0.get(), s, H, h0.get());
         for (int j = 0; j < H; ++j) g1_in[j] = h0[j] + s[j];
-        step_torch_gru(w1_t.get(), r1_t.get(), bi1.get(), bh1.get(), g1_in, H, h1.get());
-        // Warm-up optimization: final readout [3*H -> H -> 2] has zero feedback into h0/h1!
+        step_torch_gru(w1_p.get(), r1_p.get(), bi1.get(), bh1.get(), g1_in, H, h1.get());
         if (!out2) return;
         std::memcpy(cat + 0,     s,        H * sizeof(float));
         std::memcpy(cat + H,     h0.get(), H * sizeof(float));
         std::memcpy(cat + 2 * H, h1.get(), H * sizeof(float));
-        gemv_set(h1_w_t.get(), cat, 3 * H, H, h1_b.get(), mid);
+        gemv_f16_packed_set(h1_w_p.get(), cat, 3 * H, H, h1_b.get(), mid);
         for (int j = 0; j < H; ++j) mid[j] = exact_gelu(mid[j]);
         float o0 = h2_b[0], o1 = h2_b[1];
         const float* hw = h2_w_t.get();
@@ -411,33 +835,30 @@ struct TorchSortedGRU {
 struct TorchSortedLSTM {
     int H = 128;
     alignas(64) float in_mu[169], in_sd[169];
-    std::unique_ptr<float[]> stem_w_t, stem_b;
-    std::unique_ptr<float[]> w0_t, r0_t, bi0, bh0;
-    std::unique_ptr<float[]> w1_t, r1_t, bi1, bh1;
-    std::unique_ptr<float[]> h1_w_t, h1_b;
-    std::unique_ptr<float[]> h2_w_t;
+    AlignedU16 stem_w_p, w0_p, r0_p, w1_p, r1_p, h1_w_p;
+    AlignedFloats stem_b, bi0, bh0, bi1, bh1, h1_b, h2_w_t;
     float h2_b[2]{};
-    std::unique_ptr<float[]> h0, c0, h1, c1;
+    AlignedFloats h0, c0, h1, c1;
 
     void init_dims(int hidden) {
         H = hidden;
-        stem_w_t = std::make_unique<float[]>(169 * H);
-        stem_b   = std::make_unique<float[]>(H);
-        w0_t     = std::make_unique<float[]>(H * 4 * H);
-        r0_t     = std::make_unique<float[]>(H * 4 * H);
-        bi0      = std::make_unique<float[]>(4 * H);
-        bh0      = std::make_unique<float[]>(4 * H);
-        w1_t     = std::make_unique<float[]>(H * 4 * H);
-        r1_t     = std::make_unique<float[]>(H * 4 * H);
-        bi1      = std::make_unique<float[]>(4 * H);
-        bh1      = std::make_unique<float[]>(4 * H);
-        h1_w_t   = std::make_unique<float[]>(3 * H * H);
-        h1_b     = std::make_unique<float[]>(H);
-        h2_w_t   = std::make_unique<float[]>(H * 2);
-        h0       = std::make_unique<float[]>(H);
-        c0       = std::make_unique<float[]>(H);
-        h1       = std::make_unique<float[]>(H);
-        c1       = std::make_unique<float[]>(H);
+        stem_w_p = alloc_aligned_u16(169 * H);
+        stem_b   = alloc_aligned_floats(H);
+        w0_p     = alloc_aligned_u16(H * 4 * H);
+        r0_p     = alloc_aligned_u16(H * 4 * H);
+        bi0      = alloc_aligned_floats(4 * H);
+        bh0      = alloc_aligned_floats(4 * H);
+        w1_p     = alloc_aligned_u16(H * 4 * H);
+        r1_p     = alloc_aligned_u16(H * 4 * H);
+        bi1      = alloc_aligned_floats(4 * H);
+        bh1      = alloc_aligned_floats(4 * H);
+        h1_w_p   = alloc_aligned_u16(3 * H * H);
+        h1_b     = alloc_aligned_floats(H);
+        h2_w_t   = alloc_aligned_floats(H * 2);
+        h0       = alloc_aligned_floats(H);
+        c0       = alloc_aligned_floats(H);
+        h1       = alloc_aligned_floats(H);
+        c1       = alloc_aligned_floats(H);
         reset();
     }
 
@@ -448,38 +869,83 @@ struct TorchSortedLSTM {
         if (c1) std::memset(c1.get(), 0, H * sizeof(float));
     }
 
-    static inline void step_torch_lstm(const float* W_t, const float* R_t,
+    template <int FH>
+    static inline void step_torch_lstm_fixed(const uint16_t* __restrict W_p, const uint16_t* __restrict R_p,
+                                             const float* __restrict bi, const float* __restrict bh,
+                                             const float* __restrict inp, float* __restrict h, float* __restrict c) {
+        alignas(64) float gates[4 * FH];
+        for (int j = 0; j < 4 * FH; ++j) gates[j] = bi[j] + bh[j];
+        gemv_f16_packed_add(W_p, inp, FH, 4 * FH, gates);
+        gemv_f16_packed_add(R_p, h,   FH, 4 * FH, gates);
+        for (int j = 0; j < FH; ++j) {
+            float ig = fast_sigmoid(gates[j]);
+            float fg = fast_sigmoid(gates[FH + j]);
+            float gg = fast_tanh(gates[2 * FH + j]);
+            float og = fast_sigmoid(gates[3 * FH + j]);
+            float nc = fg * c[j] + ig * gg;
+            c[j] = nc;
+            h[j] = og * fast_tanh(nc);
+        }
+    }
+
+    template <int FH>
+    inline void step_fixed(const float* __restrict feat169, float* __restrict out2) {
+        alignas(64) float z[169], s[FH], l1_in[FH], cat[3 * FH], mid[FH];
+        for (int i = 0; i < 169; ++i) z[i] = (feat169[i] - in_mu[i]) / in_sd[i];
+        gemv_f16_packed_set(stem_w_p.get(), z, 169, FH, stem_b.get(), s);
+        for (int j = 0; j < FH; ++j) s[j] = exact_gelu(s[j]);
+        step_torch_lstm_fixed<FH>(w0_p.get(), r0_p.get(), bi0.get(), bh0.get(), s, h0.get(), c0.get());
+        for (int j = 0; j < FH; ++j) l1_in[j] = h0[j] + s[j];
+        step_torch_lstm_fixed<FH>(w1_p.get(), r1_p.get(), bi1.get(), bh1.get(), l1_in, h1.get(), c1.get());
+        if (!out2) return;
+        std::memcpy(cat + 0,      s,        FH * sizeof(float));
+        std::memcpy(cat + FH,     h0.get(), FH * sizeof(float));
+        std::memcpy(cat + 2 * FH, h1.get(), FH * sizeof(float));
+        gemv_f16_packed_set(h1_w_p.get(), cat, 3 * FH, FH, h1_b.get(), mid);
+        for (int j = 0; j < FH; ++j) mid[j] = exact_gelu(mid[j]);
+        float o0 = h2_b[0], o1 = h2_b[1];
+        const float* hw = h2_w_t.get();
+        for (int j = 0; j < FH; ++j) {
+            o0 += mid[j] * hw[2 * j];
+            o1 += mid[j] * hw[2 * j + 1];
+        }
+        out2[0] = o0; out2[1] = o1;
+    }
+
+    static inline void step_torch_lstm(const uint16_t* W_p, const uint16_t* R_p,
                                        const float* bi, const float* bh,
                                        const float* inp, int H, float* h, float* c) {
-        alignas(64) float gates[1536]; // 4 * H (supports H up to 384)
+        alignas(64) float gates[1536];
         for (int j = 0; j < 4 * H; ++j) gates[j] = bi[j] + bh[j];
-        gemv_tiled_add(W_t, inp, H, 4 * H, gates);
-        gemv_tiled_add(R_t, h,   H, 4 * H, gates);
-        // PyTorch LSTM gate order is [i, f, g, o]: c' = f * c + i * g, h' = o * tanh(c')
+        gemv_f16_packed_add(W_p, inp, H, 4 * H, gates);
+        gemv_f16_packed_add(R_p, h,   H, 4 * H, gates);
         for (int j = 0; j < H; ++j) {
             float ig = fast_sigmoid(gates[j]);
             float fg = fast_sigmoid(gates[H + j]);
-            float gg = std::tanh(gates[2 * H + j]);
+            float gg = fast_tanh(gates[2 * H + j]);
             float og = fast_sigmoid(gates[3 * H + j]);
             float nc = fg * c[j] + ig * gg;
             c[j] = nc;
-            h[j] = og * std::tanh(nc);
+            h[j] = og * fast_tanh(nc);
         }
     }
 
     void step(const float* feat169, float* out2) {
+        if (H == 160) { step_fixed<160>(feat169, out2); return; }
+        if (H == 128) { step_fixed<128>(feat169, out2); return; }
+        if (H == 192) { step_fixed<192>(feat169, out2); return; }
         alignas(64) float z[169], s[384], l1_in[384], cat[1152], mid[384];
         for (int i = 0; i < 169; ++i) z[i] = (feat169[i] - in_mu[i]) / in_sd[i];
-        gemv_set(stem_w_t.get(), z, 169, H, stem_b.get(), s);
+        gemv_f16_packed_set(stem_w_p.get(), z, 169, H, stem_b.get(), s);
         for (int j = 0; j < H; ++j) s[j] = exact_gelu(s[j]);
-        step_torch_lstm(w0_t.get(), r0_t.get(), bi0.get(), bh0.get(), s, H, h0.get(), c0.get());
+        step_torch_lstm(w0_p.get(), r0_p.get(), bi0.get(), bh0.get(), s, H, h0.get(), c0.get());
         for (int j = 0; j < H; ++j) l1_in[j] = h0[j] + s[j];
-        step_torch_lstm(w1_t.get(), r1_t.get(), bi1.get(), bh1.get(), l1_in, H, h1.get(), c1.get());
+        step_torch_lstm(w1_p.get(), r1_p.get(), bi1.get(), bh1.get(), l1_in, H, h1.get(), c1.get());
         if (!out2) return;
         std::memcpy(cat + 0,     s,        H * sizeof(float));
         std::memcpy(cat + H,     h0.get(), H * sizeof(float));
         std::memcpy(cat + 2 * H, h1.get(), H * sizeof(float));
-        gemv_set(h1_w_t.get(), cat, 3 * H, H, h1_b.get(), mid);
+        gemv_f16_packed_set(h1_w_p.get(), cat, 3 * H, H, h1_b.get(), mid);
         for (int j = 0; j < H; ++j) mid[j] = exact_gelu(mid[j]);
         float o0 = h2_b[0], o1 = h2_b[1];
         const float* hw = h2_w_t.get();
@@ -612,11 +1078,11 @@ void ens_load_onnx_gru(void* p, int idx, const float* w0, const float* r0, const
                        const float* hw, const float* hb, float blend_w) {
     auto* ctx = static_cast<EnsembleContext*>(p);
     auto& g = ctx->onnx_grus[idx];
-    for (int i = 0; i < 112; ++i) for (int j = 0; j < 384; ++j) g.w0_t[i * 384 + j] = w0[j * 112 + i];
-    for (int i = 0; i < 128; ++i) for (int j = 0; j < 384; ++j) g.r0_t[i * 384 + j] = r0[j * 128 + i];
+    pack_matrix_f16_panels(w0, 112, 384, g.w0_p);
+    pack_matrix_f16_panels(r0, 128, 384, g.r0_p);
     std::memcpy(g.b0, b0, 768 * sizeof(float));
-    for (int i = 0; i < 128; ++i) for (int j = 0; j < 384; ++j) g.w1_t[i * 384 + j] = w1[j * 128 + i];
-    for (int i = 0; i < 128; ++i) for (int j = 0; j < 384; ++j) g.r1_t[i * 384 + j] = r1[j * 128 + i];
+    pack_matrix_f16_panels(w1, 128, 384, g.w1_p);
+    pack_matrix_f16_panels(r1, 128, 384, g.r1_p);
     std::memcpy(g.b1, b1, 768 * sizeof(float));
     std::memcpy(g.hw, hw, 256 * sizeof(float));
     std::memcpy(g.hb, hb, 2 * sizeof(float));
@@ -637,17 +1103,15 @@ void ens_load_sorted_gru_v2(void* p, int idx, int hidden,
     g.init_dims(H);
     std::memcpy(g.in_mu, in_mu, 169 * sizeof(float));
     std::memcpy(g.in_sd, in_sd, 169 * sizeof(float));
-    for (int i = 0; i < 169; ++i) for (int j = 0; j < H; ++j) g.stem_w_t[i * H + j] = stem_w[j * 169 + i];
+    pack_matrix_f16_panels(stem_w, 169, H, g.stem_w_p.get());
     std::memcpy(g.stem_b.get(), stem_b, H * sizeof(float));
-    for (int i = 0; i < H; ++i) for (int j = 0; j < 3 * H; ++j) {
-        g.w0_t[i * (3 * H) + j] = w0[j * H + i];
-        g.r0_t[i * (3 * H) + j] = r0[j * H + i];
-        g.w1_t[i * (3 * H) + j] = w1[j * H + i];
-        g.r1_t[i * (3 * H) + j] = r1[j * H + i];
-    }
+    pack_matrix_f16_panels(w0, H, 3 * H, g.w0_p.get());
+    pack_matrix_f16_panels(r0, H, 3 * H, g.r0_p.get());
+    pack_matrix_f16_panels(w1, H, 3 * H, g.w1_p.get());
+    pack_matrix_f16_panels(r1, H, 3 * H, g.r1_p.get());
     std::memcpy(g.bi0.get(), bi0, 3 * H * sizeof(float)); std::memcpy(g.bh0.get(), bh0, 3 * H * sizeof(float));
     std::memcpy(g.bi1.get(), bi1, 3 * H * sizeof(float)); std::memcpy(g.bh1.get(), bh1, 3 * H * sizeof(float));
-    for (int i = 0; i < 3 * H; ++i) for (int j = 0; j < H; ++j) g.h1_w_t[i * H + j] = h1_w[j * (3 * H) + i];
+    pack_matrix_f16_panels(h1_w, 3 * H, H, g.h1_w_p.get());
     std::memcpy(g.h1_b.get(), h1_b, H * sizeof(float));
     for (int i = 0; i < H; ++i) for (int j = 0; j < 2; ++j) g.h2_w_t[i * 2 + j] = h2_w[j * H + i];
     std::memcpy(g.h2_b, h2_b, 2 * sizeof(float));
@@ -679,17 +1143,15 @@ void ens_load_sorted_lstm(void* p, int idx, int hidden,
     g.init_dims(H);
     std::memcpy(g.in_mu, in_mu, 169 * sizeof(float));
     std::memcpy(g.in_sd, in_sd, 169 * sizeof(float));
-    for (int i = 0; i < 169; ++i) for (int j = 0; j < H; ++j) g.stem_w_t[i * H + j] = stem_w[j * 169 + i];
+    pack_matrix_f16_panels(stem_w, 169, H, g.stem_w_p.get());
     std::memcpy(g.stem_b.get(), stem_b, H * sizeof(float));
-    for (int i = 0; i < H; ++i) for (int j = 0; j < 4 * H; ++j) {
-        g.w0_t[i * (4 * H) + j] = w0[j * H + i];
-        g.r0_t[i * (4 * H) + j] = r0[j * H + i];
-        g.w1_t[i * (4 * H) + j] = w1[j * H + i];
-        g.r1_t[i * (4 * H) + j] = r1[j * H + i];
-    }
+    pack_matrix_f16_panels(w0, H, 4 * H, g.w0_p.get());
+    pack_matrix_f16_panels(r0, H, 4 * H, g.r0_p.get());
+    pack_matrix_f16_panels(w1, H, 4 * H, g.w1_p.get());
+    pack_matrix_f16_panels(r1, H, 4 * H, g.r1_p.get());
     std::memcpy(g.bi0.get(), bi0, 4 * H * sizeof(float)); std::memcpy(g.bh0.get(), bh0, 4 * H * sizeof(float));
     std::memcpy(g.bi1.get(), bi1, 4 * H * sizeof(float)); std::memcpy(g.bh1.get(), bh1, 4 * H * sizeof(float));
-    for (int i = 0; i < 3 * H; ++i) for (int j = 0; j < H; ++j) g.h1_w_t[i * H + j] = h1_w[j * (3 * H) + i];
+    pack_matrix_f16_panels(h1_w, 3 * H, H, g.h1_w_p.get());
     std::memcpy(g.h1_b.get(), h1_b, H * sizeof(float));
     for (int i = 0; i < H; ++i) for (int j = 0; j < 2; ++j) g.h2_w_t[i * 2 + j] = h2_w[j * H + i];
     std::memcpy(g.h2_b, h2_b, 2 * sizeof(float));

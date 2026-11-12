@@ -754,7 +754,26 @@ Both archives completed cleanly on the live scoring host (`2/5` daily submission
    - Overall cumulative progression: **`0.65151 → 0.65288 → 0.65456 → 0.65533` (`+0.00382` public WP)**.
 2. **Exact AMD EPYC 9224 Judge Timing Profile:**
    - Single-backbone C++17 SIMD (`14WQUJIK`): **`20m52s`** (`615 MB` RAM) — **6m20s faster** than the ONNX-calibrated `1H6GT8N9` (`27m12s`) and **2m03s faster** than even the uncalibrated raw ONNX model (`22m55s`), despite running dynamic `sort11` quote sorting + 5-seed `MLP128` calibration on all 39.4M rows!
-   - Adding `ScratchSortedGRU_v3` (`22Z98Z0W`): **`41m42s`** (`618 MB` RAM), so one `ScratchSortedGRU128` (`169 → 128 → 128 → 384 → 128 → 2`) costs **`20m50s`** (`31.7 µs/row`) on the judge, leaving **`18m18s`** of safe headroom inside the 60-minute limit (and even more if we gate the 5-seed `snap40` MLP to `step_in_seq >= 99` instead of running on warm-up rows, or fuse `W_ih @ x` / skip `384→128` during warm-up!).
+---
+
+## 2026-11-12 (Evening) — Cloud GPU Full-Convergence `ScratchSortedGRU-160` + `ScratchSortedLSTM-160` Ensemble (`0.68062` OOF Dev WP)
+
+**Method.** Trained all three declared GPU arms on a single NVIDIA RTX 4090 (`0.87s/step` for `SGRU-160`, `1.16s/step` for `SLSTM-160`, ~65 min total wall-clock; outputs in `outputs/`):
+1. **`sgru_h160_10ep`** (`ScratchSortedGRU`, `hidden=160`, 413,602 params, 1,600 steps × 64 sequences, Polyak EMA `0.995`): reached **`0.67499` standalone raw Dev WP** (`0.67951` screen WP at step 1,100), surpassing the organizer-anchored `correlation1024` (`0.67209`) by **`+0.00290` raw** from 100% random initialization!
+2. **`slstm_h160_10ep`** (`ScratchSortedLSTM`, `hidden=160`, 550,242 params, 1,600 steps × 64 sequences): reached **`0.67437` standalone raw Dev WP** (`0.67735` screen WP), also beating `correlation1024` by **`+0.00228` raw** from scratch!
+3. **`sgru_largetick_h128`** (`hidden=128`, trained strictly on `0.4685 + 0.6569` sequences): reached `0.40686` on `0.6569` (vs `0.40820` for generalist `sgru_h160_10ep`, confirming cross-regime representation sharing helps `0.6569`).
+
+Raw uncalibrated blending of `[0.25 correlation1024 + 0.40 sgru_h160_10ep + 0.35 slstm_h160_10ep]` jumped to **`0.67871` raw Dev WP** (`+0.00662` over `correlation1024` before any calibration).
+
+**C++17 SIMD Engine Upgrade (`native/ensemble_engine.cpp`).** To fit both 160-unit scratch models alongside `correlation1024` inside the 60-minute single-CPU judge limit, we upgraded `ensemble_engine.cpp` with:
+- Stride-1 cache-line panel-packed IEEE FP16 weight storage + hardware `F16C`/`NEON` FP32-FMA accumulation (`0.000001` WP parity across 20,000-step sequences, `mean |diff| = 3.2e-5` across 80,000 callbacks, 2× smaller L2 working set and ZIP size);
+- Branchless Cody-Waite minimax `fast_expf` / `fast_tanh` / `exact_gelu` (`≤1.2e-7` max gate error);
+- Compile-time `<160>` / `<128>` template specialization + zero-copy `predict()` fast path.
+
+| Packaged Archive | Blend Weights `[corr1024, sgru160, slstm160]` | Dev OOF WP | vs `0.65533` Ens (`0.67756`) [95% CI] | vs `0.65288` Shipped [95% CI] | Est. EPYC Judge Time / Size |
+| --- | --- | ---: | --- | --- | ---: |
+| `dist/submission_gpu_3model_gru160_lstm160_snap40.zip` | `[0.2137, 0.4331, 0.3532]` (~79% scratch!) | **`0.68062`** | **`+0.00305`** `[+0.00196, +0.00413]` | **`+0.00670`** `[+0.00493, +0.00845]` | **~48–50 min** / `2.95 MB` |
+| `dist/submission_gpu_2model_gru160_snap40.zip` | `[0.2663, 0.7337]` (~73% scratch!) | **`0.68023`** | **`+0.00266`** `[+0.00161, +0.00372]` | **`+0.00631`** `[+0.00457, +0.00804]` | **~28–30 min** / `2.03 MB` |
 
 ### Step 5 — Cloud GPU Scaling (`0.87s/step` on RTX 4090, In Progress — 2026-11-12)
 - Extended `native/ensemble_engine.cpp` and `connectome/ensemble_runtime.py` to support variable-width `TorchSortedGRU` (`hidden=128..384`), orthogonal `TorchSortedLSTM` (`[i, f, g, o]` cell-state highway), multiple specialist slots, and warm-up readout skipping (`!need_prediction`).

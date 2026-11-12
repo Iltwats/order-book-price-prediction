@@ -12,3 +12,5 @@ datasets/
 artifacts/
 dist/
 build/
+outputs/
+outputs-v2/
