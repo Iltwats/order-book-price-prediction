@@ -11,7 +11,8 @@ test set; the private leaderboard uses a separate dataset.
 
 | | Global WP |
 | --- | ---: |
-| Our best public: `submission_correlation1024.zip` (rank 635) | 0.65151 |
+| Our best public: `submission_correlation1024_mlp64_clip2.zip` (`1H6GT8N9`) | 0.65288 |
+| Previous public: `submission_correlation1024.zip` (rank 635) | 0.65151 |
 | Public rank 300 / 100 / 50 | 0.6572 / 0.6628 / 0.6653 |
 | Public rank ~8 (last paid place) / rank 1 | ~0.670 / 0.6739 |
 | Same model, our 1,400-sequence development split | 0.67209 |
@@ -86,9 +87,10 @@ TRAIN target check. These findings shape the next experiments.
 ## Next experiments
 
 The [discussion and model improvement plan](docs/MULTISCALE_CONTEXT_PLAN.md)
-records how we arrived at the next steps: complete the prepared coverage
-comparison, test whether a longer backward window improves the current GRU,
-then assess an explicit combination of recent changes and slower context.
+records how we arrived at the next steps. The prepared coverage comparison is
+done. At its learning rate the model barely moved, so the next test raises the
+learning rate before the coverage, objective or window questions can be
+answered.
 The context experiments require separate plans. A CPU probe found no added
 signal from fast/slow summaries on top of the current outputs.
 
@@ -97,9 +99,9 @@ Every experiment run, with commands, numbers and decisions, is recorded in
 
 | Experiment | Status |
 | --- | --- |
-| Fine-tune the upper GRU of correlation-1024 with the batch-pooled Global WP loss ([plan v2.1](docs/GPU_TRAINING.md)) | Ready; needs CUDA qualification on a rented GPU |
+| Fine-tune the upper GRU of correlation-1024 with the batch-pooled Global WP loss ([plan v2.1](docs/GPU_TRAINING.md)): 4,096 sequences × 1 pass against 1,024 × 4, two seeds | Done on CPU ([log](docs/EXPERIMENT_LOG.md)): coverage beats repeat by +0.0002 raw and +0.00007 calibrated; at learning rate 1e-5 the outputs moved only about 1%, so the test is inconclusive; nothing to ship |
 | Compare 256-row and 1,024-row backward windows with matched training examples and updates | Proposed after the prepared comparison; preserves the inference architecture |
-| Calibrate the two outputs on scored rows (64-unit network, inputs clipped to ±2), appended to the ONNX graph | Dev +0.0018 out of fold; packaged as `dist/submission_correlation1024_mlp64_clip2.zip`; awaiting public score |
+| Calibrate the two outputs on scored rows (64-unit network, inputs clipped to ±2), appended to the ONNX graph | Dev +0.0018 out of fold; public **0.65288** (+0.00137 over 0.65151; 27m12s, 625 MB) |
 | Add a small temporal correction and compare capacity control, fast-only, slow-only and combined summaries | Deprioritized: on cached outputs, fast/slow summaries added nothing over an outputs-only control ([log](docs/EXPERIMENT_LOG.md)) |
 | Train new GRUs from scratch on all 10,607 train sequences with pooled \|y\|-weighted MSE on clipped targets (the loss whose minimizer maximizes Global WP) | Proposed |
 | Check our assumptions against the official data overview: tick classes, class mix, mask, feature representation | Done ([log](docs/EXPERIMENT_LOG.md)): loss and calibration are sound; training ignores the class mix and the mask |
@@ -123,7 +125,7 @@ public scores.
 | `connectome/gpu_training.py` (+ `partial_gru.py`, `conversion_audit.py`, `recurrent_parity.py`) | Frozen-plan GPU runner for upper-GRU training with ONNX parity checks |
 | `connectome/training.py`, `model_io.py` | Torch GRU import/export, head and affine fitting, ONNX inspection |
 | `scripts/` | `rescore_global.py`, Linux single-CPU checks, callback benchmarks |
-| `experiments/` | CPU experiments on cached development predictions: context probe, output calibration, calibrated ONNX export, latency breakdown, data-semantics checks, frozen-state head probe ([log](docs/EXPERIMENT_LOG.md)) |
+| `experiments/` | CPU experiments on cached development predictions: context probe, output calibration, calibrated ONNX export, latency breakdown, data-semantics checks, frozen-state head probe, coverage pilot checks, seed-plan derivation, arm evaluation and comparison ([log](docs/EXPERIMENT_LOG.md)) |
 | `cloud/Dockerfile`, `scripts/Dockerfile` | GPU training image; offline inference-check image |
 | `configs/` | Postprocessing configurations used by the rescore |
 | `baseline/` | Official baseline, unchanged |

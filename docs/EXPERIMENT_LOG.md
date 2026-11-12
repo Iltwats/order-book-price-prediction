@@ -208,8 +208,11 @@ validation.
 - The Linux x86-64 container check was not rerun (Docker was not running). The runtime code is
   unchanged, and the new graph nodes are standard ONNX operators.
 
-**Public result.** Pending upload. If the dev gain carries over, expect roughly
-0.6533 (+0.0018). Record the score here when it arrives.
+**Public result.** Uploaded (`1H6GT8N9`): **0.65288** Global WP (+0.00137 over
+`0.65151`), runtime **27m12s**, peak memory **625 MB**. Confirms that ~75% of
+the scored-row calibration gain transfers to the hidden test mask, and reveals
+that appending 11 small ONNX ops added 4m17s of per-call dispatch overhead on
+the judge.
 
 ---
 
@@ -516,3 +519,155 @@ Within-class WP in the 0.6569 class stays 0.399–0.408 in every arm (raw 0.407)
   - stop early on held-out *sequences*;
   - clip the residual base;
   - do not trust single-seed results from early-stopped heads.
+
+## 2026-10-26 — Does more TRAIN coverage improve the upper GRU? (v2.1 on CPU)
+
+**Question.** Does fine-tuning the upper GRU on more distinct TRAIN sequences
+help more than more passes over the incumbent's own training set, once each
+model gets the same calibration? This is the prepared
+[v2.1 comparison](GPU_TRAINING.md), run on CPU instead of a rented GPU. A
+repeatable gain is the evidence that would justify GPU time for larger-scale
+training.
+
+**Design** (frozen plan `artifacts/gpu/global-wp-v2.1`, plan SHA256
+`1c3a926d…`).
+- Both arms start from `correlation1024_seed20260912`, which is also the
+  teacher. Batch-pooled correlation objective, learning rate 1e-5, batch 8,
+  256-row backward window, lower GRU frozen, 512 updates.
+  - `repeat1024`: 4 passes over 1,024 sequences. These are exactly the
+    sequences the incumbent was fine-tuned on (checked against its report).
+  - `coverage4096`: 1 pass over those 1,024 plus 3,072 the model has never
+    fitted.
+- Both arms match TRAIN's tick-class mix within 1.5 points. The 512-sequence
+  TRAIN reserve is excluded.
+- Only arm vs arm isolates coverage. The incumbent was trained with a
+  per-sequence correlation objective, learning rate 3e-5 and 128 updates, so
+  comparisons with the incumbent also include that recipe change.
+- **Second seed.** `prepare` would redraw the added sequences, because it
+  counts earlier plans as exposure. `experiments/derive_seed_plan.py` therefore
+  copies v2.1 and changes only the seed, which sets the batch order and the
+  Torch seed. The copy is `artifacts/gpu/global-wp-v2.1-seed20261124`, plan
+  SHA256 `f7658d0a…`.
+- **Evaluation** (`experiments/coverage_evaluate.py`, then
+  `experiments/coverage_comparison.py`):
+  - one byte-parity check on the 32 smoke sequences, then one full-dev
+    evaluation per completed arm;
+  - each model, the incumbent included, gets the shipped calibration
+    (64 units, inputs clipped to ±2, 30 epochs, scored rows, out of fold);
+  - reports cover pooled WP, each target, each tick class, the screen, and how
+    far the outputs moved from the incumbent's.
+
+  A self-test with the incumbent against itself reproduces raw 0.67209,
+  calibrated 0.67392 and the per-class scores from the data-semantics entry.
+
+**Decision rules, fixed before any arm was scored.**
+- *Coverage helps* if `coverage4096` beats `repeat1024` after calibration on
+  both seeds, with paired CIs excluding zero.
+- *A new pipeline is worth a submission* if, calibrated, it beats the
+  incumbent's calibrated 0.67392 by at least +0.001 on both seeds, with a CI
+  excluding zero.
+- *Did not move.* If an arm's raw outputs keep correlation above 0.999 with
+  the incumbent's on dev scored rows, a flat result means the model barely
+  moved. It says nothing about coverage.
+
+**Pilot: the first 32 updates of `coverage4096`.** Run on CPU with
+`--max-updates 32`, then checked with `experiments/coverage_pilot_checks.py`.
+The checks read TRAIN features only, with no targets and no validation.
+Output: `artifacts/experiments/coverage_pilot/report_32.json`; snapshot
+`artifacts/gpu/cpu-v2.1/coverage4096_pilot32/`.
+- **Cost:** 5.5 s per update, 198 s in total, 2.8 GB peak memory. Each run is
+  single-threaded, so four runs in parallel take 5.7 s per update.
+- **Health:** qualification passed, losses and gradients finite (gradient norm
+  median 0.28, max 0.69), lower GRU bit-identical.
+- **Weights moved:** relative change 5–7e-4 in the upper GRU and 1.2e-3 in the
+  head.
+- **Export is exact:** on 4 unused TRAIN sequences (outside both arms, the
+  reserve and every recorded exposure), row-by-row and bulk outputs are
+  bit-identical, and ONNX matches Torch to ≤ 2.6e-5.
+- **No collapse, but little movement:** correlation with the incumbent's
+  outputs is 0.99998–0.99999, std ratio 0.998–0.999, and mean |change| is
+  0.0013–0.0019 against an output std of about 0.43.
+
+  At this learning rate, and with the teacher anchored to the incumbent, the
+  full 512 updates may also move the model very little. That is why the
+  did-not-move rule above exists.
+
+**Runs.** All four started together on 2026-10-26:
+- `artifacts/gpu/cpu-v2.1/{coverage4096,repeat1024}`; the coverage run
+  resumes the pilot's checkpoint;
+- `artifacts/gpu/cpu-v2.1-seed20261124/{coverage4096,repeat1024}`.
+
+**Training.**
+- All four runs completed 512 updates in 52–56 minutes each, run in
+  parallel at 2.9 GB peak memory per run.
+- All passed byte parity on the 32 smoke sequences (callback against bulk)
+  before evaluation.
+- The lower GRU is bit-identical in every arm.
+
+**Results** (dev scored rows; CI = paired sequence bootstrap; calibration is
+the shipped procedure, out of fold). Output:
+`artifacts/experiments/coverage_comparison/`.
+
+| Model | Raw | Calibrated | Raw vs incumbent | Calibrated vs incumbent |
+| --- | ---: | ---: | --- | --- |
+| incumbent | 0.67209 | 0.67392 | | |
+| coverage, seed 0 | 0.67233 | 0.67407 | +0.00024 [+0.00010, +0.00038] | +0.00015 [+0.00002, +0.00028] |
+| coverage, seed 1 | 0.67232 | 0.67407 | +0.00023 [+0.00010, +0.00037] | +0.00015 [+0.00004, +0.00028] |
+| repeat, seed 0 | 0.67215 | 0.67401 | +0.00005 [−0.00013, +0.00024] | +0.00009 [−0.00007, +0.00027] |
+| repeat, seed 1 | 0.67211 | 0.67399 | +0.00001 [−0.00019, +0.00021] | +0.00007 [−0.00011, +0.00026] |
+
+Coverage against repeat, same seed:
+
+| Seed | Raw | Calibrated |
+| --- | --- | --- |
+| 0 | +0.00018 [+0.00008, +0.00028] | +0.00006 [−0.00002, +0.00012] |
+| 1 | +0.00022 [+0.00011, +0.00033] | +0.00008 [+0.00001, +0.00016] |
+
+How far each model moved from the incumbent:
+
+| Arm | Output correlation with incumbent (dev scored rows) | Mean \|change\| (share of output std) | Relative weight change, upper GRU / head |
+| --- | --- | --- | --- |
+| coverage | 0.99988–0.99989 | 0.0126–0.0130 (1.2–1.3%) | 0.43–0.46% / 1.2% |
+| repeat | 0.99979–0.99988 | 0.0167–0.0174 (1.5–1.9%) | 0.49–0.53% / 1.4% |
+
+- Tick classes, targets and the screen move by at most 0.0004 in any arm.
+  The 0.6569 class goes from 0.4074 to 0.4076–0.4078 raw.
+- Seeds agree to within 0.00004 for every arm, so batch order barely matters
+  at this learning rate.
+
+**Against the declared rules.**
+- *Did not move: triggered for every arm.* Output correlation with the
+  incumbent is 0.9998–0.9999, above the 0.999 threshold. The 512 Adam steps
+  at 1e-5 can move each weight by at most about 5e-3. The upper GRU moved
+  0.45% in relative terms and the head 1.2%. Movement grew from 32 to 512
+  updates roughly in proportion to the steps taken. The run is limited by its
+  learning rate.
+- *Coverage helps: not met.* After calibration, seed 1's CI excludes zero but
+  seed 0's does not.
+- *Worth a submission: not met.* The best pipeline gains +0.00015 over the
+  incumbent's calibrated score. The bar was +0.001.
+
+**Findings.**
+- **New sequences beat repeated ones, but only by a tiny amount.**
+  - Raw, coverage beats repeat on both seeds, about +0.0002 with CIs excluding
+    zero.
+  - Repeat moved the model *more* than coverage and gained nothing. More
+    passes over the incumbent's own sequences don't help, which is consistent
+    with its fine-tune having plateaued.
+- **Calibration absorbs most of the raw gain.** The coverage advantage over
+  repeat shrinks from +0.0002 to +0.00007 after calibration. That matches the
+  "raw improves, recalibration removes it" row of the plan.
+- **The experiment can't say more, because nothing moved.**
+  - The models changed their outputs by about 1% of their spread.
+  - The same learning rate and teacher anchor would also bind the objective
+    and two-layer tests in the plan's decision table.
+
+**Decision.**
+- Ship nothing from this. The prepared v2.1 configuration is too conservative
+  to test the hypothesis.
+- The next test must let the model move:
+  - Change one variable: the learning rate, on `coverage4096`.
+  - Keep the teacher, anchor, objective and updates as in v2.1.
+  - Also check the did-not-move rule.
+- Until a configuration moves the model, the plan's later steps (objective
+  swap, both layers) would hit the same limit.
