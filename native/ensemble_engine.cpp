@@ -663,7 +663,10 @@ int ens_step(void* p, const float* __restrict x112, int need_calibrator, float* 
     std::memcpy(z_in + pos, snap34, 34 * sizeof(float));
     pos += 34;
 
-    for (int i = 0; i < pos; ++i) z_in[i] = (z_in[i] - ctx->cal_mu[i]) / ctx->cal_sd[i];
+    for (int i = 0; i < pos; ++i) {
+        float zi = (z_in[i] - ctx->cal_mu[i]) / ctx->cal_sd[i];
+        z_in[i] = std::max(-8.0f, std::min(8.0f, zi));
+    }
 
     float d0 = 0.0f, d1 = 0.0f;
     alignas(64) float h_buf[256];

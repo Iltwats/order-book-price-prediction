@@ -103,11 +103,10 @@ Every experiment run, with commands, numbers and decisions, is recorded in
 | Compare 256-row and 1,024-row backward windows with matched training examples and updates | Proposed after the prepared comparison; preserves the inference architecture |
 | Calibrate the two outputs on scored rows (64-unit network, inputs clipped to ±2), appended to the ONNX graph | Dev +0.0018 out of fold; public **0.65288** (+0.00137 over 0.65151; 27m12s, 625 MB) |
 | Add a small temporal correction and compare capacity control, fast-only, slow-only and combined summaries | Deprioritized: on cached outputs, fast/slow summaries added nothing over an outputs-only control ([log](docs/EXPERIMENT_LOG.md)) |
-| Train new GRUs from scratch on all 10,607 train sequences with pooled \|y\|-weighted MSE on clipped targets (the loss whose minimizer maximizes Global WP) | Proposed |
+| Train new GRUs from scratch on all 10,607 train sequences with pooled \|y\|-weighted MSE + Global WP + mask-propensity & class-mix weighting | Done ([log](docs/EXPERIMENT_LOG.md)): `ScratchSortedGRU` (169 price-sorted L11 depth, aligned volume & multi-lag order-flow features) reaches **0.66076** standalone dev WP from random init and lifts raw blend with `correlation1024` from **0.67209 → 0.67331** |
 | Check our assumptions against the official data overview: tick classes, class mix, mask, feature representation | Done ([log](docs/EXPERIMENT_LOG.md)): loss and calibration are sound; training ignores the class mix and the mask |
 | Frozen-state head probe: does the GRU state lack current book/trade information? Heads on the frozen state or the two outputs, with and without current `i0` price/trade features | Done ([log](docs/EXPERIMENT_LOG.md)): a head alone adds nothing; current `i0` features add about +0.0025 over raw and +0.0007 over the shipped calibrator, not through the large-tick class |
-| Class- and mask-aware training: weight TRAIN sequences to validation's class mix and rows by a mask-propensity model (`a2`–`a6`); report WP per tick class | Next; CPU pilot first |
-| Ensemble seeds/variants within the runtime budget; refit the final models on train + validation | Proposed |
+| Price-sorted LOB snapshot calibrator (`snap40`, no `LayerNorm`) + C++17 SIMD ensemble runtime | Done ([log](docs/EXPERIMENT_LOG.md)): single-backbone reaches **0.67688** OOF dev WP (**+0.00296** over shipped `0.65288`, ~19 min judge runtime) in `dist/submission_corr1024_snap40_fast.zip`; 2-model diverse ensemble reaches **0.67756** OOF dev WP (**+0.00365** over shipped, CI `[+0.00238, +0.00489]`, ~35 min judge runtime) in `dist/submission_ensemble_sorted_gru_snap40.zip` |
 
 The FAQ warns against overfitting the visible validation mask, and the private
 test uses different data, so judge changes on held-out sequences, not only on
@@ -130,7 +129,7 @@ public scores.
 | `configs/` | Postprocessing configurations used by the rescore |
 | `baseline/` | Official baseline, unchanged |
 | `native/`, `connectome/native.py` | Experimental C++ GRU backend; failed its speed and accuracy gates and is not shipped |
-| `docs/` | [Experiment log](docs/EXPERIMENT_LOG.md), [results](docs/GLOBAL_WP_RESULTS.md), [GPU training](docs/GPU_TRAINING.md), [training tools](docs/training.md), [Linux checks](docs/linux_validation.md), [competition pages](docs/competition/) |
+| `docs/` | [Sorted-LOB ensemble & next steps](docs/SORTED_LOB_ENSEMBLE_AND_NEXT_STEPS.md), [experiment log](docs/EXPERIMENT_LOG.md), [results](docs/GLOBAL_WP_RESULTS.md), [GPU training](docs/GPU_TRAINING.md), [training tools](docs/training.md), [Linux checks](docs/linux_validation.md), [competition pages](docs/competition/) |
 | `artifacts/`, `dist/`, `datasets/` | Local outputs and data (gitignored; small evidence receipts are force-added) |
 
 `artifacts/manifest.json` freezes the validation split: 1,400 development

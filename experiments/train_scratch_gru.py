@@ -111,6 +111,7 @@ def main():
     p.add_argument("--eval-every", type=int, default=40)
     p.add_argument("--seed", type=int, default=20261112)
     p.add_argument("--threads", type=int, default=5)
+    p.add_argument("--resume", default="", help="Optional checkpoint path (`best_model.pt` or `final_checkpoint.pt`) to warm-start from")
     args = p.parse_args()
 
     torch.set_num_threads(args.threads)
@@ -136,14 +137,19 @@ def main():
     model = ScratchSortedGRU(hidden=args.hidden)
     print(f"Initialized ScratchSortedGRU (hidden={args.hidden}, {sum(x.numel() for x in model.parameters()):,} params)", flush=True)
 
-    with ThreadPoolExecutor(max_workers=3) as init_pool:
-        f_cal, _, _, _ = load_batch_tcn(args.train, batches[0], train_classes, propensity, init_pool)
-    with torch.no_grad():
-        f_btf = f_cal.transpose(1, 2).contiguous()
-        mu = f_btf.mean(dim=(0, 1), keepdim=True)
-        sd = f_btf.std(dim=(0, 1), unbiased=False, keepdim=True) + 1e-4
-        model.in_mu.copy_(mu)
-        model.in_sd.copy_(sd)
+    if args.resume:
+        ckpt = torch.load(args.resume, map_location="cpu", weights_only=False)
+        model.load_state_dict(ckpt["model_state"])
+        print(f"Resumed weights (including fixed in_mu/in_sd) from {args.resume}", flush=True)
+    else:
+        with ThreadPoolExecutor(max_workers=3) as init_pool:
+            f_cal, _, _, _ = load_batch_tcn(args.train, batches[0], train_classes, propensity, init_pool)
+        with torch.no_grad():
+            f_btf = f_cal.transpose(1, 2).contiguous()
+            mu = f_btf.mean(dim=(0, 1), keepdim=True)
+            sd = f_btf.std(dim=(0, 1), unbiased=False, keepdim=True) + 1e-4
+            model.in_mu.copy_(mu)
+            model.in_sd.copy_(sd)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=2e-4)
 
@@ -156,6 +162,10 @@ def main():
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
 
     best_screen_wp = -1.0
+    if args.resume:
+        init_sc = evaluate_scratch_gru(model, screen_groups, screen_targets, screen_scored)
+        best_screen_wp = init_sc["wp"]
+        print(f"[GRU] Resumed Screen WP={best_screen_wp:.5f}", flush=True)
     best_state = copy.deepcopy(model.state_dict())
     history = []
     t_start = time.time()

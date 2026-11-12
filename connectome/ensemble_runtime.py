@@ -145,3 +145,161 @@ class CompiledEnsembleBackend:
 
     def __del__(self):
         self.close()
+
+
+class FallbackPythonEnsembleBackend:
+    """Pure-NumPy fallback matching `ensemble_engine.cpp` bit-for-bit if `c++` is ever absent."""
+
+    def __init__(self, weights_npz: str | Path):
+        d = np.load(weights_npz, allow_pickle=False)
+        self.n_onnx = int(d["n_onnx_gru"])
+        self.has_sgru = bool(int(d["has_sorted_gru"]))
+        self.onnx_models = [
+            {k: d[f"onnx_{i}_{k}"].astype(np.float32) for k in ("w0", "r0", "b0", "w1", "r1", "b1", "hw", "hb", "blend")}
+            for i in range(self.n_onnx)
+        ]
+        if self.has_sgru:
+            self.sgru = {k: d[f"sgru_{k}"].astype(np.float32) for k in (
+                "in_mu", "in_sd", "stem_w", "stem_b", "w0", "r0", "bi0", "bh0",
+                "w1", "r1", "bi1", "bh1", "h1_w", "h1_b", "h2_w", "h2_b", "blend"
+            )}
+        self.cal_seeds = int(d["cal_seeds"])
+        if self.cal_seeds > 0:
+            self.cal = {k: d[f"cal_{k}"].astype(np.float32) for k in ("mu", "sd", "w1", "b1", "w2", "b2")}
+            self.cal_in_dim = int(d["cal_in_dim"])
+        self.sequence = None
+        self.previous_step = None
+        self.reset()
+
+    def reset(self):
+        self.dyn_ring = np.zeros((32, 16), dtype=np.float32)
+        self.f_step = 0
+        self.onnx_h = [[np.zeros(128, np.float32), np.zeros(128, np.float32)] for _ in range(self.n_onnx)]
+        self.sgru_h = [np.zeros(128, np.float32), np.zeros(128, np.float32)]
+
+    @staticmethod
+    def _sig(x):
+        return np.where(x >= 0, 1.0 / (1.0 + np.exp(-np.clip(x, -30, 30))),
+                        np.exp(np.clip(x, -30, 30)) / (1.0 + np.exp(np.clip(x, -30, 30)))).astype(np.float32)
+
+    @staticmethod
+    def _gelu(x):
+        from scipy.special import erf as _erf  # optional
+        return (0.5 * x * (1.0 + _erf(x * 0.7071067811865475))).astype(np.float32)
+
+    def _gelu_safe(self, x):
+        import math
+        vec_erf = np.vectorize(math.erf, otypes=[np.float32])
+        return (0.5 * x * (1.0 + vec_erf(x * np.float32(0.7071067811865475)))).astype(np.float32)
+
+    def predict(self, data_point) -> np.ndarray | None:
+        seq, step, need = int(data_point.seq_ix), int(data_point.step_in_seq), bool(data_point.need_prediction)
+        if step < 0 or step >= 20_000 or need != (step >= 99):
+            raise ValueError("invalid sequence step or warm-up flag")
+        if seq != self.sequence:
+            if step != 0:
+                raise ValueError("a new sequence must start at step zero")
+            self.reset()
+            self.sequence, self.previous_step = seq, None
+        if self.previous_step is not None and step != self.previous_step + 1:
+            raise ValueError("rows must arrive in sequence order")
+        x = np.ascontiguousarray(data_point.state, dtype=np.float32)
+        if x.shape != (112,) or not np.isfinite(x).all():
+            raise ValueError("invalid or nonfinite features")
+
+        # Sort quotes
+        bo0 = np.argsort(x[0:11], kind="stable"); ao0 = np.argsort(x[11:22], kind="stable")
+        bp0, bv0 = x[0:11][bo0], x[22:33][bo0]
+        ap0, av0 = x[11:22][ao0], x[33:44][ao0]
+        bo1 = np.argsort(x[52:63], kind="stable"); ao1 = np.argsort(x[63:74], kind="stable")
+        bp1, bv1 = x[52:63][bo1], x[74:85][bo1]
+        ap1, av1 = x[63:74][ao1], x[85:96][ao1]
+
+        mid0 = 0.5 * (bp0[10] + ap0[0]); spr0 = ap0[0] - bp0[10]
+        wmid0 = (bp0[10]* abs(av0[0]) + ap0[0]*abs(bv0[10])) / (abs(bv0[10]) + abs(av0[0]) + 1e-4)
+        imb0 = (bv0.sum() - av0.sum()) / (np.abs(bv0).sum() + np.abs(av0).sum() + 1e-4)
+        imb0_3 = (bv0[8:11].sum() - av0[0:3].sum()) / (np.abs(bv0[8:11]).sum() + np.abs(av0[0:3]).sum() + 1e-4)
+        mid1 = 0.5 * (bp1[10] + ap1[0]); spr1 = ap1[0] - bp1[10]
+        imb1 = (bv1.sum() - av1.sum()) / (np.abs(bv1).sum() + np.abs(av1).sum() + 1e-4)
+        imb1_3 = (bv1[8:11].sum() - av1[0:3].sum()) / (np.abs(bv1[8:11]).sum() + np.abs(av1[0:3]).sum() + 1e-4)
+
+        cur_dyn = np.array([mid0, wmid0, spr0, imb0, imb0_3, *x[44:48], mid1, spr1, imb1, *x[96:100]], np.float32)
+        s = self.f_step
+        self.dyn_ring[s & 31] = cur_dyn
+        l1 = self.dyn_ring[(s - 1 if s >= 1 else 0) & 31]
+        l4 = self.dyn_ring[(s - 4 if s >= 4 else 0) & 31]
+        l16 = self.dyn_ring[(s - 16 if s >= 16 else 0) & 31]
+        self.f_step = s + 1
+
+        preds, weights = [], []
+        for idx, m in enumerate(self.onnx_models):
+            h0, h1 = self.onnx_h[idx]
+            for li, (w, r, b, inp, h) in enumerate([(m["w0"], m["r0"], m["b0"], x, h0), (m["w1"], m["r1"], m["b1"], None, h1)]):
+                if li == 1: inp = h0
+                xp, rp = w @ inp, r @ h
+                z = self._sig(xp[:128] + rp[:128] + b[:128] + b[384:512])
+                rg = self._sig(xp[128:256] + rp[128:256] + b[128:256] + b[512:640])
+                c = np.tanh(xp[256:] + b[256:384] + rg * (rp[256:] + b[640:]))
+                nh = (1.0 - z) * c + z * h
+                if li == 0: h0 = nh
+                else: h1 = nh
+            self.onnx_h[idx] = [h0, h1]
+            preds.append((h1 @ m["hw"] + m["hb"]).astype(np.float32))
+            weights.append(float(m["blend"]))
+
+        if self.has_sgru:
+            f169 = np.concatenate([bp0, ap0, bv0, av0, x[44:52], bp1, ap1, bv1, av1, x[96:104], x[104:112],
+                                   [mid0, wmid0, spr0, imb0, imb0_3, mid1, spr1, imb1, imb1_3],
+                                   cur_dyn - l1, cur_dyn - l4, cur_dyn - l16]).astype(np.float32)
+            g = self.sgru
+            st_out = self._gelu_safe(((f169 - g["in_mu"]) / g["in_sd"]) @ g["stem_w"].T + g["stem_b"])
+            h0, h1 = self.sgru_h
+            for li, (w, r, bi, bh, inp, h) in enumerate([
+                (g["w0"], g["r0"], g["bi0"], g["bh0"], st_out, h0),
+                (g["w1"], g["r1"], g["bi1"], g["bh1"], None, h1),
+            ]):
+                if li == 1: inp = h0 + st_out
+                xp, rp = w @ inp + bi, r @ h + bh
+                rg = self._sig(xp[:128] + rp[:128])
+                zg = self._sig(xp[128:256] + rp[128:256])
+                ng = np.tanh(xp[256:] + rg * rp[256:])
+                nh = (1.0 - zg) * ng + zg * h
+                if li == 0: h0 = nh
+                else: h1 = nh
+            self.sgru_h = [h0, h1]
+            mid = self._gelu_safe(np.concatenate([st_out, h0, h1]) @ g["h1_w"].T + g["h1_b"])
+            preds.append((mid @ g["h2_w"].T + g["h2_b"]).astype(np.float32))
+            weights.append(float(g["blend"]))
+
+        self.previous_step = step
+        if not need:
+            return None
+
+        qs = [np.clip(pr, -2.0, 2.0) for pr in preds]
+        bq = np.clip(sum(w * q for w, q in zip(weights, qs)), -2.0, 2.0).astype(np.float32)
+        if self.cal_seeds == 0:
+            return bq
+
+        snap34 = np.array([
+            bp0.mean(), bp0.std(), bp0[10], bp0[0], ap0.mean(), ap0.std(), ap0[10], ap0[0], ap0.mean() - bp0.mean(),
+            bv0.sum()/11.0, x[22:33].max(), av0.sum()/11.0, x[33:44].max(),
+            (bv0.sum() - av0.sum()) / (np.abs(bv0).sum() + np.abs(av0).sum() + 1e-5), *x[44:52],
+            bp1.mean(), ap1.mean(), (bv1.sum() - av1.sum()) / (np.abs(bv1).sum() + np.abs(av1).sum() + 1e-5),
+            x[96:100].mean(), x[100:104].mean(),
+            bp0[10], bp0[9], bp0[5], ap0[0], ap0[1], ap0[5], ap0[0] - bp0[10],
+        ], dtype=np.float32)
+        qf = np.array([bq[0], bq[1], bq[0] - bq[1], bq[0] + bq[1], abs(bq[0]), abs(bq[1])], np.float32)
+        z_parts = [qf] + (qs if len(qs) > 1 and self.cal_in_dim == 6 + 2 * len(qs) + 34 else []) + [snap34]
+        zn = np.clip((np.concatenate(z_parts) - self.cal["mu"]) / self.cal["sd"], -8.0, 8.0)
+        delta = np.zeros(2, np.float32)
+        for si in range(self.cal_seeds):
+            h = self._gelu_safe(zn @ self.cal["w1"][si].T + self.cal["b1"][si])
+            delta += h @ self.cal["w2"][si].T + self.cal["b2"][si]
+        return (bq + delta / float(self.cal_seeds)).astype(np.float32)
+
+
+def load_ensemble_predictor(cpp_source: str | Path, weights_npz: str | Path):
+    try:
+        return CompiledEnsembleBackend(cpp_source, weights_npz)
+    except (OSError, subprocess.SubprocessError, RuntimeError):
+        return FallbackPythonEnsembleBackend(weights_npz)

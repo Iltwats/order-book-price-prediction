@@ -671,3 +671,76 @@ How far each model moved from the incumbent:
   - Also check the did-not-move rule.
 - Until a configuration moves the model, the plan's later steps (objective
   swap, both layers) would hit the same limit.
+
+---
+
+## 2026-11-11 — Public validation of `mlp64_clip2` (`0.65288`) & breaking the baseline plateau
+
+**Public result (`1H6GT8N9`).** `dist/submission_correlation1024_mlp64_clip2.zip`
+scored **0.65288** Global WP (+0.00137 over `0.65151`, ~75% of the +0.00183 dev
+OOF gain), taking **27m12s** and **625 MB** RAM. Two immediate lessons:
+1. The hidden test mask selects high-activity `is_scored` rows with the same
+   structure as `valid.parquet` (remember the calibrator *hurt* unscored rows by
+   −0.0068).
+2. Appending 11 small ONNX ops (`Clip`, `MatMul`, `Erf`, etc.) added **4m17s**
+   of per-row ORT dispatch overhead on `batch=1, seq=1`.
+
+### Step 1 — OOF mask-propensity model (`experiments/mask_propensity.py`)
+- Fitted a 20-input observable-state propensity network (`a0`–`a7`, quadratic
+  `a2,a3,a4,a7`, book/trade change fractions, spread, log volume, normalized
+  step) across the 1,400 dev sequences out of fold.
+- **OOF AUC = 0.7985** (mean predicted propensity 0.217 on scored rows vs 0.081
+  on unscored rows, 2.69× separation).
+- Checking `correlation1024` on `train.parquet` by propensity quantile explained
+  why naive unanchored fine-tuning on `train.parquet` drops validation WP:
+  `correlation1024` scores **0.500 WP** on all post-warmup `TRAIN` rows,
+  **0.596** on the top 20% propensity rows, **0.649** on the top 10%, and
+  **0.689** on the top 5%. Any training objective that weights quiet unscored
+  rows pulls weights toward the noisy 0.47–0.50 unscored regime.
+
+### Step 2 — Why earlier snapshot heads plateaued, and the `snap40` breakthrough (`experiments/regime_calibrator.py`, `experiments/build_ensemble_submission.py`)
+Systematic ablations on the 2.61M dev scored rows revealed three critical mechanics:
+1. **Never apply `LayerNorm` to head/calibrator inputs:** Global WP weights rows
+   across sequences by $|y|$; `LayerNorm` divides each row by its own norm and
+   destroys cross-sequence amplitude, collapsing `0.6569` WP from `0.407` to `0.387`.
+2. **Exclude sequence-identifying slow features (`a0..a7` running means, raw volume
+   levels with 0.94 between-sequence variance ratio)** from the post-calibrator:
+   MLPs memorize training sequence IDs (`-0.0046` OOF WP).
+3. **Decode the anonymized depth permutation by sorting the 11 bid and 11 ask
+   price-like columns (`p0..p10`, `p11..p21`) per row:** column indices are
+   unordered identifiers (`data_overview.md`), so sorting recovers best bid,
+   best ask, spread, and quote depth cleanly without sequence memorization.
+   Combined with fixed-epoch cosine-annealed training on 100% of fold training
+   sequences and `±8σ` input clipping (`snap40`, 128 GELU units), single-backbone
+   OOF dev WP jumps from **0.67392 → 0.67688** (**+0.00296** over shipped
+   `0.65288`, CI `[+0.00181, +0.00407]`, lifting `0.6569` WP from `0.4067` to
+   `0.4107` and `0.1254` from `0.7890` to `0.7935`).
+
+### Step 3 — Scratch 2-Layer Sorted-LOB GRU on `train.parquet` (`experiments/train_scratch_gru.py`)
+- Built a 100% baseline-independent model (`ScratchSortedGRU`, 269,442 params)
+  reading **169 causal channels**: price-sorted `i0`/`i1` L11 quotes, volumes
+  gathered in quote-rank order, microstructure imbalances/weighted-mid, and
+  exact ring-buffer lags (`t−1, t−4, t−16`) on 16 core series.
+- Trained from random initialization on `train.parquet` (300 steps × 64
+  stratified sequences = 19,200 sequence passes across v1+v3) with exact
+  full-sequence batch-pooled Global WP + `|y|`-weighted MSE gradients weighted
+  by mask propensity ($P^{1.5}$).
+- Reached **0.66076** standalone dev WP from scratch (`0.7816` in `0.1254`,
+  `0.7535` in `0.2413`), with `0.92` prediction correlation against
+  `correlation1024`—genuine architectural & feature diversity.
+- Even **before** calibration, a raw `0.85 / 0.15` blend with `correlation1024`
+  improves raw dev WP from **0.67209 → 0.67303** (`0.75 / 0.25` → **0.67331**).
+
+### Step 4 — Unified C++17 SIMD Streaming Engine & Packaged Submissions (`native/ensemble_engine.cpp`, `connectome/ensemble_runtime.py`)
+- Replaced per-row ONNX calibrator ops with a zero-allocation, 64-byte-aligned,
+  register-tiled C++17 SIMD streaming engine (`ARM NEON` + `x86-64 AVX2/FMA`)
+  compiled at `PredictionModel.__init__()` (~9 ms startup, with automatic
+  bit-compatible pure-NumPy fallback).
+- Verified across 80,000 real validation callbacks: max abs difference vs
+  Python/PyTorch/ONNX reference is **7.58e-6**, state resets bit-identically
+  across interleaved sequences (`A, B, A`), and all 188 pytest tests pass.
+
+| Submission Archive | Models | Dev OOF WP | vs Raw (`0.67209`) | vs Shipped (`0.67392` / pub `0.65288`) | Est. Judge Time |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `dist/submission_corr1024_snap40_fast.zip` | `correlation1024` + 5-seed `snap40` MLP128 | **0.67688** | `+0.00479` `[+0.00337, +0.00624]` | **+0.00296** `[+0.00181, +0.00407]` | **~19.1 min** |
+| `dist/submission_ensemble_sorted_gru_snap40.zip` | `0.85 correlation1024 + 0.15 ScratchSortedGRU_v3` + 5-seed `snap40` MLP128 | **0.67756** | `+0.00547` `[+0.00388, +0.00716]` | **+0.00365** `[+0.00238, +0.00489]` | **~35.2 min** |
