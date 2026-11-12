@@ -319,11 +319,48 @@ def _export_rnn_weights(weights_dict: dict, prefix: str, state: dict, rnn_prefix
     weights_dict[f"{prefix}blend"] = np.float32(blend)
 
 
+def fit_simplex_blend_weights(qs: list[np.ndarray], y: np.ndarray, train_mask: np.ndarray,
+                              steps: int = 250, lr: float = 0.08) -> list[float]:
+    """Fit non-negative simplex blend weights strictly on `train_mask` via pooled |y|-weighted MSE + Global WP."""
+    n_m = len(qs)
+    if n_m == 1:
+        return [1.0]
+    with torch.enable_grad():
+        q_stack = torch.from_numpy(np.stack([q[train_mask] for q in qs], axis=0))  # [M, N, 2]
+        yt = torch.from_numpy(np.clip(y[train_mask], -2.0, 2.0))
+        wt = yt.abs()
+        wt = wt / wt.sum(dim=0, keepdim=True).clamp_min(1e-8)
+        ym = (wt * yt).sum(dim=0, keepdim=True)
+        yd = yt - ym
+        vy = (wt * yd.square()).sum(dim=0, keepdim=True).clamp_min(1e-12)
+
+        logits = torch.zeros(n_m, dtype=torch.float32, requires_grad=True)
+        opt = torch.optim.Adam([logits], lr=lr)
+        for _ in range(steps):
+            w = torch.softmax(logits, dim=0)
+            b = (w.view(n_m, 1, 1) * q_stack).sum(dim=0)
+            pm = (wt * b).sum(dim=0, keepdim=True)
+            pd = b - pm
+            vp = (wt * pd.square()).sum(dim=0, keepdim=True).clamp_min(1e-12)
+            cov = (wt * yd * pd).sum(dim=0, keepdim=True)
+            rho = (cov / (vy.sqrt() * vp.sqrt())).mean()
+            mse = (wt * (b - yt).square()).sum(dim=0).mean()
+            loss = (1.0 - rho) + 0.35 * mse
+            opt.zero_grad()
+            loss.backward()
+            opt.step()
+    w_np = torch.softmax(logits.detach(), dim=0).numpy()
+    w_round = [round(float(x), 4) for x in w_np]
+    w_round[0] = round(1.0 - sum(w_round[1:]), 4)
+    return w_round
+
+
 def _ensure_dev_predictions(run_dir: Path, dev_groups: list[int], targets: np.ndarray, scored: np.ndarray) -> np.ndarray:
     """Load `dev_predictions.npy`, or generate & cache it automatically if only `final_checkpoint.pt` was copied back from GPU."""
     pred_path = run_dir / "dev_predictions.npy"
     if pred_path.exists():
         return np.load(pred_path, mmap_mode="r")
+    from concurrent.futures import ThreadPoolExecutor
     from experiments.gpu_train_sorted_models import build_model, evaluate_model_gpu
     ckpt = torch.load(run_dir / "final_checkpoint.pt", map_location="cpu", weights_only=False)
     state = ckpt["model_state"]
@@ -332,7 +369,8 @@ def _ensure_dev_predictions(run_dir: Path, dev_groups: list[int], targets: np.nd
     print(f"Generating missing dev_predictions.npy for {run_dir} ({arch}, hidden={hidden})...", flush=True)
     model = build_model(arch, hidden, torch.device("cpu"))
     model.load_state_dict(state)
-    ev = evaluate_model_gpu(model, dev_groups, targets, scored, DEFAULT_VALID, torch.device("cpu"))
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        ev = evaluate_model_gpu(model, dev_groups, targets, scored, DEFAULT_VALID, torch.device("cpu"), executor=ex)
     np.save(pred_path, ev["preds"])
     np.save(run_dir / "dev_statistics.npy", ev["stats"])
     return np.load(pred_path, mmap_mode="r")
@@ -388,14 +426,22 @@ def main():
     n_models = len(all_qs)
     fold = folds(n_seq)
 
-    # Candidate blend weight vectors [w_inc, w_m1, w_m2, ...]
+    # Report standalone raw WP and pairwise correlation for every model before OOF calibration
+    model_names = ["correlation1024"] + [f"sgru:{d.name}" for d in sgru_dirs] + [f"slstm:{d.name}" for d in slstm_dirs]
+    for m_name, q_m in zip(model_names, all_qs):
+        st_m = seq_stats(q_m)
+        by_cm = {str(c): round(global_wp(st_m[classes == c]), 5) for c in np.unique(classes)}
+        corr_inc = float(np.corrcoef(q_inc.ravel(), q_m.ravel())[0, 1])
+        print(f"  [raw] {m_name:28s}: Dev WP={global_wp(st_m):.5f} (corr_vs_inc={corr_inc:.4f}) | {by_cm}", flush=True)
+
+    # Candidate blend weight vectors [w_inc, w_m1, w_m2, ...] + out-of-fold simplex-learned weights!
     if n_models == 1:
         weight_grid = [[1.0]]
     elif n_models == 2:
-        weight_grid = [[1.0, 0.0], [0.85, 0.15], [0.80, 0.20], [0.65, 0.35], [0.50, 0.50]]
+        weight_grid = [[1.0, 0.0], [0.85, 0.15], [0.70, 0.30], [0.55, 0.45], [0.40, 0.60]]
     else:
         weight_grid = [[1.0] + [0.0] * (n_models - 1)]
-        for w_tot in (0.30, 0.45, 0.60, 0.70):
+        for w_tot in (0.35, 0.50, 0.65, 0.75):
             each = w_tot / float(n_models - 1)
             weight_grid.append([round(1.0 - w_tot, 4)] + [round(each, 4)] * (n_models - 1))
 
@@ -404,45 +450,58 @@ def main():
     best_weights = weight_grid[-1]
     best_oof_wp = -1.0
     best_oof_st = None
+    best_is_learned = False
 
-    for wvec in weight_grid:
-        tag = "_".join(f"{w:.2f}" for w in wvec)
-        base_q = np.clip(sum(w * q for w, q in zip(wvec, all_qs)), -2.0, 2.0).astype(np.float32)
-        q_feats = np.column_stack([
-            base_q, base_q[:, 0:1] - base_q[:, 1:2], base_q[:, 0:1] + base_q[:, 1:2], np.abs(base_q)
-        ]).astype(np.float32)
-        use_multi = (n_models > 1 and any(w > 0 for w in wvec[1:]))
-        z_all = np.hstack(([q_feats] + all_qs + [snap34]) if use_multi else [q_feats, snap34]).astype(np.float32)
+    # Also evaluate fold-honest simplex-optimized blend weights when n_models >= 2
+    candidate_arms = [(f"weights_{'_'.join(f'{w:.2f}' for w in wv)}", wv) for wv in weight_grid]
+    if n_models >= 2:
+        candidate_arms.append(("simplex_learned", None))
 
+    for arm_name, fixed_wvec in candidate_arms:
         oof_pred = np.empty_like(p_inc)
+        fold_wvecs = []
         for k in range(5):
             tr_m = fold[seq] != k
             te_m = ~tr_m
+            wvec_k = fit_simplex_blend_weights(all_qs, y, tr_m) if fixed_wvec is None else fixed_wvec
+            fold_wvecs.append(wvec_k)
+            base_q_all = np.clip(sum(w * q for w, q in zip(wvec_k, all_qs)), -2.0, 2.0).astype(np.float32)
+            q_feats = np.column_stack([
+                base_q_all,
+                base_q_all[:, 0:1] - base_q_all[:, 1:2],
+                base_q_all[:, 0:1] + base_q_all[:, 1:2],
+                np.abs(base_q_all),
+            ]).astype(np.float32)
+            use_multi_k = (n_models > 1 and any(w > 0 for w in wvec_k[1:]))
+            z_all = np.hstack(([q_feats] + all_qs + [snap34]) if use_multi_k else [q_feats, snap34]).astype(np.float32)
             params_k = fit_meta_calibrator_ensemble(
-                z_all, base_q, y, tr_m, hidden=128, n_seeds=3, epochs=10, seed_base=500 + 10 * k
+                z_all, base_q_all, y, tr_m, hidden=128, n_seeds=3, epochs=10, seed_base=500 + 10 * k
             )
-            oof_pred[te_m] = apply_meta_calibrator(params_k, z_all[te_m], base_q[te_m])
+            oof_pred[te_m] = apply_meta_calibrator(params_k, z_all[te_m], base_q_all[te_m])
 
+        rep_wvec = fit_simplex_blend_weights(all_qs, y, np.ones(len(y), dtype=bool)) if fixed_wvec is None else fixed_wvec
+        use_multi = (n_models > 1 and any(w > 0 for w in rep_wvec[1:]))
         st = seq_stats(oof_pred)
         wp = global_wp(st)
         vs_raw = paired_bootstrap(st, raw_st)
         vs_ship = paired_bootstrap(st, ship_st)
         by_c = {str(c): round(global_wp(st[classes == c]), 5) for c in np.unique(classes)}
-        oof_results[f"weights_{tag}"] = {
-            "blend_weights": wvec,
+        oof_results[arm_name] = {
+            "blend_weights": rep_wvec,
             "oof_wp": wp,
             "vs_raw": vs_raw,
             "vs_shipped": vs_ship,
             "by_class": by_c,
         }
-        print(f"  weights={wvec}: OOF WP={wp:.5f} | vs_raw={vs_raw['delta']:+.5f} | "
+        print(f"  {arm_name:24s} ({rep_wvec}): OOF WP={wp:.5f} | vs_raw={vs_raw['delta']:+.5f} | "
               f"vs_shipped={vs_ship['delta']:+.5f} [{vs_ship['ci_low']:+.5f}, {vs_ship['ci_high']:+.5f}] | {by_c}", flush=True)
         if (n_models == 1 or use_multi) and wp > best_oof_wp:
             best_oof_wp = wp
-            best_weights = wvec
+            best_weights = rep_wvec
             best_oof_st = st
+            best_is_learned = (fixed_wvec is None)
 
-    print(f"Selected ensemble blend weights: {best_weights} (OOF Dev WP = {best_oof_wp:.5f})", flush=True)
+    print(f"Selected ensemble blend weights: {best_weights} (learned={best_is_learned}, OOF Dev WP = {best_oof_wp:.5f})", flush=True)
 
     base_q_final = np.clip(sum(w * q for w, q in zip(best_weights, all_qs)), -2.0, 2.0).astype(np.float32)
     q_feats_final = np.column_stack([

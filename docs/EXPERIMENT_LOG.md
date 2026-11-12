@@ -755,3 +755,11 @@ Both archives completed cleanly on the live scoring host (`2/5` daily submission
 2. **Exact AMD EPYC 9224 Judge Timing Profile:**
    - Single-backbone C++17 SIMD (`14WQUJIK`): **`20m52s`** (`615 MB` RAM) — **6m20s faster** than the ONNX-calibrated `1H6GT8N9` (`27m12s`) and **2m03s faster** than even the uncalibrated raw ONNX model (`22m55s`), despite running dynamic `sort11` quote sorting + 5-seed `MLP128` calibration on all 39.4M rows!
    - Adding `ScratchSortedGRU_v3` (`22Z98Z0W`): **`41m42s`** (`618 MB` RAM), so one `ScratchSortedGRU128` (`169 → 128 → 128 → 384 → 128 → 2`) costs **`20m50s`** (`31.7 µs/row`) on the judge, leaving **`18m18s`** of safe headroom inside the 60-minute limit (and even more if we gate the 5-seed `snap40` MLP to `step_in_seq >= 99` instead of running on warm-up rows, or fuse `W_ih @ x` / skip `384→128` during warm-up!).
+
+### Step 5 — Cloud GPU Scaling (`0.87s/step` on RTX 4090, In Progress — 2026-11-12)
+- Extended `native/ensemble_engine.cpp` and `connectome/ensemble_runtime.py` to support variable-width `TorchSortedGRU` (`hidden=128..384`), orthogonal `TorchSortedLSTM` (`[i, f, g, o]` cell-state highway), multiple specialist slots, and warm-up readout skipping (`!need_prediction`).
+- Built `experiments/gpu_train_sorted_models.py`, `cloud/run_gpu_suite.sh`, and `experiments/bundle_cloud_gpu.py` (`dist/cloud_gpu_sorted_lob_bundle.tar.gz`) to train 3 orthogonal arms on an RTX 4090 (`28` Xeon vCPUs, `62 GiB` RAM):
+  1. `sgru_h160_10ep`: `ScratchSortedGRU` (`hidden=160`, `1,600` steps × `B=64` = `102,400` seqs ≈ `9.65` epochs, Polyak EMA `0.995`).
+  2. `slstm_h160_10ep`: `ScratchSortedLSTM` (`hidden=160`, `1,600` steps × `B=64` ≈ `9.65` epochs, Polyak EMA `0.995`).
+  3. `sgru_largetick_h128`: Dedicated `0.6569 + 0.4685` Large-Tick Specialist GRU (`1,000` steps × `B=64` strictly on the `8,044` large-tick `TRAIN` sequences).
+- Moving `MaskPropensityScorer` onto CUDA (`TorchMaskPropensityScorer`), caching `pq.ParquetFile(..., pre_buffer=False)` per worker via `threading.local()`, and preallocating `[64, 20000, 112]` buffers reduced batch step time from **`18.0s/step → 0.87s/step`** (**20× speedup**, ~66 minutes total for all 3 arms / 4,200 steps).

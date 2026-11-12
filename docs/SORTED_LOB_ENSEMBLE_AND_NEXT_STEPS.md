@@ -143,16 +143,19 @@ export PATH="/opt/conda/bin:$PATH"
 /opt/conda/bin/python -m pip install --no-cache-dir "numpy<2" "scipy<1.14" pyarrow onnx onnxruntime
 /opt/conda/bin/python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"
 
-# (c) Force the suite to use /opt/conda/bin/python (run_gpu_suite.sh now does this automatically):
-sed -i 's/^python /\/opt\/conda\/bin\/python /g' cloud/run_gpu_suite.sh
-
-# (d) Deterministic CuBLAS workspace (required: seed_everything enables deterministic algorithms):
-export CUBLAS_WORKSPACE_CONFIG=:4096:8
-
-# (e) Launch all 3 arms (28 vCPUs → --workers 12):
+# (c) Launch all 3 arms (`run_gpu_suite.sh` auto-selects `/opt/conda/bin/python` and sets `CUBLAS_WORKSPACE_CONFIG=:4096:8`):
 DATA_DIR=/workspace/data RUNS_DIR=/workspace/runs WORKERS=12 bash cloud/run_gpu_suite.sh 2>&1 | tee /workspace/runs/suite.log
 ```
-Detach with `Ctrl+B` then `D`; reattach with `tmux attach -t train`. Checkpoints save every 50 steps, so the run is safe to leave. Expected total: **~1.5–2.5 hours** for all 3 arms.
+Detach with `Ctrl+B` then `D`; reattach with `tmux attach -t train`. Checkpoints save every 50 steps, so the run is safe to leave.
+
+**Measured RTX 4090 Throughput (`0.87s/step` at `B=64`, 20× Speedup):**
+- Initial CPU-propensity + per-row-group `pq.ParquetFile` opening ran at **`18.0s/step`** (GPU sat idle 17s out of every 18s waiting on GIL-bound NumPy `MaskPropensityScorer` + 64× Parquet footer parses).
+- Moving `MaskPropensityScorer` onto CUDA (`TorchMaskPropensityScorer`, ~2 ms/batch), caching `pq.ParquetFile(..., pre_buffer=False)` per worker via `threading.local()`, and filling preallocated `[64, 20000, 112]` buffers dropped step time to **`0.87s/step`** (`1.47M rows/sec` full forward + exact FP64 Global WP + TBPTT backward!).
+- **Total wall time for all 3 arms (`4,200` steps):** **~65–70 minutes** (~24 min for `sgru_h160_10ep`, ~26 min for `slstm_h160_10ep`, ~16 min for `sgru_largetick_h128`).
+- Monitor live validation milestones anytime via:
+  ```sh
+  grep -E "Step|Screen WP|DONE|Arm |complete" /workspace/runs/suite.log | tail -20
+  ```
 
 **4. Pull checkpoints back to your Mac** (before destroying the instance):
 ```sh
@@ -164,12 +167,15 @@ rsync -avP -e "ssh -p <PORT>" \
   root@<HOST_IP>:/workspace/runs/ artifacts/gpu_runs/
 ```
 
-**Troubleshooting (all hit on 2026-11-12):**
-| Symptom | Cause | Fix |
+**Engineering Fixes & Troubleshooting Log (all verified on RTX 4090, 2026-11-12):**
+| Issue Encountered | Root Cause | Permanent Fix Baked Into Repo |
 | --- | --- | --- |
-| `ModuleNotFoundError: No module named 'torch'` | A `(venv)` in `/workspace/connectome-gpu/venv` shadows `/opt/conda` | `deactivate` + `export PATH="/opt/conda/bin:$PATH"` |
-| `RuntimeError: Numpy is not available` / `Failed to initialize NumPy` | `scipy` pulled `numpy 2.2.6`; torch 2.2.1 needs `numpy<2` | `pip install "numpy<2" "scipy<1.14"` |
-| `Deterministic behavior was enabled ... CUBLAS_WORKSPACE_CONFIG` | `seed_everything` sets deterministic algorithms | `export CUBLAS_WORKSPACE_CONFIG=:4096:8` (now baked into `run_gpu_suite.sh` + `Dockerfile.scratch`) |
+| `ModuleNotFoundError: No module named 'torch'` | Stray `(venv)` without `--system-site-packages` shadowed `/opt/conda` | `run_gpu_suite.sh` auto-detects `/opt/conda/bin/python` (override via `PYTHON_BIN`) |
+| `RuntimeError: Numpy is not available` / `_ARRAY_API not found` | `pip install scipy` upgraded NumPy to `2.2.6` against NumPy-1.x-compiled `torch 2.2.1` | Pin `"numpy<2" "scipy<1.14"` when installing into PyTorch 2.2 environments |
+| `Deterministic behavior was enabled ... CUBLAS_WORKSPACE_CONFIG` | `seed_everything` forced strict deterministic CUDA atomics without workspace env | `os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")` before `import torch` + opt-in `--deterministic` (`cudnn.benchmark=True` by default) |
+| `18s/step` (`0%` GPU util between 1s spikes) | 64× `pq.ParquetFile()` footer parses + GIL-bound CPU NumPy `MaskPropensityScorer` | Batched CUDA `TorchMaskPropensityScorer` + zero-copy preallocated `[B, 20000, 112]` buffers → **`0.87s/step` (20× faster)** |
+| `pyarrow.lib.ArrowInvalid: ReadRangeCache did not find matching cache entry` | Sharing a single `pq.ParquetFile` (`pre_buffer=True`) across 12 concurrent threads | Thread-local `threading.local()` cache with `pq.ParquetFile(path, pre_buffer=False)` |
+| Cross-device deserialization & tie-breaking safety | CUDA tensors in `best_state` / unstable CUDA `torch.sort` on ties | Explicit `.detach().cpu()` on all saved checkpoints, `final_checkpoint.pt` saved prior to 1,400-seq `dev` eval, and `torch.sort(..., stable=True)` matching C++ `sort11` |
 
 `cloud/run_gpu_suite.sh` executes all 3 orthogonal arms with Polyak EMA (`0.995`), atomic checkpointing every 50 steps, and clean `SIGTERM`/`SIGINT` Spot/Pod preemption resume (`--resume`):
 1. **`sgru_h160_10ep`**: Full-convergence `ScratchSortedGRU` (`hidden=160`, `1,600` steps × `B=64` = `102,400` sequences ≈ **9.65 epochs**).
