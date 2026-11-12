@@ -1,0 +1,56 @@
+{
+  "archive": "dist/submission_gpu_3model_gru160_lstm160_snap40.zip",
+  "size_bytes": 2950441,
+  "sha256": "d21dccbffba658b9abb4ac970eee8505ac2f2347ad842705f2dbdafa17f8185a",
+  "files": {
+    "MODEL.md": "254b4e3749ec04004e6dda592c269124eb83cd15e836c7e0d0a91d1ea81b7a2a",
+    "connectome/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "connectome/ensemble_runtime.py": "69bd42099e9c7d6a1cefb793640a85ed7de08c504c572a93b7d6387048314e84",
+    "ensemble_engine.cpp": "1ce4d215ae720e35241a8dfb4df7ac618c4d2f9fab4ae26bcbde64c1e0a39038",
+    "ensemble_weights.npz": "e7ca60ffbdcbd4adbd49ef2ea212b2a2cb173b3dfb34ee7eb72f3c35b560de73",
+    "solution.py": "27392bc8a0cc621a98047343de33aed70b0071a8fe383755bf029cf03498d381"
+  },
+  "isolated_verification": {
+    "passed": true,
+    "init_compile_and_load_ms": 14.4,
+    "us_per_callback": 54.14,
+    "estimated_judge_minutes": 49.7,
+    "sample_pred_step99": [
+      0.695268988609314,
+      -0.07152215391397476
+    ]
+  },
+  "parity_max_abs_error_80k_rows": 0.0003093741834163666,
+  "selected_blend_weights": [
+    0.2137,
+    0.4331,
+    0.3532
+  ],
+  "oof_results": {
+    "simplex_learned": {
+      "blend_weights": [
+        0.2137,
+        0.4331,
+        0.3532
+      ],
+      "oof_wp": 0.6806154978225869,
+      "vs_raw": {
+        "delta": 0.008523541566379134,
+        "ci_low": 0.006502725661706374,
+        "ci_high": 0.010745076994001495
+      },
+      "vs_shipped": {
+        "delta": 0.0066971895483385335,
+        "ci_low": 0.004927778707065814,
+        "ci_high": 0.008446174657893109
+      },
+      "by_class": {
+        "0.1254": 0.7988,
+        "0.2413": 0.77266,
+        "0.4685": 0.7262,
+        "0.6569": 0.41446
+      }
+    }
+  },
+  "elapsed_seconds": 381.8
+}

@@ -1,0 +1,54 @@
+{
+  "archive": "dist/submission_gpu_2model_gru160_snap40.zip",
+  "size_bytes": 2032006,
+  "sha256": "0b69caebf98ca0faba012f25d7178abc43d32190e51335af9537a08182cb0b48",
+  "files": {
+    "MODEL.md": "1c02b00a4e560f79e9875147d699e4cb9da7c60206fc29c306f2e27a33049848",
+    "connectome/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "connectome/ensemble_runtime.py": "69bd42099e9c7d6a1cefb793640a85ed7de08c504c572a93b7d6387048314e84",
+    "ensemble_engine.cpp": "1ce4d215ae720e35241a8dfb4df7ac618c4d2f9fab4ae26bcbde64c1e0a39038",
+    "ensemble_weights.npz": "05f3e679856213091bfe6c84cf1e288bf37f353ddf7d164872b57011652d8b96",
+    "solution.py": "27392bc8a0cc621a98047343de33aed70b0071a8fe383755bf029cf03498d381"
+  },
+  "isolated_verification": {
+    "passed": true,
+    "init_compile_and_load_ms": 9.3,
+    "us_per_callback": 32.32,
+    "estimated_judge_minutes": 29.7,
+    "sample_pred_step99": [
+      0.6625155806541443,
+      -0.12326566874980927
+    ]
+  },
+  "parity_max_abs_error_80k_rows": 0.0003148764371871948,
+  "selected_blend_weights": [
+    0.2663,
+    0.7337
+  ],
+  "oof_results": {
+    "simplex_learned": {
+      "blend_weights": [
+        0.2663,
+        0.7337
+      ],
+      "oof_wp": 0.6802269310182292,
+      "vs_raw": {
+        "delta": 0.008134974762021407,
+        "ci_low": 0.006119725430529363,
+        "ci_high": 0.010404939129519754
+      },
+      "vs_shipped": {
+        "delta": 0.006308622743980807,
+        "ci_low": 0.00456529295769989,
+        "ci_high": 0.008038984982223513
+      },
+      "by_class": {
+        "0.1254": 0.79853,
+        "0.2413": 0.77159,
+        "0.4685": 0.72551,
+        "0.6569": 0.41413
+      }
+    }
+  },
+  "elapsed_seconds": 402.7
+}

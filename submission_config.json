@@ -1,0 +1,5 @@
+{
+  "backend": "ensemble",
+  "cpp_source": "native/ensemble_engine.cpp",
+  "weights": "models/gpu_3model_gru160_lstm160_snap40/ensemble_weights.npz"
+}
