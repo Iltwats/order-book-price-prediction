@@ -770,10 +770,17 @@ Raw uncalibrated blending of `[0.25 correlation1024 + 0.40 sgru_h160_10ep + 0.35
 - Branchless Cody-Waite minimax `fast_expf` / `fast_tanh` / `exact_gelu` (`≤1.2e-7` max gate error);
 - Compile-time `<160>` / `<128>` template specialization + zero-copy `predict()` fast path.
 
-| Packaged Archive | Blend Weights `[corr1024, sgru160, slstm160]` | Dev OOF WP | vs `0.65533` Ens (`0.67756`) [95% CI] | vs `0.65288` Shipped [95% CI] | Est. EPYC Judge Time / Size |
-| --- | --- | ---: | --- | --- | ---: |
-| `dist/submission_gpu_3model_gru160_lstm160_snap40.zip` | `[0.2137, 0.4331, 0.3532]` (~79% scratch!) | **`0.68062`** | **`+0.00305`** `[+0.00196, +0.00413]` | **`+0.00670`** `[+0.00493, +0.00845]` | **~48–50 min** / `2.95 MB` |
-| `dist/submission_gpu_2model_gru160_snap40.zip` | `[0.2663, 0.7337]` (~73% scratch!) | **`0.68023`** | **`+0.00266`** `[+0.00161, +0.00372]` | **`+0.00631`** `[+0.00457, +0.00804]` | **~28–30 min** / `2.03 MB` |
+| Packaged Archive | Blend Weights `[corr1024, sgru160, slstm160]` | Dev OOF WP | vs `0.65533` Ens (`0.67756`) [95% CI] | Live Public WP | Live Judge Runtime / RAM |
+| --- | --- | ---: | --- | ---: | ---: |
+| `dist/submission_gpu_3model_gru160_lstm160_snap40.zip` (`22GU0AJ2`) | `[0.2137, 0.4331, 0.3532]` (~79% scratch!) | **`0.68062`** | **`+0.00305`** `[+0.00196, +0.00413]` | **`0.65694`** (`+0.00543` vs `0.65151`) | **`51m27s`** / `656 MB` |
+| `dist/submission_gpu_2model_gru160_snap40.zip` (`2QU7CNP2`) | `[0.2663, 0.7337]` (~73% scratch!) | **`0.68023`** | **`+0.00266`** `[+0.00161, +0.00372]` | **`0.65662`** (`+0.00511` vs `0.65151`) | **`33m51s`** / `664 MB` |
+
+**Live Public Leaderboard Confirmation (2026-11-12 00:32 UTC, `4/5` daily submissions used):**
+- Both GPU archives passed offline checks and scored cleanly well inside the 60-minute budget:
+  - `2QU7CNP2` (`2-model`, `32.32 µs/row` local → **`33m51s`** on EPYC, `51.55 µs/row`, `1.047 min` per local `µs/row`) scored **`0.65662`** (`+0.00129` over `0.65533`). Note: despite widening `ScratchSortedGRU` from `hidden=128 → 160` (+49% more FLOPs), our FP16-panel AVX2/F16C kernel ran **`7m51s` faster** than the earlier FP32 `hidden=128` 2-model submission (`41m42s` → `33m51s`)!
+  - `22GU0AJ2` (`3-model`, `54.14 µs/row` local → **`51m27s`** on EPYC, `78.35 µs/row`, `0.950 min` per local `µs/row`) scored **`0.65694`** (`+0.00161` over `0.65533`, **`+0.00543`** total gain over `0.65151`).
+  - Adding `slstm_h160_10ep` gained `+0.00039` on Dev OOF and **`+0.00032` on Live Public (`82.1%` transfer!)**.
+  - Overall transfer from single-backbone `snap40` (`0.65456` / `0.67688` OOF) to 3-model GPU (`0.65694` / `0.68062` OOF) is `+0.00238` Public / `+0.00374` Dev OOF (**`63.6%` slope**, with Public Test exhibiting a ~2× heavier `0.6569` large-tick weight than `dev`, directly confirming why improving `0.6569` + cross-sequence scale is the highest-leverage path to `0.663–0.670+`).
 
 ### Step 5 — Cloud GPU Scaling (`0.87s/step` on RTX 4090, In Progress — 2026-11-12)
 - Extended `native/ensemble_engine.cpp` and `connectome/ensemble_runtime.py` to support variable-width `TorchSortedGRU` (`hidden=128..384`), orthogonal `TorchSortedLSTM` (`[i, f, g, o]` cell-state highway), multiple specialist slots, and warm-up readout skipping (`!need_prediction`).

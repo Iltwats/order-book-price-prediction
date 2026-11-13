@@ -11,14 +11,16 @@ test set; the private leaderboard uses a separate dataset.
 
 | | Global WP |
 | --- | ---: |
-| Our best public: `submission_ensemble_sorted_gru_snap40.zip` (`22Z98Z0W`) | **0.65533** |
-| Single-backbone `snap40` public: `submission_corr1024_snap40_fast.zip` (`14WQUJIK`) | 0.65456 |
-| Prior ONNX-calibrated public: `submission_correlation1024_mlp64_clip2.zip` (`1H6GT8N9`) | 0.65288 |
+| **Our best public:** `submission_gpu_3model_gru160_lstm160_snap40.zip` (`22GU0AJ2`, `51m27s`, `656 MB`) | **0.65694** |
+| GPU 2-model public: `submission_gpu_2model_gru160_snap40.zip` (`2QU7CNP2`, `33m51s`, `664 MB`) | 0.65662 |
+| CPU 2-model public: `submission_ensemble_sorted_gru_snap40.zip` (`22Z98Z0W`, `41m42s`, `618 MB`) | 0.65533 |
+| Single-backbone `snap40` public: `submission_corr1024_snap40_fast.zip` (`14WQUJIK`, `20m52s`, `615 MB`) | 0.65456 |
+| Prior ONNX-calibrated public: `submission_correlation1024_mlp64_clip2.zip` (`1H6GT8N9`, `27m12s`, `625 MB`) | 0.65288 |
 | Previous public: `submission_correlation1024.zip` (rank 635) | 0.65151 |
 | Public rank 300 / 100 / 50 | 0.6572 / 0.6628 / 0.6653 |
 | Public rank ~8 (last paid place) / rank 1 | ~0.670 / 0.6739 |
 | `correlation1024` raw, our 1,400-sequence development split | 0.67209 |
-| `submission_ensemble_sorted_gru_snap40.zip` OOF, 1,400-sequence dev split | **0.67756** |
+| `submission_gpu_3model_gru160_lstm160_snap40.zip` OOF, 1,400-sequence dev split | **0.68062** |
 
 Development scores run about 0.02 above public scores, so compare
 improvements, not levels. Each +0.001 currently moves dozens of places. Full
@@ -109,7 +111,8 @@ Every experiment run, with commands, numbers and decisions, is recorded in
 | Train new GRUs from scratch on all 10,607 train sequences with pooled \|y\|-weighted MSE + Global WP + mask-propensity & class-mix weighting | Done ([log](docs/EXPERIMENT_LOG.md)): `ScratchSortedGRU` (169 price-sorted L11 depth, aligned volume & multi-lag order-flow features) reaches **0.66076** standalone dev WP from random init and lifts raw blend with `correlation1024` from **0.67209 → 0.67331** |
 | Check our assumptions against the official data overview: tick classes, class mix, mask, feature representation | Done ([log](docs/EXPERIMENT_LOG.md)): loss and calibration are sound; training ignores the class mix and the mask |
 | Frozen-state head probe: does the GRU state lack current book/trade information? Heads on the frozen state or the two outputs, with and without current `i0` price/trade features | Done ([log](docs/EXPERIMENT_LOG.md)): a head alone adds nothing; current `i0` features add about +0.0025 over raw and +0.0007 over the shipped calibrator, not through the large-tick class |
-| Price-sorted LOB snapshot calibrator (`snap40`, no `LayerNorm`) + C++17 SIMD ensemble runtime | Done ([log](docs/EXPERIMENT_LOG.md)): single-backbone reaches **0.67688** OOF dev WP and **0.65456** public (`14WQUJIK`, **20m52s**, 615 MB); 2-model diverse ensemble reaches **0.67756** OOF dev WP and **0.65533** public (`22Z98Z0W`, **+0.00245** over `0.65288` and **+0.00382** over `0.65151`, **41m42s**, 618 MB) |
+| Price-sorted LOB snapshot calibrator (`snap40`, no `LayerNorm`) + C++17 SIMD ensemble runtime | Done ([log](docs/EXPERIMENT_LOG.md)): single-backbone reaches **0.67688** OOF dev WP and **0.65456** public (`14WQUJIK`, **20m52s**, 615 MB); 2-model CPU ensemble reaches **0.67756** OOF dev WP and **0.65533** public (`22Z98Z0W`, **41m42s**, 618 MB) |
+| Cloud GPU 10-epoch `ScratchSortedGRU-160` + `ScratchSortedLSTM-160` + FP16-panel C++17 SIMD engine | Done ([log](docs/EXPERIMENT_LOG.md)): both scratch models beat `correlation1024` standalone (`0.67499` & `0.67437` raw dev WP); 2-model GPU ensemble reaches **0.68023** OOF / **0.65662** public (`2QU7CNP2`, **33m51s**, 664 MB) and 3-model GPU ensemble reaches **0.68062** OOF / **0.65694** public (`22GU0AJ2`, **+0.00543** over `0.65151`, **51m27s**, 656 MB) |
 
 The FAQ warns against overfitting the visible validation mask, and the private
 test uses different data, so judge changes on held-out sequences, not only on

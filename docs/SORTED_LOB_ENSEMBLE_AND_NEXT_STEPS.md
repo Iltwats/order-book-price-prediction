@@ -39,8 +39,8 @@ Before this sprint, every model evaluated in the repository was a small perturba
 
 | Archive | Submission ID | Size | Dev OOF WP | Live Public WP | Public Delta vs `0.65151` / `0.65288` | Live Judge Time / RAM |
 | --- | --- | ---: | ---: | ---: | --- | ---: |
-| `dist/submission_gpu_3model_gru160_lstm160_snap40.zip` | *Ready* | 2.95 MB | **`0.68062`** | *Pending* | OOF **`+0.00305`** `[+0.00196, +0.00413]` vs `0.65533` (`+0.00670` vs `0.65288`) | **~48–50m** est. |
-| `dist/submission_gpu_2model_gru160_snap40.zip` | *Ready* | 2.03 MB | **`0.68023`** | *Pending* | OOF **`+0.00266`** `[+0.00161, +0.00372]` vs `0.65533` (`+0.00631` vs `0.65288`) | **~28–30m** est. |
+| `dist/submission_gpu_3model_gru160_lstm160_snap40.zip` | `22GU0AJ2` | 2.95 MB | **`0.68062`** | **`0.65694`** | **`+0.00543` / `+0.00406`** | **`51m27s`** / `656 MB` |
+| `dist/submission_gpu_2model_gru160_snap40.zip` | `2QU7CNP2` | 2.03 MB | **`0.68023`** | **`0.65662`** | **`+0.00511` / `+0.00374`** | **`33m51s`** / `664 MB` |
 | `dist/submission_ensemble_sorted_gru_snap40.zip` | `22Z98Z0W` | 1.84 MB | **`0.67756`** | **`0.65533`** | **`+0.00382` / `+0.00245`** | **`41m42s`** / `618 MB` |
 | `dist/submission_corr1024_snap40_fast.zip` | `14WQUJIK` | 0.83 MB | **`0.67688`** | **`0.65456`** | **`+0.00305` / `+0.00168`** | **`20m52s`** / `615 MB` |
 
