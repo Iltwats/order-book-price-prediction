@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software, models, or ideas in your research or projects, please cite and credit the author as below."
+title: "Alpha Connectome: Sorted-LOB Recurrent Ensemble & C++17 SIMD Inference Engine"
+authors:
+  - family-names: Sharma
+    given-names: Atul
+repository-code: "https://github.com/Iltwats/wunder-lob"
+license: MIT
+date-released: "2026-11-21"
+keywords:
+  - limit-order-book
+  - quantitative-finance
+  - recurrent-neural-networks
+  - simd
+  - onnx

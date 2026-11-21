@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --extra-index-url https://download.pytorch.org/whl/cpu \
+            numpy==2.2.6 onnxruntime==1.23.2 pyarrow==19.0.1 \
+            torch==2.5.1 onnx==1.17.0 pytest==8.3.5
+
+      - name: Run unit, C++17 SIMD parity, and isolated packaging tests
+        run: pytest tests native/test_model_io.py -q

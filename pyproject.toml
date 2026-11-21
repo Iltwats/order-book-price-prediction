@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wunder-lob-connectome"
+version = "1.0.0"
+description = "Sorted-LOB Recurrent Ensemble and C++17 SIMD streaming inference engine for the Alpha Connectome ML competition"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Atul Sharma" },
+]
+keywords = ["limit-order-book", "quantitative-finance", "gru", "lstm", "simd", "onnx"]
+dependencies = [
+  "numpy>=1.26,<3",
+  "onnxruntime>=1.18",
+  "pyarrow>=15.0",
+]
+
+[project.optional-dependencies]
+train = [
+  "torch>=2.2",
+  "onnx>=1.16",
+]
+dev = [
+  "pytest>=8.0",
+]
+
+[tool.setuptools]
+py-modules = ["solution", "utils"]
+
+[tool.setuptools.packages.find]
+include = ["connectome*", "experiments*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "native/test_model_io.py"]
+addopts = "-q"
